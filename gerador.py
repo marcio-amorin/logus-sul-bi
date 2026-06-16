@@ -133,11 +133,12 @@ def _d_stat(label, val, cor, tab=''):
 
 def _d_row(t):
     fc,_ = _dc(t['dias'])
-    tc = '#ef4444' if t['tipo']=='Incidente' else '#3b82f6' if t['tipo']=='Requisição' else '#a78bfa'
-    ec = {'Novo':'#22c55e','Em andamento':'#3b82f6','Aguardando':'#d97706'}.get(t['status'],'#6b7280')
+    tipo = t['tipo'] or '—'
+    tc = '#ef4444' if t['tipo']=='Incidente' else '#3b82f6' if t['tipo']=='Requisição' else '#6b7280'
+    ec = {'Novo':'#22c55e','Em andamento':'#3b82f6','Aguardando':'#d97706','Resolvido':'#22c55e','Fechado':'#22c55e'}.get(t['status'],'#6b7280')
     return (f'<tr style="border-bottom:1px solid #111">'
             f'<td style="color:#f97316;font-weight:900;padding:9px 12px;white-space:nowrap">#{t["code"]}</td>'
-            f'<td style="padding:9px 12px"><span style="background:{tc}22;color:{tc};border-radius:4px;padding:3px 8px;font-size:10px;font-weight:900">{t["tipo"].upper()}</span></td>'
+            f'<td style="padding:9px 12px"><span style="background:{tc}22;color:{tc};border-radius:4px;padding:3px 8px;font-size:10px;font-weight:900">{tipo.upper()}</span></td>'
             f'<td style="color:#e2e8f0;padding:9px 12px;font-size:13px">{t["assunto"]}</td>'
             f'<td style="padding:9px 12px"><span style="background:{ec}22;color:{ec};border-radius:4px;padding:3px 8px;font-size:10px;font-weight:900">{t["status"].upper()}</span></td>'
             f'<td style="color:#94a3b8;padding:9px 12px;font-size:12px;white-space:nowrap">{t["atrib"]}</td>'
@@ -311,30 +312,36 @@ def gerar_html(all_tks, baixados_hoje=None):
 
     hoje_cards=''.join(_tk(t) for t in sorted([t for t in sul if t['data']==today_str],key=lambda x:x['empresa']))
 
+    # hoje sempre aparece primeiro no seletor, mesmo sem dados
+    datas_show = [today_str] + [d for d in datas_res if d != today_str]
+
     # seletor de datas para baixados
     date_opts=''
-    for i,dt in enumerate(datas_res):
+    for dt in datas_show:
         safe=dt.replace('/','_')
-        lbl=f'{dt}  ✅ hoje' if dt==today_str else dt
-        sel='selected' if i==0 else ''
+        cnt=len(by_res.get(dt,[]))
+        lbl=f'{dt} — {cnt} resolvidos  ✅ HOJE' if dt==today_str else f'{dt} — {cnt} resolvidos'
+        sel='selected' if dt==today_str else ''
         date_opts+=f'<option value="{safe}" {sel}>{lbl}</option>'
+
+    vazio='<div style="color:#374151;text-align:center;padding:24px;font-size:13px">Nenhum chamado resolvido neste dia.</div>'
 
     # seções mobile (cards) por data
     mob_bx=''
-    for i,dt in enumerate(datas_res):
+    for dt in datas_show:
         safe=dt.replace('/','_')
-        tks=sorted(by_res[dt],key=lambda x:x.get('empresa',''))
-        show='block' if i==0 else 'none'
+        tks=sorted(by_res.get(dt,[]),key=lambda x:x.get('empresa',''))
+        show='block' if dt==today_str else 'none'
         mob_bx+=f'<div id="mbx-{safe}" class="bx-s" style="display:{show}">'+\
-                ''.join(_tk(t) for t in tks)+'</div>'
+                (''.join(_tk(t) for t in tks) if tks else vazio)+'</div>'
 
     # seções desktop (tabelas) por data
     dt_bx=''
-    for i,dt in enumerate(datas_res):
+    for dt in datas_show:
         safe=dt.replace('/','_')
-        tks=sorted(by_res[dt],key=lambda x:x.get('empresa',''))
-        show='block' if i==0 else 'none'
-        rows=''.join(_d_row(t) for t in tks)
+        tks=sorted(by_res.get(dt,[]),key=lambda x:x.get('empresa',''))
+        show='block' if dt==today_str else 'none'
+        rows=''.join(_d_row(t) for t in tks) if tks else f'<tr><td colspan="7">{vazio}</td></tr>'
         dt_bx+=(f'<div id="dbx-{safe}" class="bx-s" style="display:{show}">'
                 f'<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">'
                 f'{_d_tbl_hdr()}<tbody>{rows}</tbody></table></div></div>')
