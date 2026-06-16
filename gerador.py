@@ -230,6 +230,13 @@ def gerar_html(all_tks, baixados_hoje=None):
     # filtra baixados para conter apenas clientes da base Sul
     baixados_hoje = [t for t in baixados_hoje if t['empresa'] in sul_emp]
 
+    # agrupa por data de resolução
+    by_res = defaultdict(list)
+    for t in baixados_hoje:
+        if t['resolucao']:
+            by_res[t['resolucao']].append(t)
+    datas_res = sorted(by_res.keys(), reverse=True)
+
     sul = [t for t in all_tks if t['empresa'] in sul_emp]
     by_cli  = defaultdict(list)
     by_resp = defaultdict(list)
@@ -248,7 +255,7 @@ def gerar_html(all_tks, baixados_hoje=None):
     n_and=sum(1 for t in sul if t['status']=='Em andamento')
     n_req=sum(1 for t in sul if t['tipo']=='Requisição')
     n_duv=sum(1 for t in sul if t['tipo'] not in ('Incidente','Requisição'))
-    n_resol=len(baixados_hoje); n_hoje=sum(1 for t in sul if t['data']==today_str)
+    n_resol=len(by_res.get(today_str,[])); n_hoje=sum(1 for t in sul if t['data']==today_str)
 
     tk_lkp = {t['code']:t for t in all_tks}
     def _sec(codes): return [t for t in sul if t['code'] in codes]
@@ -300,7 +307,34 @@ def gerar_html(all_tks, baixados_hoje=None):
                     +''.join(_ccard(b) for b in grp))
 
     hoje_cards=''.join(_tk(t) for t in sorted([t for t in sul if t['data']==today_str],key=lambda x:x['empresa']))
-    bx_cards=''.join(_tk(t) for t in sorted(baixados_hoje,key=lambda x:x.get('empresa','')))
+
+    # seletor de datas para baixados
+    date_opts=''
+    for i,dt in enumerate(datas_res):
+        safe=dt.replace('/','_')
+        lbl=f'{dt}  ✅ hoje' if dt==today_str else dt
+        sel='selected' if i==0 else ''
+        date_opts+=f'<option value="{safe}" {sel}>{lbl}</option>'
+
+    # seções mobile (cards) por data
+    mob_bx=''
+    for i,dt in enumerate(datas_res):
+        safe=dt.replace('/','_')
+        tks=sorted(by_res[dt],key=lambda x:x.get('empresa',''))
+        show='block' if i==0 else 'none'
+        mob_bx+=f'<div id="mbx-{safe}" class="bx-s" style="display:{show}">'+\
+                ''.join(_tk(t) for t in tks)+'</div>'
+
+    # seções desktop (tabelas) por data
+    dt_bx=''
+    for i,dt in enumerate(datas_res):
+        safe=dt.replace('/','_')
+        tks=sorted(by_res[dt],key=lambda x:x.get('empresa',''))
+        show='block' if i==0 else 'none'
+        rows=''.join(_d_row(t) for t in tks)
+        dt_bx+=(f'<div id="dbx-{safe}" class="bx-s" style="display:{show}">'
+                f'<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">'
+                f'{_d_tbl_hdr()}<tbody>{rows}</tbody></table></div></div>')
 
     mob_res=(
         f'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px">'
@@ -318,7 +352,9 @@ def gerar_html(all_tks, baixados_hoje=None):
         +_bar('Incidente',tot_inc,tot,'#ef4444')+_bar('Requisição',n_req,tot,'#3b82f6')+_bar('Dúvida/Outros',n_duv,tot,'#a78bfa')
         +f'</div>'
         +(f'<div style="color:#22c55e;font-size:12px;font-weight:700;letter-spacing:1px;padding:4px 0 8px">📥 ENTRARAM HOJE</div>'+hoje_cards if n_hoje else '')
-        +(f'<div style="color:#22c55e;font-size:12px;font-weight:700;letter-spacing:1px;padding:4px 0 8px">📤 RESOLVIDOS HOJE</div>'+bx_cards if n_resol else '')
+        +(f'<div style="color:#22c55e;font-size:12px;font-weight:700;letter-spacing:1px;padding:8px 0 6px">📤 RESOLVIDOS</div>'
+          f'<select onchange="filtrarRes(\'mbx\',this.value)" style="width:100%;background:#161616;color:#e5e7eb;border:1px solid #333;border-radius:6px;padding:8px 10px;font-size:13px;margin-bottom:10px">{date_opts}</select>'
+          +mob_bx if datas_res else '')
     )
 
     # ── desktop HTML vars ─────────────────────────────────────────────────────
@@ -384,10 +420,10 @@ def gerar_html(all_tks, baixados_hoje=None):
           +f'<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">{_d_tbl_hdr()}<tbody>'
           +''.join(_d_row(t) for t in sorted([t for t in sul if t['data']==today_str],key=lambda x:x['empresa']))
           +f'</tbody></table></div>' if n_hoje else '')
-        +(f'<div style="color:#22c55e;font-size:12px;font-weight:700;letter-spacing:1px;margin:20px 0 10px">📤 RESOLVIDOS HOJE</div>'
-          +f'<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">{_d_tbl_hdr()}<tbody>'
-          +''.join(_d_row(t) for t in sorted(baixados_hoje,key=lambda x:x.get('empresa','')))
-          +f'</tbody></table></div>' if n_resol else '')
+        +(f'<div style="display:flex;align-items:center;gap:14px;margin:20px 0 12px">'
+          f'<span style="color:#22c55e;font-size:12px;font-weight:700;letter-spacing:1px">📤 RESOLVIDOS</span>'
+          f'<select onchange="filtrarRes(\'dbx\',this.value)" style="background:#161616;color:#e5e7eb;border:1px solid #333;border-radius:6px;padding:6px 12px;font-size:13px">{date_opts}</select>'
+          f'</div>{dt_bx}' if datas_res else '')
     )
 
     dt_hdr_stats=(_d_stat('CLIENTES',n_cli,'#f97316','cli')
@@ -465,6 +501,10 @@ function showTab(t){{
   var cls={{'cli':'on','resp':'on','urg':'on-urg','res':'on-res','cust':'on-cust'}};
   var nb=document.getElementById('nb-'+t); if(nb)nb.className='nb '+(cls[t]||'on');
   window.scrollTo(0,0);
+}}
+function filtrarRes(prefix,val){{
+  document.querySelectorAll('[id^="'+prefix+'-"]').forEach(function(el){{el.style.display='none'}});
+  var el=document.getElementById(prefix+'-'+val); if(el)el.style.display='block';
 }}
 function tog(i){{
   var s=document.getElementById('sec'+i);

@@ -69,5 +69,4 @@ def parse_csv(content_bytes):
 
 def parse_csv_baixados(content_bytes):
     tickets = parse_csv(content_bytes)
-    today_str = date.today().strftime('%d/%m/%Y')
-    return [t for t in tickets if t['resolucao'] == today_str]
+    return [t for t in tickets if t['resolucao']]  # todos com data de resolução
