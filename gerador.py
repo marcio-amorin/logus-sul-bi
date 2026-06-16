@@ -462,6 +462,42 @@ def gerar_html(all_tks, baixados_hoje=None):
                 f'<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">'
                 f'{_d_tbl_hdr(show_cli=True)}<tbody>{rows}</tbody></table></div></div>')
 
+    # agrupa abertos por data de abertura
+    by_data = defaultdict(list)
+    for t in sul:
+        if t['data']:
+            by_data[t['data']].append(t)
+    datas_ent = sorted(by_data.keys(), reverse=True)
+    datas_ent_show = [today_str] + [d for d in datas_ent if d != today_str]
+
+    ent_opts=''
+    for dt in datas_ent_show:
+        safe=dt.replace('/','_')
+        cnt=len(by_data.get(dt,[]))
+        lbl=f'{dt} — {cnt} tickets  📅 HOJE' if dt==today_str else f'{dt} — {cnt} tickets'
+        sel='selected' if dt==today_str else ''
+        ent_opts+=f'<option value="{safe}" {sel}>{lbl}</option>'
+
+    vazio_ent='<div style="color:#374151;text-align:center;padding:24px;font-size:13px">Nenhum chamado aberto neste dia.</div>'
+
+    mob_ent=''
+    for dt in datas_ent_show:
+        safe=dt.replace('/','_')
+        tks=sorted(by_data.get(dt,[]),key=lambda x:x.get('empresa',''))
+        show='block' if dt==today_str else 'none'
+        mob_ent+=f'<div id="mbe-{safe}" class="bx-s" style="display:{show}">'+\
+                  (''.join(_tk(t) for t in tks) if tks else vazio_ent)+'</div>'
+
+    dt_ent=''
+    for dt in datas_ent_show:
+        safe=dt.replace('/','_')
+        tks=sorted(by_data.get(dt,[]),key=lambda x:x.get('empresa',''))
+        show='block' if dt==today_str else 'none'
+        rows=''.join(_d_row(t,show_cli=True) for t in tks) if tks else f'<tr><td colspan="8">{vazio_ent}</td></tr>'
+        dt_ent+=(f'<div id="dbe-{safe}" class="bx-s" style="display:{show}">'
+                 f'<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">'
+                 f'{_d_tbl_hdr(show_cli=True)}<tbody>{rows}</tbody></table></div></div>')
+
     mob_res=(
         _priority_panel_html(tk_lkp,baixados_by_code)
         +f'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px">'
@@ -478,7 +514,9 @@ def gerar_html(all_tks, baixados_hoje=None):
         +f'<div style="color:#64748b;font-size:11px;font-weight:700;letter-spacing:1px;margin-bottom:14px">TIPO</div>'
         +_bar('Incidente',tot_inc,tot,'#ef4444')+_bar('Requisição',n_req,tot,'#3b82f6')+_bar('Dúvida/Outros',n_duv,tot,'#a78bfa')
         +f'</div>'
-        +(f'<div style="color:#22c55e;font-size:12px;font-weight:700;letter-spacing:1px;padding:4px 0 8px">📥 ENTRARAM HOJE</div>'+hoje_cards if n_hoje else '')
+        +(f'<div style="color:#22c55e;font-size:12px;font-weight:700;letter-spacing:1px;padding:4px 0 8px">📥 ENTRARAM</div>'
+          f'<select onchange="filtrarRes(\'mbe\',this.value)" style="width:100%;background:#161616;color:#e5e7eb;border:1px solid #333;border-radius:6px;padding:8px 10px;font-size:13px;margin-bottom:10px">{ent_opts}</select>'
+          +mob_ent if datas_ent else '')
         +(f'<div style="color:#22c55e;font-size:12px;font-weight:700;letter-spacing:1px;padding:8px 0 6px">📤 RESOLVIDOS</div>'
           f'<select onchange="filtrarRes(\'mbx\',this.value)" style="width:100%;background:#161616;color:#e5e7eb;border:1px solid #333;border-radius:6px;padding:8px 10px;font-size:13px;margin-bottom:10px">{date_opts}</select>'
           +mob_bx if datas_res else '')
@@ -545,10 +583,10 @@ def gerar_html(all_tks, baixados_hoje=None):
         +_bar('Incidente',tot_inc,tot,'#ef4444')+_bar('Requisição',n_req,tot,'#3b82f6')+_bar('Dúvida/Outros',n_duv,tot,'#a78bfa')
         +f'</div></div>'
         +f'<div style="margin-top:20px">{_priority_panel_html(tk_lkp,baixados_by_code)}</div>'
-        +(f'<div style="color:#22c55e;font-size:12px;font-weight:700;letter-spacing:1px;margin:20px 0 10px">📥 ENTRARAM HOJE</div>'
-          +f'<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">{_d_tbl_hdr()}<tbody>'
-          +''.join(_d_row(t) for t in sorted([t for t in sul if t['data']==today_str],key=lambda x:x['empresa']))
-          +f'</tbody></table></div>' if n_hoje else '')
+        +(f'<div style="display:flex;align-items:center;gap:14px;margin:20px 0 12px">'
+          f'<span style="color:#22c55e;font-size:12px;font-weight:700;letter-spacing:1px">📥 ENTRARAM</span>'
+          f'<select onchange="filtrarRes(\'dbe\',this.value)" style="background:#161616;color:#e5e7eb;border:1px solid #333;border-radius:6px;padding:6px 12px;font-size:13px">{ent_opts}</select>'
+          f'</div>{dt_ent}' if datas_ent else '')
         +(f'<div style="display:flex;align-items:center;gap:14px;margin:20px 0 12px">'
           f'<span style="color:#22c55e;font-size:12px;font-weight:700;letter-spacing:1px">📤 RESOLVIDOS</span>'
           f'<select onchange="filtrarRes(\'dbx\',this.value)" style="background:#161616;color:#e5e7eb;border:1px solid #333;border-radius:6px;padding:6px 12px;font-size:13px">{date_opts}</select>'
