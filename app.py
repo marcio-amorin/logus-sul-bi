@@ -12,11 +12,49 @@ app = Flask(__name__)
 app.secret_key = 'ls-bi-2026-xk9'
 app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024  # 10 MB
 
-ADMIN_USER = 'logussul'
-ADMIN_PASS = 'varlog'
+ADMIN_USER  = 'logussul'
+ADMIN_PASS  = 'varlog'
+VIEWER_USER = 'varejus'
+VIEWER_PASS = 'varlog'
 
 # painel em memória — gerado pelo admin, visto pela equipe
 _painel = {'html': None, 'gerado_em': None}
+
+VIEWER_LOGIN_PAGE = '''<!DOCTYPE html><html lang="pt-BR"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Logus Sul BI</title>
+<link rel="icon" href="/static/favicon.ico">
+<link rel="manifest" href="/static/manifest.json">
+<meta name="theme-color" content="#ea580c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Sul BI">
+<link rel="apple-touch-icon" href="/static/icon-192.png">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0c0c0c;color:#e5e7eb;font-family:"Segoe UI",Arial,sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+.card{background:#0d0800;border:2px solid #ea580c;border-radius:12px;padding:36px 40px;width:100%;max-width:360px}
+label{display:block;color:#9ca3af;font-size:11px;font-weight:700;letter-spacing:.8px;margin-bottom:6px;margin-top:18px}
+input{width:100%;padding:11px 14px;background:#080500;border:1px solid #2a1800;border-radius:6px;color:#e5e7eb;font-size:13px;outline:none;transition:border-color .2s}
+input:focus{border-color:#ea580c}
+.btn{display:block;width:100%;margin-top:24px;padding:13px;background:#ea580c;color:#fff;font-size:14px;font-weight:900;border:none;border-radius:8px;cursor:pointer;transition:background .2s}
+.btn:hover{background:#f97316}
+.err{background:#1a0000;border:1px solid #ef4444;color:#f87171;border-radius:6px;padding:10px 14px;font-size:12px;margin-bottom:16px}
+.sub{color:#6b4c30;font-size:11px;text-align:center;margin-bottom:20px}
+</style></head><body>
+<div class="card">
+  <div style="text-align:center;margin-bottom:16px"><img src="/static/logo.png" style="height:70px;background:#fff;border-radius:10px;padding:6px 14px"></div>
+  <div class="sub">Painel de Chamados — Logus Sul</div>
+  {error}
+  <form method="POST" action="/login">
+    <label>USUÁRIO</label>
+    <input type="text" name="usuario" autocomplete="username" autofocus>
+    <label>SENHA</label>
+    <input type="password" name="senha" autocomplete="current-password">
+    <button class="btn" type="submit">Entrar</button>
+  </form>
+</div>
+</body></html>'''
 
 AGUARDANDO_PAGE = '''<!DOCTYPE html><html lang="pt-BR"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -140,9 +178,34 @@ el.addEventListener('drop',function(){el.classList.remove('over');});});
 def admin_logado():
     return session.get('admin') == True
 
+def viewer_logado():
+    return session.get('viewer') == True or session.get('admin') == True
+
 # ── rotas públicas ─────────────────────────────────────────────────────────────
+@app.route('/login', methods=['GET', 'POST'])
+def viewer_login():
+    if request.method == 'POST':
+        u = request.form.get('usuario', '').strip()
+        s = request.form.get('senha', '').strip()
+        if u == VIEWER_USER and s == VIEWER_PASS:
+            session['viewer'] = True
+            return redirect('/')
+        if u == ADMIN_USER and s == ADMIN_PASS:
+            session['admin'] = True
+            return redirect('/admin')
+        err = '<div class="err">⚠ Usuário ou senha incorretos.</div>'
+        return Response(VIEWER_LOGIN_PAGE.replace('{error}', err), mimetype='text/html', status=401)
+    return Response(VIEWER_LOGIN_PAGE.replace('{error}', ''), mimetype='text/html')
+
+@app.route('/sair')
+def viewer_sair():
+    session.pop('viewer', None)
+    return redirect('/login')
+
 @app.route('/')
 def index():
+    if not viewer_logado():
+        return redirect('/login')
     if _painel['html']:
         return Response(_painel['html'], mimetype='text/html')
     return Response(AGUARDANDO_PAGE, mimetype='text/html')
