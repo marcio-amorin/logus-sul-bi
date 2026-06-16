@@ -27,6 +27,8 @@ URG_ALL  = URG_PDV | URG_ERP | URG_DEV
 RESP_OWN = {'Comercial','Engenharia Software','Desenv. PDV','Sust. Desenv.','Sustentação Desenv.'}
 BACKLOG = [{'num': 1, 'ticket': '21979', 'cliente': 'YPÊ', 'desc': 'Emissão de MDF-e', 'est': '16/03', 'status': 'Homologado'}, {'num': 2, 'ticket': '22206', 'cliente': 'YPÊ', 'desc': 'Emissão de NF para CPF com IE', 'est': '16/03', 'status': 'Homologado'}, {'num': 3, 'ticket': '12752', 'cliente': 'LEAL', 'desc': 'Adequação NT 2023.004', 'est': '31/03', 'status': 'Homologado'}, {'num': 4, 'ticket': '6197', 'cliente': 'VICARI', 'desc': 'Parametrização Custo no Balanço Comercial', 'est': '22/04', 'status': 'Em Homologação'}, {'num': 5, 'ticket': '24348', 'cliente': 'GUMZ JARAGUA', 'desc': 'Prazo de pagamento diferenciado por cliente', 'est': '04/05', 'status': 'Homologado'}, {'num': 6, 'ticket': '16783', 'cliente': 'LEAL', 'desc': 'Número do Pedido de Compras em Campo Específico', 'est': '05/05', 'status': 'Em Homologação'}, {'num': 7, 'ticket': '24705', 'cliente': 'LEAL', 'desc': 'ICMS ST retido no cálculo ICMS próprio', 'est': '11/05', 'status': 'Homologado'}, {'num': 8, 'ticket': '24839', 'cliente': 'GUMZ POMERODE', 'desc': 'Trazer produtos ativos por filial na pesquisa', 'est': '19/05', 'status': 'Homologado'}, {'num': 9, 'ticket': '17727', 'cliente': 'GUMZ JARAGUA', 'desc': 'Desconto em Forma de Recebimento', 'est': '14/05', 'status': 'Em Homologação'}, {'num': 10, 'ticket': '11753', 'cliente': 'GUMZ JARAGUA', 'desc': 'Relatório Contas a Receber', 'est': '25/05', 'status': 'Em Homologação'}, {'num': 11, 'ticket': '10223', 'cliente': 'ANGELINO', 'desc': 'Juros Acréscimo não lista na Manutenção de Recebimentos', 'est': '25/05', 'status': 'Em Homologação'}, {'num': 12, 'ticket': '16761', 'cliente': 'SCHUTZE', 'desc': 'Exibir dados históricos no pedido automático', 'est': '03/06', 'status': 'Em Homologação'}, {'num': 13, 'ticket': '12755', 'cliente': 'VICARI', 'desc': 'Crédito de Diferimento - Apuração e Preço de Venda', 'est': '24/07', 'status': 'Em Roadmap'}, {'num': 14, 'ticket': '16219', 'cliente': 'LEAL', 'desc': 'SPED FISCAL - Ajuste de Crédito', 'est': '24/07', 'status': 'Em Roadmap'}, {'num': 15, 'ticket': '6497', 'cliente': 'VICARI', 'desc': 'Baixas Uso/Consumo no Balanço Comercial', 'est': '03/07', 'status': 'Em Roadmap'}, {'num': 16, 'ticket': '20278', 'cliente': 'VICARI', 'desc': 'ICMS Desonerado na Entrada da NF', 'est': '04/09', 'status': 'Em Roadmap'}, {'num': 17, 'ticket': '20484', 'cliente': 'ANGELINO', 'desc': 'Campo Juros Baixa Recebimento', 'est': '', 'status': 'Pendente'}, {'num': 18, 'ticket': '4255', 'cliente': 'PRINCESA', 'desc': 'Troco Solidário', 'est': '', 'status': 'Pendente'}, {'num': 19, 'ticket': '6451', 'cliente': 'PRINCESA', 'desc': 'Emissão Notas Fiscais a partir do PDV', 'est': '', 'status': 'Pendente'}, {'num': 20, 'ticket': '16782', 'cliente': 'LEAL', 'desc': 'Venda a Órgão Público com Retenção do IRRF', 'est': '', 'status': 'Pendente'}, {'num': 21, 'ticket': '23172', 'cliente': 'LEAL', 'desc': 'Sistema não considerando ICMS desonerado', 'est': '', 'status': 'Pendente'}, {'num': 22, 'ticket': '22787', 'cliente': 'LEAL', 'desc': 'Erro ao finalizar NF (#1)', 'est': '', 'status': 'Pendente'}, {'num': 23, 'ticket': '23568', 'cliente': 'LEAL', 'desc': 'Erro ao finalizar NF (#2)', 'est': '', 'status': 'Pendente'}, {'num': 24, 'ticket': '19372', 'cliente': 'LEAL', 'desc': 'Venda para cliente fora do estado', 'est': '', 'status': 'Pendente'}, {'num': 25, 'ticket': '21652', 'cliente': 'LEAL', 'desc': 'Formas de Recebimento - Boleto', 'est': '', 'status': 'Pendente'}, {'num': 26, 'ticket': '25271', 'cliente': 'MILANI', 'desc': 'Filtro de seleção de NF na alteração de preços', 'est': '', 'status': 'Pendente'}, {'num': 27, 'ticket': '22981', 'cliente': 'SCHUTZE', 'desc': 'Seleção de nota em documentos de devolução', 'est': '', 'status': 'Pendente'}, {'num': 28, 'ticket': '25443', 'cliente': 'GUMZ', 'desc': 'Parâmetros PDV – Operações que Exigem Supervisor', 'est': 'URGENTE', 'status': 'Urgente'}, {'num': 29, 'ticket': '24134', 'cliente': 'LEAL', 'desc': 'Limitação Logus PDV – ausência de observação na NF-e', 'est': '', 'status': 'Pendente'}]
 
+# ── shared helpers ────────────────────────────────────────────────────────────
+
 def _dc(d):
     if d<=3:  return '#4ade80','#052e16'
     if d<=7:  return '#fde047','#1c1a00'
@@ -41,6 +43,8 @@ def _sbadge(s):
 
 def _ticon(t):
     return {'Incidente':'🔴','Requisição':'🔵','Dúvida':'🟣'}.get(t,'⚪')
+
+# ── mobile helpers ────────────────────────────────────────────────────────────
 
 def _tk(t, sc=True):
     fc,bg = _dc(t['dias'])
@@ -113,6 +117,99 @@ def _bar(lbl, v, tot, cor):
             f'<span style="color:{cor};font-size:16px;font-weight:900">{v} <span style="color:#374151;font-size:11px">{pct}%</span></span></div>'
             f'<div style="background:#1f2937;border-radius:6px;height:10px"><div style="width:{pct}%;background:{cor};height:100%;border-radius:6px"></div></div></div>')
 
+# ── desktop helpers ───────────────────────────────────────────────────────────
+
+def _d_safe(s):
+    return ''.join(c if c.isalnum() else '_' for c in s)
+
+def _d_stat(label, val, cor):
+    return (f'<div style="border:1px solid {cor};border-radius:6px;padding:8px 18px;text-align:center;min-width:90px">'
+            f'<div style="color:{cor};font-size:26px;font-weight:900;line-height:1.1">{val}</div>'
+            f'<div style="color:{cor};font-size:9px;font-weight:700;opacity:.6;margin-top:4px;letter-spacing:.5px">{label}</div></div>')
+
+def _d_row(t):
+    fc,_ = _dc(t['dias'])
+    tc = '#ef4444' if t['tipo']=='Incidente' else '#3b82f6' if t['tipo']=='Requisição' else '#a78bfa'
+    ec = {'Novo':'#22c55e','Em andamento':'#3b82f6','Aguardando':'#d97706'}.get(t['status'],'#6b7280')
+    return (f'<tr style="border-bottom:1px solid #111">'
+            f'<td style="color:#f97316;font-weight:900;padding:9px 12px;white-space:nowrap">#{t["code"]}</td>'
+            f'<td style="padding:9px 12px"><span style="background:{tc}22;color:{tc};border-radius:4px;padding:3px 8px;font-size:10px;font-weight:900">{t["tipo"].upper()}</span></td>'
+            f'<td style="color:#e2e8f0;padding:9px 12px;font-size:13px">{t["assunto"]}</td>'
+            f'<td style="padding:9px 12px"><span style="background:{ec}22;color:{ec};border-radius:4px;padding:3px 8px;font-size:10px;font-weight:900">{t["status"].upper()}</span></td>'
+            f'<td style="color:#94a3b8;padding:9px 12px;font-size:12px;white-space:nowrap">{t["atrib"]}</td>'
+            f'<td style="color:#64748b;padding:9px 12px;font-size:12px;white-space:nowrap">{t["data"]}</td>'
+            f'<td style="color:{fc};font-weight:900;padding:9px 12px;text-align:right;white-space:nowrap">{t["dias"]}</td>'
+            f'</tr>')
+
+def _d_tbl_hdr():
+    return ('<thead><tr style="border-bottom:2px solid #1f2937">'
+            '<th style="color:#475569;font-size:10px;font-weight:700;text-align:left;padding:8px 12px">TICKET</th>'
+            '<th style="color:#475569;font-size:10px;font-weight:700;text-align:left;padding:8px 12px">TIPO</th>'
+            '<th style="color:#475569;font-size:10px;font-weight:700;text-align:left;padding:8px 12px">ASSUNTO</th>'
+            '<th style="color:#475569;font-size:10px;font-weight:700;text-align:left;padding:8px 12px">ESTADO</th>'
+            '<th style="color:#475569;font-size:10px;font-weight:700;text-align:left;padding:8px 12px">COM QUEM</th>'
+            '<th style="color:#475569;font-size:10px;font-weight:700;text-align:left;padding:8px 12px">ABERTURA</th>'
+            '<th style="color:#475569;font-size:10px;font-weight:700;text-align:right;padding:8px 12px">DIAS</th>'
+            '</tr></thead>')
+
+def _d_clibox(emp, tks):
+    inc = sum(1 for t in tks if t['tipo']=='Incidente')
+    mx  = max(t['dias'] for t in tks) if tks else 0
+    fc,_ = _dc(mx)
+    sid = _d_safe(emp)
+    itag = f'<div style="color:#ef4444;font-size:11px;margin-top:2px">⚠ {inc} inc</div>' if inc else ''
+    return (f'<div class="dcbox" data-id="{sid}" onclick="dCli(\'{sid}\')" '
+            f'style="border:1px solid #3a1800;border-radius:8px;padding:12px 14px;cursor:pointer;background:#0d0800;min-width:130px">'
+            f'<div style="color:#f97316;font-size:12px;font-weight:900;margin-bottom:3px">{emp}</div>'
+            f'<div style="color:#fb923c;font-size:12px">{len(tks)} tickets</div>'
+            f'{itag}'
+            f'<div style="color:{fc};font-size:13px;font-weight:700;margin-top:4px">{mx}d</div></div>')
+
+def _d_respbox(resp, tks, cor):
+    inc = sum(1 for t in tks if t['tipo']=='Incidente')
+    mx  = max(t['dias'] for t in tks) if tks else 0
+    fc,_ = _dc(mx)
+    sid = _d_safe(resp)
+    itag = f'<div style="color:#ef4444;font-size:11px;margin-top:2px">⚠ {inc} inc</div>' if inc else ''
+    return (f'<div class="drbox" onclick="dResp(\'{sid}\')" '
+            f'style="border:1px solid #1e1040;border-radius:8px;padding:12px 14px;cursor:pointer;background:#0a0814;min-width:150px">'
+            f'<div style="color:{cor};font-size:12px;font-weight:900;margin-bottom:3px">{resp}</div>'
+            f'<div style="color:#64748b;font-size:12px">{len(tks)} chamados</div>'
+            f'{itag}'
+            f'<div style="color:{fc};font-size:13px;font-weight:700;margin-top:4px">{mx}d</div></div>')
+
+def _d_detail(label, tks, div_id, close_fn):
+    inc = sum(1 for t in tks if t['tipo']=='Incidente')
+    mx  = max(t['dias'] for t in tks) if tks else 0
+    fc,_ = _dc(mx)
+    resps = sorted(set(t['atrib'] for t in tks))
+    rtags = ''.join(f'<span style="background:#ea580c22;color:#f97316;border-radius:4px;padding:3px 10px;font-size:11px;font-weight:700;margin-right:6px">{r}</span>' for r in resps)
+    rows  = ''.join(_d_row(t) for t in sorted(tks, key=lambda x:(0 if x['tipo']=='Incidente' else 1,-x['dias'])))
+    ispn  = f'<span style="color:#ef4444;font-size:12px">⚠ {inc} inc</span> ' if inc else ''
+    return (f'<div id="{div_id}" class="ddet" style="display:none;background:#090500;border:1px solid #3a1800;border-radius:8px;margin-top:10px;padding:16px 20px">'
+            f'<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:10px">'
+            f'<div style="display:flex;align-items:center;gap:14px">'
+            f'<span style="color:#f97316;font-size:16px;font-weight:900">{label}</span>'
+            f'<span style="color:#94a3b8;font-size:12px">{len(tks)} chamados</span>'
+            f'{ispn}<span style="color:{fc};font-size:13px;font-weight:700">{mx}d</span></div>'
+            f'<button onclick="{close_fn}" style="background:none;border:1px solid #333;color:#6b7280;border-radius:4px;padding:4px 10px;cursor:pointer;font-size:11px">✕ fechar</button>'
+            f'</div>'
+            f'<div style="margin-bottom:12px">{rtags}</div>'
+            f'<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">'
+            f'{_d_tbl_hdr()}<tbody>{rows}</tbody></table></div></div>')
+
+def _d_urg_sec(titulo, cor, bg, tks):
+    if not tks: return ''
+    rows = ''.join(_d_row(t) for t in sorted(tks, key=lambda x:(0 if x['tipo']=='Incidente' else 1,-x['dias'])))
+    return (f'<div style="margin-bottom:20px">'
+            f'<div style="background:{bg};border-left:4px solid {cor};border-radius:6px;padding:10px 16px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between">'
+            f'<span style="color:{cor};font-size:13px;font-weight:900">{titulo}</span>'
+            f'<span style="color:{cor};font-size:18px;font-weight:900">{len(tks)}</span></div>'
+            f'<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">'
+            f'{_d_tbl_hdr()}<tbody>{rows}</tbody></table></div></div>')
+
+# ── main ──────────────────────────────────────────────────────────────────────
+
 def gerar_html(all_tks, baixados_hoje=None):
     today     = date.today()
     today_str = today.strftime('%d/%m/%Y')
@@ -143,7 +240,11 @@ def gerar_html(all_tks, baixados_hoje=None):
 
     tot=len(sul); tot_inc=sum(1 for t in sul if t['tipo']=='Incidente')
     tot_ag=sum(1 for t in sul if t['status']=='Aguardando')
-    n_cli=len(clientes)
+    n_cli=len(clientes); n_nov=sum(1 for t in sul if t['status']=='Novo')
+    n_and=sum(1 for t in sul if t['status']=='Em andamento')
+    n_req=sum(1 for t in sul if t['tipo']=='Requisição')
+    n_duv=sum(1 for t in sul if t['tipo'] not in ('Incidente','Requisição'))
+    n_resol=len(baixados_hoje); n_hoje=sum(1 for t in sul if t['dias']==0)
 
     tk_lkp = {t['code']:t for t in all_tks}
     def _sec(codes): return [t for t in sul if t['code'] in codes]
@@ -162,7 +263,9 @@ def gerar_html(all_tks, baixados_hoje=None):
              _dtk('25368','BEBIDA POP','Emissão de NF — Transformar Pedido em NF')]
 
     n_urg=len(pdv_tks)+len(erp_tks)+len(alta_tks)+len(eng_tks)+len(pdvd_tks)+len(sust_tks)+3+len(com_tks)
+    n_bklog=len(BACKLOG)
 
+    # ── mobile HTML vars ──────────────────────────────────────────────────────
     idx=0
     cli_secs=''
     for emp in sorted(clientes, key=lambda e:(-sum(1 for t in by_cli[e] if t['tipo']=='Incidente'),-len(by_cli[e]))):
@@ -192,15 +295,10 @@ def gerar_html(all_tks, baixados_hoje=None):
         cust_html+=(f'<div style="color:{cor};font-size:11px;font-weight:700;letter-spacing:1px;padding:10px 4px 6px">{st.upper()} — {len(grp)}</div>'
                     +''.join(_ccard(b) for b in grp))
 
-    n_nov=sum(1 for t in sul if t['status']=='Novo')
-    n_and=sum(1 for t in sul if t['status']=='Em andamento')
-    n_req=sum(1 for t in sul if t['tipo']=='Requisição')
-    n_duv=sum(1 for t in sul if t['tipo'] not in ('Incidente','Requisição'))
-    n_resol=len(baixados_hoje); n_hoje=sum(1 for t in sul if t['dias']==0)
     hoje_cards=''.join(_tk(t) for t in sorted([t for t in sul if t['dias']==0],key=lambda x:x['empresa']))
     bx_cards=''.join(_tk(t) for t in sorted(baixados_hoje,key=lambda x:x.get('empresa','')))
 
-    res_html=(
+    mob_res=(
         f'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px">'
         +f'<div style="background:#052e16;border:2px solid #22c55e;border-radius:12px;padding:14px;text-align:center"><div style="color:#4ade80;font-size:32px;font-weight:900">{n_hoje}</div><div style="color:#22c55e;font-size:11px;font-weight:700">ENTRARAM HOJE</div></div>'
         +f'<div style="background:#0a0a16;border:2px solid #3b82f6;border-radius:12px;padding:14px;text-align:center"><div style="color:#60a5fa;font-size:32px;font-weight:900">{tot}</div><div style="color:#3b82f6;font-size:11px;font-weight:700">TOTAL ABERTOS</div></div>'
@@ -219,6 +317,81 @@ def gerar_html(all_tks, baixados_hoje=None):
         +(f'<div style="color:#22c55e;font-size:12px;font-weight:700;letter-spacing:1px;padding:4px 0 8px">📤 RESOLVIDOS HOJE</div>'+bx_cards if n_resol else '')
     )
 
+    # ── desktop HTML vars ─────────────────────────────────────────────────────
+    cli_ord = sorted(clientes, key=lambda e:(-sum(1 for t in by_cli[e] if t['tipo']=='Incidente'),-len(by_cli[e])))
+    dt_cli_grid    = ''.join(_d_clibox(e,by_cli[e]) for e in cli_ord)
+    dt_cli_details = ''.join(_d_detail(e,by_cli[e],f'dtd-{_d_safe(e)}','dCli(null)') for e in clientes)
+
+    dt_rsul_grid    = ''.join(_d_respbox(r,by_resp[r],'#f97316') for r in resp_sul)
+    dt_rlogus_grid  = ''.join(_d_respbox(r,by_resp[r],'#a78bfa') for r in resp_logus)
+    dt_rsul_det     = ''.join(_d_detail(r,by_resp[r],f'dtr-{_d_safe(r)}','dResp(null)') for r in resp_sul)
+    dt_rlogus_det   = ''.join(_d_detail(r,by_resp[r],f'dtr-{_d_safe(r)}','dResp(null)') for r in resp_logus)
+
+    dt_urg_html=(
+        _d_urg_sec('🟢 PDV — Urgente','#4ade80','#052e16',pdv_tks)+
+        _d_urg_sec('🔴 ERP — Urgente','#ef4444','#1a0000',erp_tks)+
+        _d_urg_sec('📋 Em Alta','#60a5fa','#05152a',alta_tks)+
+        _d_urg_sec('💻 Dev / Sustentação','#a78bfa','#0d0520',dev_tks)+
+        _d_urg_sec('🔩 Engenharia','#94a3b8','#111827',eng_tks)+
+        _d_urg_sec('🖥️ Desenv. PDV','#2dd4bf','#051a17',pdvd_tks)+
+        _d_urg_sec('🛠️ Sustentação Desenv.','#818cf8','#0d0f20',sust_tks)+
+        _d_urg_sec('🤝 Comercial','#fbbf24','#1a1000',com_tks)
+    )
+
+    dt_cust_rows=''
+    for st in ['Urgente','Em Homologação','Em Roadmap','Pendente','Homologado']:
+        for b in [x for x in BACKLOG if x['status']==st]:
+            s=b['status']
+            cor={'Urgente':'#ef4444','Homologado':'#22c55e','Em Homologação':'#fb923c','Em Roadmap':'#60a5fa'}.get(s,'#6b7280')
+            est=b['est'] if b['est'] else '—'
+            dt_cust_rows+=(f'<tr style="border-bottom:1px solid #111">'
+                           f'<td style="color:#f97316;font-weight:900;padding:9px 12px;white-space:nowrap">#{b["ticket"]}</td>'
+                           f'<td style="color:#fed7aa;padding:9px 12px;font-size:12px;font-weight:700">{b["cliente"]}</td>'
+                           f'<td style="color:#e2e8f0;padding:9px 12px;font-size:13px">{b["desc"]}</td>'
+                           f'<td style="color:{cor};padding:9px 12px;font-size:11px;white-space:nowrap">{est}</td>'
+                           f'<td style="padding:9px 12px"><span style="background:{cor}22;color:{cor};border-radius:4px;padding:3px 8px;font-size:10px;font-weight:900">{s.upper()}</span></td>'
+                           f'</tr>')
+
+    pct_nov=int(n_nov/tot*100) if tot else 0
+    pct_and=int(n_and/tot*100) if tot else 0
+    pct_ag =int(tot_ag/tot*100) if tot else 0
+    pct_inc=int(tot_inc/tot*100) if tot else 0
+    pct_req=int(n_req/tot*100) if tot else 0
+    pct_duv=int(n_duv/tot*100) if tot else 0
+
+    dt_res_html=(
+        f'<div style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap">'
+        +_d_stat('ENTRARAM HOJE',n_hoje,'#22c55e')
+        +_d_stat('TOTAL ABERTOS',tot,'#3b82f6')
+        +_d_stat('INCIDENTES',tot_inc,'#ef4444')
+        +_d_stat('AGUARDANDO',tot_ag,'#d97706')
+        +(_d_stat('RESOLVIDOS HOJE',n_resol,'#22c55e') if n_resol else '')
+        +f'</div>'
+        +f'<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">'
+        +f'<div style="background:#161616;border-radius:10px;padding:18px">'
+        +f'<div style="color:#64748b;font-size:10px;font-weight:700;letter-spacing:1px;margin-bottom:14px">STATUS</div>'
+        +_bar('Novo',n_nov,tot,'#22c55e')+_bar('Em Andamento',n_and,tot,'#3b82f6')+_bar('Aguardando',tot_ag,tot,'#d97706')
+        +f'</div>'
+        +f'<div style="background:#161616;border-radius:10px;padding:18px">'
+        +f'<div style="color:#64748b;font-size:10px;font-weight:700;letter-spacing:1px;margin-bottom:14px">TIPO</div>'
+        +_bar('Incidente',tot_inc,tot,'#ef4444')+_bar('Requisição',n_req,tot,'#3b82f6')+_bar('Dúvida/Outros',n_duv,tot,'#a78bfa')
+        +f'</div></div>'
+        +(f'<div style="color:#22c55e;font-size:12px;font-weight:700;letter-spacing:1px;margin:20px 0 10px">📥 ENTRARAM HOJE</div>'
+          +f'<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">{_d_tbl_hdr()}<tbody>'
+          +''.join(_d_row(t) for t in sorted([t for t in sul if t['dias']==0],key=lambda x:x['empresa']))
+          +f'</tbody></table></div>' if n_hoje else '')
+        +(f'<div style="color:#22c55e;font-size:12px;font-weight:700;letter-spacing:1px;margin:20px 0 10px">📤 RESOLVIDOS HOJE</div>'
+          +f'<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">{_d_tbl_hdr()}<tbody>'
+          +''.join(_d_row(t) for t in sorted(baixados_hoje,key=lambda x:x.get('empresa','')))
+          +f'</tbody></table></div>' if n_resol else '')
+    )
+
+    dt_hdr_stats=(_d_stat('CLIENTES',n_cli,'#f97316')
+                  +_d_stat('CHAMADOS',tot,'#fb923c')
+                  +_d_stat('INCIDENTES',tot_inc,'#ef4444')
+                  +_d_stat('AGUARDANDO',tot_ag,'#d97706')
+                  +_d_stat('NOVOS',n_nov,'#22c55e'))
+
     return f"""<!DOCTYPE html><html lang="pt-BR"><head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
@@ -226,7 +399,23 @@ def gerar_html(all_tks, baixados_hoje=None):
 <link rel="icon" href="/static/favicon.ico">
 <style>
 *{{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}}
-html,body{{height:100%;background:#0c0c0c;color:#e5e7eb;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}}
+html,body{{background:#0c0c0c;color:#e5e7eb;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}}
+@keyframes pulse{{0%,100%{{opacity:.5}}50%{{opacity:1}}}}
+/* desktop */
+#dt{{display:none}}
+@media(min-width:768px){{
+  body{{padding:0}}
+  #dt{{display:block}}
+  #mob{{display:none}}
+  .dtab{{background:none;border:none;color:#64748b;font-size:13px;font-weight:700;padding:11px 22px;cursor:pointer;border-bottom:3px solid transparent;transition:color .15s}}
+  .dtab:hover{{color:#e5e7eb}}
+  .dtab.on{{color:#f97316;border-bottom-color:#f97316}}
+  .dview{{display:none}}.dview.on{{display:block}}
+  .dcbox:hover,.drbox:hover{{background:#1a0800!important}}
+  .dcbox.sel{{background:#1a0800!important;border-color:#f97316!important}}
+}}
+/* mobile */
+#mob{{display:block}}
 body{{padding-bottom:70px}}
 #hdr{{position:sticky;top:0;z-index:100;background:#0c0c0c;border-bottom:1px solid #1a1a1a;padding:10px 14px}}
 .hdr-top{{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}}
@@ -242,21 +431,34 @@ body{{padding-bottom:70px}}
 .nb .ni{{font-size:22px;line-height:1}}
 .nb.on{{color:#f97316}}.nb.on-urg{{color:#ef4444}}.nb.on-res{{color:#22c55e}}.nb.on-cust{{color:#a78bfa}}
 .sec-hdr{{color:#64748b;font-size:11px;font-weight:700;letter-spacing:1px;padding:6px 0 10px}}
-@keyframes pulse{{0%,100%{{opacity:.5}}50%{{opacity:1}}}}
-@media(min-width:600px){{
-  body{{display:flex;justify-content:center;background:#050505}}
-  #hdr{{width:480px;left:50%;transform:translateX(-50%)}}
-  #content{{width:480px}}
-  #nav{{width:480px;left:50%;transform:translateX(-50%);border-radius:16px 16px 0 0}}
-}}
 </style>
 <script>
+/* desktop */
+function dTab(t){{
+  document.querySelectorAll('.dview').forEach(function(v){{v.style.display='none'}});
+  var el=document.getElementById('dv-'+t); if(el)el.style.display='block';
+  document.querySelectorAll('.dtab').forEach(function(b){{b.classList.remove('on')}});
+  var tb=document.getElementById('dtb-'+t); if(tb)tb.classList.add('on');
+}}
+function dCli(id){{
+  document.querySelectorAll('.ddet').forEach(function(d){{d.style.display='none'}});
+  document.querySelectorAll('.dcbox').forEach(function(b){{b.classList.remove('sel')}});
+  if(id){{
+    var d=document.getElementById('dtd-'+id); if(d)d.style.display='block';
+    document.querySelectorAll('[data-id="'+id+'"]').forEach(function(b){{b.classList.add('sel')}});
+  }}
+}}
+function dResp(id){{
+  document.querySelectorAll('.ddet').forEach(function(d){{d.style.display='none'}});
+  if(id){{var d=document.getElementById('dtr-'+id); if(d)d.style.display='block';}}
+}}
+/* mobile */
 function showTab(t){{
   document.querySelectorAll('.view').forEach(function(v){{v.classList.remove('on')}});
-  document.getElementById('v-'+t).classList.add('on');
+  var el=document.getElementById('v-'+t); if(el)el.classList.add('on');
   document.querySelectorAll('.nb').forEach(function(b){{b.className='nb'}});
   var cls={{'cli':'on','resp':'on','urg':'on-urg','res':'on-res','cust':'on-cust'}};
-  document.getElementById('nb-'+t).className='nb '+(cls[t]||'on');
+  var nb=document.getElementById('nb-'+t); if(nb)nb.className='nb '+(cls[t]||'on');
   window.scrollTo(0,0);
 }}
 function tog(i){{
@@ -266,8 +468,68 @@ function tog(i){{
   s.style.display=open?'none':'block';
   c.textContent=open?'▶':'▼';
 }}
-window.onload=function(){{showTab('cli')}};
+window.onload=function(){{showTab('cli');dTab('cli')}};
 </script></head><body>
+
+<!-- ═══════════════════════════════════════════════ DESKTOP -->
+<div id="dt">
+  <div style="background:#0c0c0c;border-bottom:1px solid #1a1a1a;padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100">
+    <div style="display:flex;align-items:center;gap:14px">
+      <img src="/static/logo.png" style="height:46px;background:#fff;border-radius:8px;padding:4px 10px">
+      <div>
+        <span style="color:#ea580c;font-size:10px;font-weight:900;background:#1a0800;border:1px solid #ea580c;border-radius:4px;padding:2px 8px;letter-spacing:.5px">SUL</span>
+        <div style="color:#6b4c30;font-size:11px;margin-top:4px">Painel de Chamados · {today_str}</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center">{dt_hdr_stats}</div>
+  </div>
+  <div style="background:#0a0a0a;border-bottom:1px solid #111;padding:8px 28px;display:flex;gap:8px;align-items:center">
+    <span style="color:#4b5563;font-size:10px;font-weight:700;margin-right:4px">DIAS EM ABERTO:</span>
+    <span style="background:#052e16;color:#4ade80;border-radius:4px;padding:3px 10px;font-size:11px;font-weight:700">0-3d</span>
+    <span style="background:#1c1a00;color:#fde047;border-radius:4px;padding:3px 10px;font-size:11px;font-weight:700">4-7d</span>
+    <span style="background:#1c0a00;color:#fb923c;border-radius:4px;padding:3px 10px;font-size:11px;font-weight:700">8-14d</span>
+    <span style="background:#1c0000;color:#f87171;border-radius:4px;padding:3px 10px;font-size:11px;font-weight:700">15-30d</span>
+    <span style="background:#150000;color:#ef4444;border-radius:4px;padding:3px 10px;font-size:11px;font-weight:700">+30d</span>
+  </div>
+  <div style="background:#0c0c0c;border-bottom:1px solid #1a1a1a;padding:0 28px;display:flex">
+    <button id="dtb-cli"  class="dtab on" onclick="dTab('cli')">Por Cliente</button>
+    <button id="dtb-resp" class="dtab"    onclick="dTab('resp')">Por Responsável</button>
+    <button id="dtb-cust" class="dtab"    onclick="dTab('cust')">Customizações {n_bklog}</button>
+    <button id="dtb-urg"  class="dtab"    onclick="dTab('urg')">Urgentes do Dia {n_urg}</button>
+    <button id="dtb-res"  class="dtab"    onclick="dTab('res')">Resultados {n_resol} hoje</button>
+  </div>
+  <div style="padding:20px 28px">
+    <div id="dv-cli" class="dview on">
+      <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px">{dt_cli_grid}</div>
+      {dt_cli_details}
+    </div>
+    <div id="dv-resp" class="dview">
+      <div style="color:#f97316;font-size:10px;font-weight:700;letter-spacing:1px;margin-bottom:8px">🌿 EQUIPE SUL</div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px">{dt_rsul_grid}</div>
+      {dt_rsul_det}
+      <div style="color:#a78bfa;font-size:10px;font-weight:700;letter-spacing:1px;margin:20px 0 8px">🏢 EQUIPE LOGUS</div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px">{dt_rlogus_grid}</div>
+      {dt_rlogus_det}
+    </div>
+    <div id="dv-cust" class="dview">
+      <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">
+        <thead><tr style="border-bottom:2px solid #1f2937">
+          <th style="color:#475569;font-size:10px;font-weight:700;text-align:left;padding:8px 12px">TICKET</th>
+          <th style="color:#475569;font-size:10px;font-weight:700;text-align:left;padding:8px 12px">CLIENTE</th>
+          <th style="color:#475569;font-size:10px;font-weight:700;text-align:left;padding:8px 12px">DESCRIÇÃO</th>
+          <th style="color:#475569;font-size:10px;font-weight:700;text-align:left;padding:8px 12px">ESTIMATIVA</th>
+          <th style="color:#475569;font-size:10px;font-weight:700;text-align:left;padding:8px 12px">STATUS</th>
+        </tr></thead>
+        <tbody>{dt_cust_rows}</tbody>
+      </table></div>
+    </div>
+    <div id="dv-urg" class="dview">{dt_urg_html}</div>
+    <div id="dv-res" class="dview">{dt_res_html}</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ MOBILE -->
+<div id="mob">
 <div id="hdr">
   <div class="hdr-top">
     <img class="hdr-logo" src="/static/logo.png">
@@ -284,8 +546,8 @@ window.onload=function(){{showTab('cli')}};
   <div id="v-cli" class="view"><div class="sec-hdr">POR CLIENTE — {n_cli} clientes</div>{cli_secs}</div>
   <div id="v-resp" class="view"><div class="sec-hdr">POR RESPONSÁVEL</div>{resp_secs}</div>
   <div id="v-urg" class="view"><div class="sec-hdr">🚨 URGENTES — {n_urg} chamados</div>{urg_html}</div>
-  <div id="v-res" class="view"><div class="sec-hdr">📊 RESULTADOS — {today_str}</div>{res_html}</div>
-  <div id="v-cust" class="view"><div class="sec-hdr">🔧 CUSTOMIZAÇÕES — {len(BACKLOG)} itens</div>{cust_html}</div>
+  <div id="v-res" class="view"><div class="sec-hdr">📊 RESULTADOS — {today_str}</div>{mob_res}</div>
+  <div id="v-cust" class="view"><div class="sec-hdr">🔧 CUSTOMIZAÇÕES — {n_bklog} itens</div>{cust_html}</div>
 </div>
 <nav id="nav">
   <button class="nb on"  id="nb-cli"  onclick="showTab('cli')"><span class="ni">👥</span>Clientes</button>
@@ -294,4 +556,6 @@ window.onload=function(){{showTab('cli')}};
   <button class="nb"     id="nb-res"  onclick="showTab('res')"><span class="ni">📊</span>Resultados</button>
   <button class="nb"     id="nb-cust" onclick="showTab('cust')"><span class="ni">🔧</span>Customiz.</button>
 </nav>
+</div>
+
 </body></html>"""
