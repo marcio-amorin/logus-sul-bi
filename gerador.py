@@ -463,10 +463,10 @@ def gerar_html(all_tks, baixados_hoje=None):
                 f'<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">'
                 f'{_d_tbl_hdr(show_cli=True)}<tbody>{rows}</tbody></table></div></div>')
 
-    # agrupa abertos por data de abertura
+    # agrupa abertos por data de abertura — apenas últimos 14 dias
     by_data = defaultdict(list)
     for t in sul:
-        if t['data']:
+        if t['data'] and t['dias'] <= 14:
             by_data[t['data']].append(t)
     datas_ent = sorted(by_data.keys(), reverse=True)
     datas_ent_show = [today_str] + [d for d in datas_ent if d != today_str]
