@@ -23,6 +23,12 @@ AGUARDANDO_PAGE = '''<!DOCTYPE html><html lang="pt-BR"><head>
 <meta http-equiv="refresh" content="60">
 <title>Logus Sul BI</title>
 <link rel="icon" href="/static/favicon.ico">
+<link rel="manifest" href="/static/manifest.json">
+<meta name="theme-color" content="#ea580c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Sul BI">
+<link rel="apple-touch-icon" href="/static/icon-192.png">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:#0c0c0c;color:#e5e7eb;font-family:"Segoe UI",Arial,sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
