@@ -226,7 +226,7 @@ def _d_donut_chart(by_cli, clientes):
               '#fb923c','#f472b6','#4ade80','#38bdf8','#c084fc','#facc15',
               '#2dd4bf','#f87171','#818cf8','#e879f9','#86efac','#fda4af']
     sorted_cli = sorted(clientes, key=lambda c: -len(by_cli[c]))
-    cx = cy = 150; R = 128; r = 68; GAP = 1.8
+    cx = cy = 120; R = 104; r = 56; GAP = 1.8
     paths = []; angle = -90.0
     for i, cli in enumerate(sorted_cli):
         cnt = len(by_cli[cli])
@@ -245,30 +245,31 @@ def _d_donut_chart(by_cli, clientes):
         tip = f'{cli} · {cnt} tickets ({pct*100:.1f}%)' + (f' · {inc} incidentes' if inc else '')
         paths.append(f'<path class="dslice" d="{d}" fill="{color}" stroke="#0c0c0c" stroke-width="2"><title>{tip}</title></path>')
         angle += sweep + GAP
-    svg = (f'<svg width="300" height="300" viewBox="0 0 300 300" style="display:block">'
+    svg = (f'<svg width="240" height="240" viewBox="0 0 240 240" style="display:block;flex-shrink:0">'
            f'<style>.dslice{{opacity:.85;transition:opacity .15s,filter .15s}}.dslice:hover{{opacity:1;filter:brightness(1.3)}}</style>'
            + ''.join(paths)
-           + f'<text x="{cx}" y="{cy-12}" text-anchor="middle" fill="#f97316" font-size="30" font-weight="900" font-family="Segoe UI,sans-serif">{total}</text>'
+           + f'<text x="{cx}" y="{cy-8}" text-anchor="middle" fill="#f97316" font-size="26" font-weight="900" font-family="Segoe UI,sans-serif">{total}</text>'
            + f'<text x="{cx}" y="{cy+10}" text-anchor="middle" fill="#6b7280" font-size="10" font-weight="700" font-family="Segoe UI,sans-serif" letter-spacing="1">TICKETS</text>'
-           + f'<text x="{cx}" y="{cy+26}" text-anchor="middle" fill="#374151" font-size="10" font-family="Segoe UI,sans-serif">{len(clientes)} clientes</text>'
+           + f'<text x="{cx}" y="{cy+24}" text-anchor="middle" fill="#374151" font-size="10" font-family="Segoe UI,sans-serif">{len(clientes)} clientes</text>'
            + '</svg>')
     top_cli = sorted_cli[0];  top_pct = len(by_cli[top_cli]) / total * 100
     bot_cli = sorted_cli[-1]; bot_pct = len(by_cli[bot_cli]) / total * 100
-    callout = (f'<div style="display:flex;gap:8px;margin-top:12px">'
-               f'<div style="background:#1a0800;border:1px solid #ea580c;border-radius:6px;padding:8px 10px;flex:1">'
+    # callout no topo, largura total
+    callout = (f'<div style="display:flex;gap:10px;margin-bottom:14px">'
+               f'<div style="background:#1a0800;border:1px solid #ea580c;border-radius:6px;padding:8px 14px;flex:1">'
                f'<div style="color:#6b4c30;font-size:9px;font-weight:700;letter-spacing:.5px">MAIOR CONCENTRAÇÃO</div>'
-               f'<div style="color:#f97316;font-size:18px;font-weight:900;margin-top:2px">{top_pct:.1f}%</div>'
+               f'<div style="color:#f97316;font-size:20px;font-weight:900;margin-top:2px">{top_pct:.1f}%</div>'
                f'<div style="color:#fb923c;font-size:11px;font-weight:700">{top_cli}</div></div>'
-               f'<div style="background:#0d1a0d;border:1px solid #166534;border-radius:6px;padding:8px 10px;flex:1">'
+               f'<div style="background:#0d1a0d;border:1px solid #166534;border-radius:6px;padding:8px 14px;flex:1">'
                f'<div style="color:#14532d;font-size:9px;font-weight:700;letter-spacing:.5px">MENOR CONCENTRAÇÃO</div>'
-               f'<div style="color:#4ade80;font-size:18px;font-weight:900;margin-top:2px">{bot_pct:.1f}%</div>'
+               f'<div style="color:#4ade80;font-size:20px;font-weight:900;margin-top:2px">{bot_pct:.1f}%</div>'
                f'<div style="color:#22c55e;font-size:11px;font-weight:700">{bot_cli}</div></div></div>')
     legend_rows = ''
     for i, cli in enumerate(sorted_cli):
         cnt = len(by_cli[cli]); pct = cnt / total * 100
         color = COLORS[i % len(COLORS)]
         inc = sum(1 for t in by_cli[cli] if t['tipo'] == 'Incidente')
-        bw = int(pct * 1.6)
+        bw = int(pct * 1.7)
         inc_tag = f'<span style="color:#ef4444;font-size:10px"> ⚠{inc}</span>' if inc else ''
         legend_rows += (f'<div style="margin-bottom:9px">'
                         f'<div style="display:flex;align-items:center;gap:7px;margin-bottom:3px">'
@@ -277,15 +278,15 @@ def _d_donut_chart(by_cli, clientes):
                         f'<span style="color:{color};font-size:12px;font-weight:900">{pct:.1f}%</span>'
                         f'<span style="color:#374151;font-size:10px;margin-left:4px">{cnt}tk{inc_tag}</span></div>'
                         f'<div style="background:#1f2937;border-radius:3px;height:4px">'
-                        f'<div style="width:{min(bw,160)}px;background:{color};height:100%;border-radius:3px"></div></div></div>')
-    return (f'<div style="display:flex;gap:20px;align-items:flex-start;background:#0d0d0d;border:1px solid #1f2937;'
-            f'border-radius:12px;padding:18px 22px;margin-top:14px;flex-wrap:wrap">'
-            f'<div style="flex-shrink:0">'
-            f'<div style="color:#64748b;font-size:10px;font-weight:700;letter-spacing:1px;margin-bottom:10px">DISTRIBUIÇÃO POR CLIENTE</div>'
-            f'{svg}{callout}</div>'
-            f'<div style="flex:1;min-width:200px;max-height:340px;overflow-y:auto;padding-right:4px">'
+                        f'<div style="width:{min(bw,170)}px;background:{color};height:100%;border-radius:3px"></div></div></div>')
+    return (f'<div style="background:#0d0d0d;border:1px solid #1f2937;border-radius:12px;padding:18px 22px;margin-top:14px">'
+            f'<div style="color:#64748b;font-size:10px;font-weight:700;letter-spacing:1px;margin-bottom:14px">DISTRIBUIÇÃO POR CLIENTE</div>'
+            f'{callout}'
+            f'<div style="display:flex;gap:20px;align-items:flex-start">'
+            f'{svg}'
+            f'<div style="flex:1;min-width:180px;max-height:240px;overflow-y:auto;padding-right:6px">'
             f'<div style="color:#64748b;font-size:10px;font-weight:700;letter-spacing:1px;margin-bottom:10px">TODOS OS CLIENTES</div>'
-            f'{legend_rows}</div></div>')
+            f'{legend_rows}</div></div></div>')
 
 def _priority_panel_html(tk_lkp, baixados_by_code):
     groups = [
