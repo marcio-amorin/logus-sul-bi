@@ -257,7 +257,7 @@ def gerar_html(all_tks, baixados_hoje=None):
 
     def _dtk(code,emp,desc):
         t=tk_lkp.get(code)
-        return t if t else {'code':code,'empresa':emp,'assunto':desc,'atrib':'—','status':'—','tipo':'Requisição','dias':0}
+        return t if t else {'code':code,'empresa':emp,'assunto':desc,'atrib':'—','status':'—','tipo':'Requisição','dias':0,'data':'','resolucao':''}
     dev_tks=[_dtk('24760','GUMZ','Erro Finalização notas simples nacional'),
              _dtk('24621','VICARI','Controle de trocas — Erro filtro Filiais'),
              _dtk('25368','BEBIDA POP','Emissão de NF — Transformar Pedido em NF')]
