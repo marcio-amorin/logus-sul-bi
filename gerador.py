@@ -243,6 +243,12 @@ body{{padding-bottom:70px}}
 .nb.on{{color:#f97316}}.nb.on-urg{{color:#ef4444}}.nb.on-res{{color:#22c55e}}.nb.on-cust{{color:#a78bfa}}
 .sec-hdr{{color:#64748b;font-size:11px;font-weight:700;letter-spacing:1px;padding:6px 0 10px}}
 @keyframes pulse{{0%,100%{{opacity:.5}}50%{{opacity:1}}}}
+@media(min-width:600px){{
+  body{{display:flex;justify-content:center;background:#050505}}
+  #hdr{{width:480px;left:50%;transform:translateX(-50%)}}
+  #content{{width:480px}}
+  #nav{{width:480px;left:50%;transform:translateX(-50%);border-radius:16px 16px 0 0}}
+}}
 </style>
 <script>
 function showTab(t){{
