@@ -122,8 +122,9 @@ def _bar(lbl, v, tot, cor):
 def _d_safe(s):
     return ''.join(c if c.isalnum() else '_' for c in s)
 
-def _d_stat(label, val, cor):
-    return (f'<div style="border:1px solid {cor};border-radius:6px;padding:8px 18px;text-align:center;min-width:90px">'
+def _d_stat(label, val, cor, tab=''):
+    click = f' onclick="dTab(\'{tab}\')" title="Ir para {label}"' if tab else ''
+    return (f'<div class="dstat"{click} style="border:1px solid {cor};border-radius:6px;padding:8px 18px;text-align:center;min-width:90px">'
             f'<div style="color:{cor};font-size:26px;font-weight:900;line-height:1.1">{val}</div>'
             f'<div style="color:{cor};font-size:9px;font-weight:700;opacity:.6;margin-top:4px;letter-spacing:.5px">{label}</div></div>')
 
@@ -386,11 +387,11 @@ def gerar_html(all_tks, baixados_hoje=None):
           +f'</tbody></table></div>' if n_resol else '')
     )
 
-    dt_hdr_stats=(_d_stat('CLIENTES',n_cli,'#f97316')
-                  +_d_stat('CHAMADOS',tot,'#fb923c')
-                  +_d_stat('INCIDENTES',tot_inc,'#ef4444')
-                  +_d_stat('AGUARDANDO',tot_ag,'#d97706')
-                  +_d_stat('NOVOS',n_nov,'#22c55e'))
+    dt_hdr_stats=(_d_stat('CLIENTES',n_cli,'#f97316','cli')
+                  +_d_stat('CHAMADOS',tot,'#fb923c','cli')
+                  +_d_stat('INCIDENTES',tot_inc,'#ef4444','urg')
+                  +_d_stat('AGUARDANDO',tot_ag,'#d97706','resp')
+                  +_d_stat('NOVOS',n_nov,'#22c55e','res'))
 
     return f"""<!DOCTYPE html><html lang="pt-BR"><head>
 <meta charset="UTF-8">
@@ -401,20 +402,8 @@ def gerar_html(all_tks, baixados_hoje=None):
 *{{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}}
 html,body{{background:#0c0c0c;color:#e5e7eb;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}}
 @keyframes pulse{{0%,100%{{opacity:.5}}50%{{opacity:1}}}}
-/* desktop */
+/* ── mobile (padrão) ── */
 #dt{{display:none}}
-@media(min-width:768px){{
-  body{{padding:0}}
-  #dt{{display:block}}
-  #mob{{display:none}}
-  .dtab{{background:none;border:none;color:#64748b;font-size:13px;font-weight:700;padding:11px 22px;cursor:pointer;border-bottom:3px solid transparent;transition:color .15s}}
-  .dtab:hover{{color:#e5e7eb}}
-  .dtab.on{{color:#f97316;border-bottom-color:#f97316}}
-  .dview{{display:none}}.dview.on{{display:block}}
-  .dcbox:hover,.drbox:hover{{background:#1a0800!important}}
-  .dcbox.sel{{background:#1a0800!important;border-color:#f97316!important}}
-}}
-/* mobile */
 #mob{{display:block}}
 body{{padding-bottom:70px}}
 #hdr{{position:sticky;top:0;z-index:100;background:#0c0c0c;border-bottom:1px solid #1a1a1a;padding:10px 14px}}
@@ -431,6 +420,19 @@ body{{padding-bottom:70px}}
 .nb .ni{{font-size:22px;line-height:1}}
 .nb.on{{color:#f97316}}.nb.on-urg{{color:#ef4444}}.nb.on-res{{color:#22c55e}}.nb.on-cust{{color:#a78bfa}}
 .sec-hdr{{color:#64748b;font-size:11px;font-weight:700;letter-spacing:1px;padding:6px 0 10px}}
+/* ── desktop (sobrescreve mobile acima de 768px) ── */
+@media(min-width:768px){{
+  body{{padding:0}}
+  #dt{{display:block}}
+  #mob{{display:none}}
+  .dtab{{background:none;border:none;color:#64748b;font-size:13px;font-weight:700;padding:11px 22px;cursor:pointer;border-bottom:3px solid transparent;transition:color .15s}}
+  .dtab:hover{{color:#e5e7eb}}
+  .dtab.on{{color:#f97316;border-bottom-color:#f97316}}
+  .dview{{display:none}}.dview.on{{display:block}}
+  .dcbox:hover,.drbox:hover{{background:#1a0800!important}}
+  .dcbox.sel{{background:#1a0800!important;border-color:#f97316!important}}
+  .dstat{{cursor:pointer;transition:opacity .15s}}.dstat:hover{{opacity:.75}}
+}}
 </style>
 <script>
 /* desktop */
