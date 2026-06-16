@@ -1,14 +1,18 @@
 import csv, io
-from datetime import date, datetime
+from datetime import date, datetime, timezone, timedelta
+
+def _hoje_brt():
+    return datetime.now(timezone(timedelta(hours=-3))).date()
 
 def _parse_date(s):
     if not s:
         return '', 0
     s = s.strip().split(' ')[0]
+    hoje = _hoje_brt()
     for fmt in ('%d/%m/%Y', '%Y-%m-%d', '%m/%d/%Y'):
         try:
             d = datetime.strptime(s, fmt).date()
-            return d.strftime('%d/%m/%Y'), (date.today() - d).days
+            return d.strftime('%d/%m/%Y'), (hoje - d).days
         except ValueError:
             continue
     return s, 0

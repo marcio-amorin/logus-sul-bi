@@ -1,5 +1,8 @@
-from datetime import date
+from datetime import date, datetime, timezone, timedelta
 from collections import defaultdict
+
+def _hoje_brt():
+    return datetime.now(timezone(timedelta(hours=-3))).date()
 
 SUL_EMP = {
     'GUMZ','MERCADO DE BEBIDA POP','MILANI','PARANA SUPERMERCADO',
@@ -212,7 +215,7 @@ def _d_urg_sec(titulo, cor, bg, tks):
 # ── main ──────────────────────────────────────────────────────────────────────
 
 def gerar_html(all_tks, baixados_hoje=None):
-    today     = date.today()
+    today     = _hoje_brt()
     today_str = today.strftime('%d/%m/%Y')
     baixados_hoje = baixados_hoje or []
 
