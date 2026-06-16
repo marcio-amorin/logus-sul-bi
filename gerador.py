@@ -227,6 +227,9 @@ def gerar_html(all_tks, baixados_hoje=None):
                 sul_emp.add(t['empresa'])
     sul_emp -= {'LOGUS','SEM EMPRESA',''}
 
+    # filtra baixados para conter apenas clientes da base Sul
+    baixados_hoje = [t for t in baixados_hoje if t['empresa'] in sul_emp]
+
     sul = [t for t in all_tks if t['empresa'] in sul_emp]
     by_cli  = defaultdict(list)
     by_resp = defaultdict(list)
