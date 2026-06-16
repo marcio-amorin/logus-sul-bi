@@ -248,7 +248,7 @@ def gerar_html(all_tks, baixados_hoje=None):
     n_and=sum(1 for t in sul if t['status']=='Em andamento')
     n_req=sum(1 for t in sul if t['tipo']=='Requisição')
     n_duv=sum(1 for t in sul if t['tipo'] not in ('Incidente','Requisição'))
-    n_resol=len(baixados_hoje); n_hoje=sum(1 for t in sul if t['dias']==0)
+    n_resol=len(baixados_hoje); n_hoje=sum(1 for t in sul if t['data']==today_str)
 
     tk_lkp = {t['code']:t for t in all_tks}
     def _sec(codes): return [t for t in sul if t['code'] in codes]
@@ -299,7 +299,7 @@ def gerar_html(all_tks, baixados_hoje=None):
         cust_html+=(f'<div style="color:{cor};font-size:11px;font-weight:700;letter-spacing:1px;padding:10px 4px 6px">{st.upper()} — {len(grp)}</div>'
                     +''.join(_ccard(b) for b in grp))
 
-    hoje_cards=''.join(_tk(t) for t in sorted([t for t in sul if t['dias']==0],key=lambda x:x['empresa']))
+    hoje_cards=''.join(_tk(t) for t in sorted([t for t in sul if t['data']==today_str],key=lambda x:x['empresa']))
     bx_cards=''.join(_tk(t) for t in sorted(baixados_hoje,key=lambda x:x.get('empresa','')))
 
     mob_res=(
@@ -382,7 +382,7 @@ def gerar_html(all_tks, baixados_hoje=None):
         +f'</div></div>'
         +(f'<div style="color:#22c55e;font-size:12px;font-weight:700;letter-spacing:1px;margin:20px 0 10px">📥 ENTRARAM HOJE</div>'
           +f'<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">{_d_tbl_hdr()}<tbody>'
-          +''.join(_d_row(t) for t in sorted([t for t in sul if t['dias']==0],key=lambda x:x['empresa']))
+          +''.join(_d_row(t) for t in sorted([t for t in sul if t['data']==today_str],key=lambda x:x['empresa']))
           +f'</tbody></table></div>' if n_hoje else '')
         +(f'<div style="color:#22c55e;font-size:12px;font-weight:700;letter-spacing:1px;margin:20px 0 10px">📤 RESOLVIDOS HOJE</div>'
           +f'<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">{_d_tbl_hdr()}<tbody>'
