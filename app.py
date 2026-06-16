@@ -1,5 +1,8 @@
 import os
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
+
+def _agora_brt():
+    return datetime.now(timezone(timedelta(hours=-3))).strftime('%d/%m/%Y %H:%M')
 from flask import Flask, Response, request, session, redirect
 
 from gerador import gerar_html
@@ -199,7 +202,7 @@ def admin_gerar():
         return Response(UPLOAD_PAGE.replace('{error}', err).replace('{ultimo}', ultimo), mimetype='text/html', status=500)
 
     _painel['html'] = html
-    _painel['gerado_em'] = datetime.now().strftime('%d/%m/%Y %H:%M')
+    _painel['gerado_em'] = _agora_brt()
     return redirect('/admin')
 
 if __name__ == '__main__':
