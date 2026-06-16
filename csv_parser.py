@@ -13,9 +13,32 @@ def _parse_date(s):
             continue
     return s, 0
 
+def _detect_dialect(text):
+    sample = text[:8192]
+    try:
+        return csv.Sniffer().sniff(sample, delimiters=',;\t|')
+    except csv.Error:
+        # fallback: conta qual delimitador aparece mais na primeira linha
+        first = sample.split('\n')[0]
+        if first.count(';') > first.count(','):
+            return csv.excel_tab.__class__  # não usar — vai por abaixo
+        return csv.excel
+
 def parse_csv(content_bytes):
-    text = content_bytes.decode('utf-8-sig', errors='replace')
-    reader = csv.reader(io.StringIO(text))
+    for enc in ('utf-8-sig', 'latin-1', 'cp1252'):
+        try:
+            text = content_bytes.decode(enc)
+            break
+        except UnicodeDecodeError:
+            continue
+    else:
+        text = content_bytes.decode('utf-8', errors='replace')
+
+    # detecta delimitador pela primeira linha
+    first_line = text.split('\n')[0]
+    delimiter = ';' if first_line.count(';') >= first_line.count(',') else ','
+
+    reader = csv.reader(io.StringIO(text), delimiter=delimiter)
     hdr = {}
     tickets = []
     for r in reader:
