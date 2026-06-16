@@ -1,11 +1,45 @@
 import os
-from flask import Flask, Response, request
+from flask import Flask, Response, request, session, redirect
 
 from gerador import gerar_html
 from csv_parser import parse_csv, parse_csv_baixados
 
 app = Flask(__name__)
+app.secret_key = 'ls-bi-2026-xk9'
 app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024  # 10 MB
+
+LOGIN_USER = 'logussul'
+LOGIN_PASS = 'varlog'
+
+LOGIN_PAGE = '''<!DOCTYPE html><html lang="pt-BR"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Logus Sul BI — Login</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0c0c0c;color:#e5e7eb;font-family:"Segoe UI",Arial,sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+.card{background:#0d0800;border:2px solid #ea580c;border-radius:12px;padding:36px 40px;width:100%;max-width:380px}
+.logo{color:#f97316;font-size:28px;font-weight:900;letter-spacing:-1px;margin-bottom:4px}
+.sub{color:#6b4c30;font-size:12px;margin-bottom:28px}
+label{display:block;color:#9ca3af;font-size:11px;font-weight:700;letter-spacing:.8px;margin-bottom:6px;margin-top:18px}
+input{width:100%;padding:11px 14px;background:#080500;border:1px solid #2a1800;border-radius:6px;color:#e5e7eb;font-size:13px;outline:none;transition:border-color .2s}
+input:focus{border-color:#ea580c}
+.btn{display:block;width:100%;margin-top:24px;padding:13px;background:#ea580c;color:#fff;font-size:14px;font-weight:900;border:none;border-radius:8px;cursor:pointer;transition:background .2s}
+.btn:hover{background:#f97316}
+.err{background:#1a0000;border:1px solid #ef4444;color:#f87171;border-radius:6px;padding:10px 14px;font-size:12px;margin-bottom:16px}
+</style></head><body>
+<div class="card">
+  <div class="logo">logus <span style="color:#fff;font-size:14px;font-weight:400">sul</span> BI</div>
+  <div class="sub">Painel de Chamados — Regional Sul</div>
+  {error}
+  <form method="POST" action="/login">
+    <label>USUÁRIO</label>
+    <input type="text" name="usuario" autocomplete="username" autofocus>
+    <label>SENHA</label>
+    <input type="password" name="senha" autocomplete="current-password">
+    <button class="btn" type="submit">Entrar</button>
+  </form>
+</div>
+</body></html>'''
 
 UPLOAD_PAGE = '''<!DOCTYPE html><html lang="pt-BR"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -28,10 +62,12 @@ label{display:block;color:#9ca3af;font-size:11px;font-weight:700;letter-spacing:
 .btn:disabled{background:#2a1800;color:#6b4c30;cursor:not-allowed}
 .tip{color:#374151;font-size:10px;margin-top:10px;line-height:1.5}
 .err{background:#1a0000;border:1px solid #ef4444;color:#f87171;border-radius:6px;padding:10px 14px;font-size:12px;margin-bottom:16px}
+.sair{float:right;color:#6b4c30;font-size:10px;text-decoration:none;margin-top:4px}
+.sair:hover{color:#f97316}
 </style></head><body>
 <div class="card">
   <div class="logo">logus <span style="color:#fff;font-size:14px;font-weight:400">sul</span> BI</div>
-  <div class="sub">Painel de Chamados — Regional Sul</div>
+  <div class="sub">Painel de Chamados — Regional Sul <a href="/sair" class="sair">Sair</a></div>
   {error}
   <form method="POST" action="/gerar" enctype="multipart/form-data" id="form">
     <label>CSV PRINCIPAL — Chamados Abertos *</label>
@@ -68,12 +104,37 @@ document.getElementById('form').addEventListener('submit',function(){
 });
 </script></body></html>'''
 
+def logado():
+    return session.get('auth') == True
+
 @app.route('/')
 def index():
+    if not logado():
+        return redirect('/login')
     return Response(UPLOAD_PAGE.replace('{error}', ''), mimetype='text/html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        u = request.form.get('usuario', '').strip()
+        s = request.form.get('senha', '').strip()
+        if u == LOGIN_USER and s == LOGIN_PASS:
+            session['auth'] = True
+            return redirect('/')
+        err = '<div class="err">⚠ Usuário ou senha incorretos.</div>'
+        return Response(LOGIN_PAGE.replace('{error}', err), mimetype='text/html', status=401)
+    return Response(LOGIN_PAGE.replace('{error}', ''), mimetype='text/html')
+
+@app.route('/sair')
+def sair():
+    session.clear()
+    return redirect('/login')
 
 @app.route('/gerar', methods=['POST'])
 def gerar():
+    if not logado():
+        return redirect('/login')
+
     f_main = request.files.get('csv_main')
     if not f_main or not f_main.filename:
         err = '<div class="err">⚠ Selecione o CSV principal antes de continuar.</div>'
