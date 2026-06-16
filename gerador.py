@@ -217,6 +217,47 @@ def _d_urg_sec(titulo, cor, bg, tks):
             f'<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">'
             f'{_d_tbl_hdr()}<tbody>{rows}</tbody></table></div></div>')
 
+def _priority_panel_html(tk_lkp, baixados_by_code):
+    groups = [
+        ('🟢 PDV — Urgente',      '#4ade80', '#052e16', URG_PDV),
+        ('🔴 ERP — Urgente',      '#ef4444', '#1a0000', URG_ERP),
+        ('💻 Dev / Sustentação',  '#a78bfa', '#0d0520', URG_DEV),
+    ]
+    html = '<div style="margin-bottom:24px;background:#0d0d0d;border:1px solid #1f2937;border-radius:10px;padding:16px 20px">'
+    html += '<div style="color:#64748b;font-size:10px;font-weight:700;letter-spacing:1px;margin-bottom:16px">🎯 ACOMPANHAMENTO DE PRIORIDADES</div>'
+    for titulo, cor, bg, codes in groups:
+        res_c = sum(1 for c in codes if c in baixados_by_code)
+        tot_c = len(codes)
+        all_done = res_c == tot_c
+        sbadge = ('<span style="background:#052e16;color:#22c55e;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:900">✅ TUDO TRATADO</span>'
+                  if all_done else
+                  f'<span style="color:{cor};font-size:11px;font-weight:700">{res_c}/{tot_c} resolvidos</span>')
+        html += (f'<div style="background:{bg};border-left:4px solid {cor};border-radius:6px;'
+                 f'padding:8px 14px;margin-bottom:4px;display:flex;align-items:center;justify-content:space-between">'
+                 f'<span style="color:{cor};font-size:12px;font-weight:900">{titulo}</span>'
+                 f'{sbadge}</div>')
+        for code in sorted(codes):
+            t = tk_lkp.get(code)
+            assunto = (t['assunto'] if t else f'Ticket #{code}')[:90]
+            empresa = t['empresa'] if t else '—'
+            res_t = baixados_by_code.get(code)
+            if res_t:
+                res_date = res_t.get('resolucao','')
+                rbadge = f'<span style="color:#22c55e;font-size:10px;font-weight:900;white-space:nowrap">✅ {res_date}</span>'
+            else:
+                st = (t['status'] if t else '—') or '—'
+                at = (t['atrib'] if t else '—') or '—'
+                rbadge = f'<span style="color:#ef4444;font-size:10px;font-weight:700;white-space:nowrap">⏳ {st} · {at}</span>'
+            html += (f'<div style="display:flex;align-items:center;gap:10px;padding:6px 12px 6px 20px;'
+                     f'border-bottom:1px solid #111;flex-wrap:wrap">'
+                     f'<span style="color:#f97316;font-size:12px;font-weight:900;min-width:58px">#{code}</span>'
+                     f'<span style="color:#fed7aa;font-size:11px;font-weight:700;min-width:85px;white-space:nowrap">{empresa}</span>'
+                     f'<span style="color:#94a3b8;font-size:12px;flex:1;min-width:120px">{assunto}</span>'
+                     f'{rbadge}</div>')
+        html += '<div style="margin-bottom:14px"></div>'
+    html += '</div>'
+    return html
+
 # ── main ──────────────────────────────────────────────────────────────────────
 
 def gerar_html(all_tks, baixados_hoje=None):
@@ -244,6 +285,7 @@ def gerar_html(all_tks, baixados_hoje=None):
         if t['resolucao']:
             by_res[t['resolucao']].append(t)
     datas_res = sorted(by_res.keys(), reverse=True)
+    baixados_by_code = {t['code']: t for t in baixados_hoje}
 
     sul = [t for t in all_tks if t['empresa'] in sul_emp]
     by_cli  = defaultdict(list)
@@ -351,7 +393,8 @@ def gerar_html(all_tks, baixados_hoje=None):
                 f'{_d_tbl_hdr(show_cli=True)}<tbody>{rows}</tbody></table></div></div>')
 
     mob_res=(
-        f'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px">'
+        _priority_panel_html(tk_lkp,baixados_by_code)
+        +f'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px">'
         +f'<div style="background:#052e16;border:2px solid #22c55e;border-radius:12px;padding:14px;text-align:center"><div style="color:#4ade80;font-size:32px;font-weight:900">{n_hoje}</div><div style="color:#22c55e;font-size:11px;font-weight:700">ENTRARAM HOJE</div></div>'
         +f'<div style="background:#0a0a16;border:2px solid #3b82f6;border-radius:12px;padding:14px;text-align:center"><div style="color:#60a5fa;font-size:32px;font-weight:900">{tot}</div><div style="color:#3b82f6;font-size:11px;font-weight:700">TOTAL ABERTOS</div></div>'
         +f'<div style="background:#1a0000;border:2px solid #ef4444;border-radius:12px;padding:14px;text-align:center"><div style="color:#f87171;font-size:32px;font-weight:900">{tot_inc}</div><div style="color:#ef4444;font-size:11px;font-weight:700">INCIDENTES</div></div>'
@@ -430,6 +473,7 @@ def gerar_html(all_tks, baixados_hoje=None):
         +f'<div style="color:#64748b;font-size:10px;font-weight:700;letter-spacing:1px;margin-bottom:14px">TIPO</div>'
         +_bar('Incidente',tot_inc,tot,'#ef4444')+_bar('Requisição',n_req,tot,'#3b82f6')+_bar('Dúvida/Outros',n_duv,tot,'#a78bfa')
         +f'</div></div>'
+        +f'<div style="margin-top:20px">{_priority_panel_html(tk_lkp,baixados_by_code)}</div>'
         +(f'<div style="color:#22c55e;font-size:12px;font-weight:700;letter-spacing:1px;margin:20px 0 10px">📥 ENTRARAM HOJE</div>'
           +f'<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">{_d_tbl_hdr()}<tbody>'
           +''.join(_d_row(t) for t in sorted([t for t in sul if t['data']==today_str],key=lambda x:x['empresa']))
