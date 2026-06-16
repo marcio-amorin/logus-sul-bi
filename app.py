@@ -28,8 +28,8 @@ input:focus{border-color:#ea580c}
 .err{background:#1a0000;border:1px solid #ef4444;color:#f87171;border-radius:6px;padding:10px 14px;font-size:12px;margin-bottom:16px}
 </style></head><body>
 <div class="card">
-  <div class="logo">logus <span style="color:#fff;font-size:14px;font-weight:400">sul</span> BI</div>
-  <div class="sub">Painel de Chamados — Regional Sul</div>
+  <div style="text-align:center;margin-bottom:20px"><img src="/static/logo.png" style="height:80px;background:#fff;border-radius:10px;padding:8px 16px"></div>
+  <div class="sub" style="text-align:center">Painel de Chamados — Regional Sul &amp; Centro Oeste</div>
   {error}
   <form method="POST" action="/login">
     <label>USUÁRIO</label>
@@ -66,8 +66,8 @@ label{display:block;color:#9ca3af;font-size:11px;font-weight:700;letter-spacing:
 .sair:hover{color:#f97316}
 </style></head><body>
 <div class="card">
-  <div class="logo">logus <span style="color:#fff;font-size:14px;font-weight:400">sul</span> BI</div>
-  <div class="sub">Painel de Chamados — Regional Sul <a href="/sair" class="sair">Sair</a></div>
+  <div style="text-align:center;margin-bottom:14px"><img src="/static/logo.png" style="height:70px;background:#fff;border-radius:10px;padding:6px 14px"></div>
+  <div class="sub" style="text-align:center">Painel de Chamados — Regional Sul &amp; Centro Oeste <a href="/sair" class="sair">Sair</a></div>
   {error}
   <form method="POST" action="/gerar" enctype="multipart/form-data" id="form">
     <label>CSV PRINCIPAL — Chamados Abertos *</label>
