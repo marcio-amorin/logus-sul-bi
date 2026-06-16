@@ -111,26 +111,12 @@ label{display:block;color:#9ca3af;font-size:11px;font-weight:700;letter-spacing:
       <div class="hint">ex: <em>Logus Retail-16_06_2026.csv</em></div>
       <div class="fname" id="n1"></div>
     </div>
-    <label>CSV BAIXA — Chamados Baixa Prioridade <span style="color:#374151;font-weight:400">(opcional)</span></label>
+    <label>CSV BAIXADOS — Chamados Resolvidos <span style="color:#374151;font-weight:400">(opcional)</span></label>
     <div class="drop" id="drop2">
-      <input type="file" name="csv_baixa" accept=".csv" onchange="setName(this,'n2')">
-      <div class="icon">🟢</div>
-      <div class="hint">ex: <em>Logus Retail-Baixa-16_06_2026.csv</em></div>
-      <div class="fname" id="n2"></div>
-    </div>
-    <label>CSV MÉDIA — Chamados Média Prioridade <span style="color:#374151;font-weight:400">(opcional)</span></label>
-    <div class="drop" id="drop3">
-      <input type="file" name="csv_media" accept=".csv" onchange="setName(this,'n3')">
-      <div class="icon">🟡</div>
-      <div class="hint">ex: <em>Logus Retail-Media-16_06_2026.csv</em></div>
-      <div class="fname" id="n3"></div>
-    </div>
-    <label>CSV BAIXADOS — Resolvidos <span style="color:#374151;font-weight:400">(opcional)</span></label>
-    <div class="drop" id="drop4">
-      <input type="file" name="csv_baixados" accept=".csv" onchange="setName(this,'n4')">
+      <input type="file" name="csv_baixados" accept=".csv" onchange="setName(this,'n2')">
       <div class="icon">📤</div>
       <div class="hint">ex: <em>Logus Retail-16_06_2026 (2).csv</em></div>
-      <div class="fname" id="n4"></div>
+      <div class="fname" id="n2"></div>
     </div>
     <button class="btn" type="submit" id="btn">🚀 Publicar Painel</button>
     <div class="tip">Após publicar, toda a equipe verá o painel atualizado automaticamente.</div>
@@ -139,7 +125,7 @@ label{display:block;color:#9ca3af;font-size:11px;font-weight:700;letter-spacing:
 <script>
 function setName(inp,id){var n=document.getElementById(id);if(inp.files&&inp.files[0]){n.textContent='✓ '+inp.files[0].name;n.style.display='block';}}
 document.getElementById('form').addEventListener('submit',function(){var b=document.getElementById('btn');b.disabled=true;b.textContent='⏳ Publicando...';});
-['drop1','drop2','drop3','drop4'].forEach(function(id){var el=document.getElementById(id);
+['drop1','drop2'].forEach(function(id){var el=document.getElementById(id);
 el.addEventListener('dragover',function(e){e.preventDefault();el.classList.add('over');});
 el.addEventListener('dragleave',function(){el.classList.remove('over');});
 el.addEventListener('drop',function(){el.classList.remove('over');});});
@@ -199,17 +185,6 @@ def admin_gerar():
         err = f'<div class="err">⚠ Erro ao ler CSV: {e}</div>'
         ultimo = f'<div class="ok">✓ Último painel publicado às {_painel["gerado_em"]}</div>' if _painel['gerado_em'] else ''
         return Response(UPLOAD_PAGE.replace('{error}', err).replace('{ultimo}', ultimo), mimetype='text/html', status=400)
-
-    # mescla CSVs de prioridade Baixa e Média (deduplica por código)
-    for field in ('csv_baixa', 'csv_media'):
-        f_extra = request.files.get(field)
-        if f_extra and f_extra.filename:
-            try:
-                extra_tks = parse_csv(f_extra.read())
-                existing = {t['code'] for t in all_tks}
-                all_tks += [t for t in extra_tks if t['code'] not in existing]
-            except Exception:
-                pass
 
     baixados = []
     f_bx = request.files.get('csv_baixados')
