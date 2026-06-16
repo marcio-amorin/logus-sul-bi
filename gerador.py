@@ -131,13 +131,15 @@ def _d_stat(label, val, cor, tab=''):
             f'<div style="color:{cor};font-size:26px;font-weight:900;line-height:1.1">{val}</div>'
             f'<div style="color:{cor};font-size:9px;font-weight:700;opacity:.6;margin-top:4px;letter-spacing:.5px">{label}</div></div>')
 
-def _d_row(t):
+def _d_row(t, show_cli=False):
     fc,_ = _dc(t['dias'])
     tipo = t['tipo'] or '—'
     tc = '#ef4444' if t['tipo']=='Incidente' else '#3b82f6' if t['tipo']=='Requisição' else '#6b7280'
     ec = {'Novo':'#22c55e','Em andamento':'#3b82f6','Aguardando':'#d97706','Resolvido':'#22c55e','Fechado':'#22c55e'}.get(t['status'],'#6b7280')
+    cli = f'<td style="color:#f97316;font-size:12px;font-weight:700;padding:9px 12px;white-space:nowrap">{t["empresa"]}</td>' if show_cli else ''
     return (f'<tr style="border-bottom:1px solid #111">'
             f'<td style="color:#f97316;font-weight:900;padding:9px 12px;white-space:nowrap">#{t["code"]}</td>'
+            f'{cli}'
             f'<td style="padding:9px 12px"><span style="background:{tc}22;color:{tc};border-radius:4px;padding:3px 8px;font-size:10px;font-weight:900">{tipo.upper()}</span></td>'
             f'<td style="color:#e2e8f0;padding:9px 12px;font-size:13px">{t["assunto"]}</td>'
             f'<td style="padding:9px 12px"><span style="background:{ec}22;color:{ec};border-radius:4px;padding:3px 8px;font-size:10px;font-weight:900">{t["status"].upper()}</span></td>'
@@ -146,9 +148,11 @@ def _d_row(t):
             f'<td style="color:{fc};font-weight:900;padding:9px 12px;text-align:right;white-space:nowrap">{t["dias"]}</td>'
             f'</tr>')
 
-def _d_tbl_hdr():
+def _d_tbl_hdr(show_cli=False):
+    cli = '<th style="color:#475569;font-size:10px;font-weight:700;text-align:left;padding:8px 12px">CLIENTE</th>' if show_cli else ''
     return ('<thead><tr style="border-bottom:2px solid #1f2937">'
             '<th style="color:#475569;font-size:10px;font-weight:700;text-align:left;padding:8px 12px">TICKET</th>'
+            f'{cli}'
             '<th style="color:#475569;font-size:10px;font-weight:700;text-align:left;padding:8px 12px">TIPO</th>'
             '<th style="color:#475569;font-size:10px;font-weight:700;text-align:left;padding:8px 12px">ASSUNTO</th>'
             '<th style="color:#475569;font-size:10px;font-weight:700;text-align:left;padding:8px 12px">ESTADO</th>'
@@ -341,10 +345,10 @@ def gerar_html(all_tks, baixados_hoje=None):
         safe=dt.replace('/','_')
         tks=sorted(by_res.get(dt,[]),key=lambda x:x.get('empresa',''))
         show='block' if dt==today_str else 'none'
-        rows=''.join(_d_row(t) for t in tks) if tks else f'<tr><td colspan="7">{vazio}</td></tr>'
+        rows=''.join(_d_row(t, show_cli=True) for t in tks) if tks else f'<tr><td colspan="8">{vazio}</td></tr>'
         dt_bx+=(f'<div id="dbx-{safe}" class="bx-s" style="display:{show}">'
                 f'<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">'
-                f'{_d_tbl_hdr()}<tbody>{rows}</tbody></table></div></div>')
+                f'{_d_tbl_hdr(show_cli=True)}<tbody>{rows}</tbody></table></div></div>')
 
     mob_res=(
         f'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px">'
