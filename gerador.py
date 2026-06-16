@@ -473,7 +473,8 @@ window.onload=function(){{showTab('cli');dTab('cli')}};
 
 <!-- ═══════════════════════════════════════════════ DESKTOP -->
 <div id="dt">
-  <div style="background:#0c0c0c;border-bottom:1px solid #1a1a1a;padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100">
+  <div style="position:sticky;top:0;z-index:100">
+  <div style="background:#0c0c0c;border-bottom:1px solid #1a1a1a;padding:14px 28px;display:flex;align-items:center;justify-content:space-between">
     <div style="display:flex;align-items:center;gap:14px">
       <img src="/static/logo.png" style="height:46px;background:#fff;border-radius:8px;padding:4px 10px">
       <div>
@@ -497,6 +498,7 @@ window.onload=function(){{showTab('cli');dTab('cli')}};
     <button id="dtb-cust" class="dtab"    onclick="dTab('cust')">Customizações {n_bklog}</button>
     <button id="dtb-urg"  class="dtab"    onclick="dTab('urg')">Urgentes do Dia {n_urg}</button>
     <button id="dtb-res"  class="dtab"    onclick="dTab('res')">Resultados {n_resol} hoje</button>
+  </div>
   </div>
   <div style="padding:20px 28px">
     <div id="dv-cli" class="dview on">
