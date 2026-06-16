@@ -9,7 +9,7 @@ def _parse_date(s):
         return '', 0
     s = s.strip().split(' ')[0]
     hoje = _hoje_brt()
-    for fmt in ('%d/%m/%Y', '%Y-%m-%d', '%m/%d/%Y'):
+    for fmt in ('%d/%m/%Y', '%d-%m-%Y', '%Y-%m-%d', '%m/%d/%Y'):
         try:
             d = datetime.strptime(s, fmt).date()
             return d.strftime('%d/%m/%Y'), (hoje - d).days
