@@ -1,4 +1,4 @@
-from datetime import date
+﻿from datetime import date
 from collections import defaultdict
 
 SUL_EMP = {
@@ -398,6 +398,7 @@ def gerar_html(all_tks, baixados_hoje=None):
     return f'''<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8">
 <meta http-equiv="refresh" content="1800">
 <title>Logus Sul BI · {today_str}</title>
+<link rel="icon" href="data:image/x-icon;base64,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">
 <style>
 *{{box-sizing:border-box;margin:0;padding:0}}
 body{{background:#0c0c0c;color:#e5e7eb;font-family:"Segoe UI",Arial,sans-serif;padding:10px 14px}}
@@ -619,3 +620,4 @@ window.addEventListener('load',fixUrgHeader);window.addEventListener('resize',fi
   Logus Sul BI · {today_str} · {tot} chamados · {len(clientes)} clientes · {tot_cust} customizações
 </div>
 </body></html>'''
+

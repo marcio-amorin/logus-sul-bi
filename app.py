@@ -13,7 +13,8 @@ LOGIN_PASS = 'varlog'
 
 LOGIN_PAGE = '''<!DOCTYPE html><html lang="pt-BR"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Logus Sul BI — Login</title>
+<title>Logus Sul BI</title>
+<link rel="icon" href="/static/favicon.ico">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:#0c0c0c;color:#e5e7eb;font-family:"Segoe UI",Arial,sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
@@ -43,7 +44,8 @@ input:focus{border-color:#ea580c}
 
 UPLOAD_PAGE = '''<!DOCTYPE html><html lang="pt-BR"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Logus Sul BI — Upload</title>
+<title>Logus Sul BI</title>
+<link rel="icon" href="/static/favicon.ico">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:#0c0c0c;color:#e5e7eb;font-family:"Segoe UI",Arial,sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
