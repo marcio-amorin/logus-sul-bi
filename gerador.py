@@ -247,6 +247,52 @@ def _d_urg_sec(titulo, cor, bg, tks):
             f'<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">'
             f'{_d_tbl_hdr(show_cli=True)}<tbody>{rows}</tbody></table></div></div>')
 
+def _ugrp_por_cli(titulo, cor, bg, tks):
+    """Seção mobile com tickets agrupados por cliente."""
+    if not tks: return ''
+    by_emp = defaultdict(list)
+    for t in tks:
+        by_emp[t['empresa']].append(t)
+    clientes_ord = sorted(by_emp.keys(), key=lambda e: -max(t['dias'] for t in by_emp[e]))
+    inner = ''
+    for emp in clientes_ord:
+        emp_tks = sorted(by_emp[emp], key=lambda x: (0 if x['tipo']=='Incidente' else 1, -x['dias']))
+        mx = max(t['dias'] for t in emp_tks)
+        fc, _ = _dc(mx)
+        inner += (f'<div style="color:{fc};font-size:12px;font-weight:900;padding:10px 4px 5px;'
+                  f'border-bottom:1px solid #222;margin-bottom:8px">'
+                  f'{emp} <span style="color:#475569;font-weight:400;font-size:11px">({len(emp_tks)} chamados · {mx}d)</span></div>')
+        inner += ''.join(_tk(t, sc=False) for t in emp_tks)
+    return (f'<div style="margin-bottom:16px">'
+            f'<div style="background:{bg};border-left:4px solid {cor};border-radius:8px;padding:10px 14px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center">'
+            f'<span style="color:{cor};font-size:13px;font-weight:900">{titulo}</span>'
+            f'<span style="color:{cor};font-size:20px;font-weight:900">{len(tks)}</span></div>'
+            f'{inner}</div>')
+
+def _d_urg_por_cli(titulo, cor, bg, tks):
+    """Seção desktop com tickets agrupados por cliente."""
+    if not tks: return ''
+    by_emp = defaultdict(list)
+    for t in tks:
+        by_emp[t['empresa']].append(t)
+    clientes_ord = sorted(by_emp.keys(), key=lambda e: -max(t['dias'] for t in by_emp[e]))
+    rows = ''
+    for emp in clientes_ord:
+        emp_tks = sorted(by_emp[emp], key=lambda x: (0 if x['tipo']=='Incidente' else 1, -x['dias']))
+        mx = max(t['dias'] for t in emp_tks)
+        fc, _ = _dc(mx)
+        rows += (f'<tr><td colspan="7" style="padding:8px 12px;background:#0d0800;border-top:2px solid #1f2937">'
+                 f'<span style="color:{fc};font-size:12px;font-weight:900">{emp}</span>'
+                 f'<span style="color:#475569;font-size:11px;margin-left:10px">{len(emp_tks)} chamados · {mx}d</span>'
+                 f'</td></tr>')
+        rows += ''.join(_d_row(t, show_cli=False) for t in emp_tks)
+    return (f'<div style="margin-bottom:20px">'
+            f'<div style="background:{bg};border-left:4px solid {cor};border-radius:6px;padding:10px 16px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between">'
+            f'<span style="color:{cor};font-size:13px;font-weight:900">{titulo}</span>'
+            f'<span style="color:{cor};font-size:18px;font-weight:900">{len(tks)}</span></div>'
+            f'<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">'
+            f'{_d_tbl_hdr(show_cli=False)}<tbody>{rows}</tbody></table></div></div>')
+
 def _d_donut_chart(by_cli, clientes):
     total = sum(len(by_cli[c]) for c in clientes)
     if total == 0 or not clientes:
@@ -429,25 +475,11 @@ def gerar_html(all_tks, baixados_hoje=None):
     sust_tks = sorted([t for t in sul if t['atrib'] in SUST_ATRIB and t['code'] not in URG_ALL_EF], key=lambda x:-x['dias'])
     com_tks  = sorted([t for t in sul if t['atrib']=='Comercial' and t['code'] not in URG_ALL_EF], key=lambda x:-x['dias'])
 
-    # prioridade por campo do CSV — normalizado (remove acentos, lowercase)
+    # todos os tickets Sul não classificados nas seções anteriores
     _shown = URG_ALL_EF | {t['code'] for t in sust_tks} | {t['code'] for t in com_tks}
-    _remaining = [t for t in sul if t['code'] not in _shown]
+    pendente_tks = sorted([t for t in sul if t['code'] not in _shown], key=lambda x:-x['dias'])
 
-    def _by_pri(pri):
-        pri_n = _pnorm(pri)
-        return sorted([t for t in _remaining if _pnorm(t.get('prioridade','')) == pri_n], key=lambda x:-x['dias'])
-
-    alta_tks  = _by_pri('Alta')
-    media_tks = _by_pri('Media')   # normalizado: "Média" → "media"
-    pri_classificados = {t['code'] for t in alta_tks} | {t['code'] for t in media_tks}
-    # Baixa = classificados como Baixa + todos sem prioridade reconhecida (fallback)
-    baixa_tks = sorted(
-        [t for t in _remaining if _pnorm(t.get('prioridade','')) == 'baixa' or
-         (t['code'] not in pri_classificados and _pnorm(t.get('prioridade','')) not in ('alta','media','urgente'))],
-        key=lambda x:-x['dias']
-    )
-
-    n_urg=len(pdv_tks)+len(erp_tks)+len(sust_tks)+len(com_tks)+len(alta_tks)+len(media_tks)+len(baixa_tks)
+    n_urg=len(pdv_tks)+len(erp_tks)+len(sust_tks)+len(com_tks)+len(pendente_tks)
     n_bklog=len(BACKLOG)
 
     # ── mobile HTML vars ──────────────────────────────────────────────────────
@@ -462,13 +494,11 @@ def gerar_html(all_tks, baixados_hoje=None):
     for r in resp_logus: resp_secs+=_rsec(r,by_resp[r],idx,'#a78bfa'); idx+=1
 
     urg_html=(
-        _ugrp('🟢 PDV — Urgente',      '#4ade80','#052e16',pdv_tks)+
-        _ugrp('🔴 Corporativo — Urgente','#ef4444','#1a0000',erp_tks)+
-        _ugrp('🛠️ Sustentação',         '#818cf8','#0d0f20',sust_tks)+
-        _ugrp('🤝 Comercial',           '#fbbf24','#1a1000',com_tks)+
-        _ugrp('🔺 Alto',               '#fb923c','#1c0800',alta_tks)+
-        _ugrp('🟡 Média',              '#fde047','#1c1a00',media_tks)+
-        _ugrp('⬇️ Baixa',              '#4ade80','#051a0a',baixa_tks)
+        _ugrp('🟢 PDV — Urgente',        '#4ade80','#052e16',pdv_tks)+
+        _ugrp('🔴 Corporativo — Urgente', '#ef4444','#1a0000',erp_tks)+
+        _ugrp('🛠️ Sustentação',           '#818cf8','#0d0f20',sust_tks)+
+        _ugrp('🤝 Comercial',             '#fbbf24','#1a1000',com_tks)+
+        _ugrp_por_cli('📋 Pendentes de Atendimento','#94a3b8','#0a0f14',pendente_tks)
     )
 
     cust_html=''
@@ -587,13 +617,11 @@ def gerar_html(all_tks, baixados_hoje=None):
     dt_rlogus_det   = ''.join(_d_detail(r,by_resp[r],f'dtr-{_d_safe(r)}','dResp(null)') for r in resp_logus)
 
     dt_urg_html=(
-        _d_urg_sec('🟢 PDV — Urgente',       '#4ade80','#052e16',pdv_tks)+
-        _d_urg_sec('🔴 Corporativo — Urgente','#ef4444','#1a0000',erp_tks)+
-        _d_urg_sec('🛠️ Sustentação',          '#818cf8','#0d0f20',sust_tks)+
-        _d_urg_sec('🤝 Comercial',            '#fbbf24','#1a1000',com_tks)+
-        _d_urg_sec('🔺 Alto',                '#fb923c','#1c0800',alta_tks)+
-        _d_urg_sec('🟡 Média',               '#fde047','#1c1a00',media_tks)+
-        _d_urg_sec('⬇️ Baixa',               '#4ade80','#051a0a',baixa_tks)
+        _d_urg_sec('🟢 PDV — Urgente',        '#4ade80','#052e16',pdv_tks)+
+        _d_urg_sec('🔴 Corporativo — Urgente', '#ef4444','#1a0000',erp_tks)+
+        _d_urg_sec('🛠️ Sustentação',           '#818cf8','#0d0f20',sust_tks)+
+        _d_urg_sec('🤝 Comercial',             '#fbbf24','#1a1000',com_tks)+
+        _d_urg_por_cli('📋 Pendentes de Atendimento','#94a3b8','#0a0f14',pendente_tks)
     )
 
     dt_cust_rows=''
