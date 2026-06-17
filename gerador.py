@@ -293,6 +293,39 @@ def _d_urg_por_cli(titulo, cor, bg, tks):
             f'<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">'
             f'{_d_tbl_hdr(show_cli=False)}<tbody>{rows}</tbody></table></div></div>')
 
+def _d_kpi_big(label, val, cor, sub=''):
+    sub_html = f'<div style="color:#475569;font-size:10px;margin-top:4px">{sub}</div>' if sub else ''
+    return (f'<div style="background:#0d0d0d;border:1px solid {cor}30;border-top:3px solid {cor};border-radius:10px;padding:18px 22px;flex:1;min-width:110px">'
+            f'<div style="color:{cor};font-size:40px;font-weight:900;line-height:1;font-variant-numeric:tabular-nums">{val}</div>'
+            f'<div style="color:{cor}bb;font-size:10px;font-weight:700;letter-spacing:.8px;margin-top:10px;text-transform:uppercase">{label}</div>'
+            f'{sub_html}</div>')
+
+def _d_exec_bar_chart(by_cli, clientes):
+    """SVG horizontal bar chart — top clientes por tickets."""
+    sorted_cli = sorted(clientes, key=lambda c: -len(by_cli[c]))[:14]
+    if not sorted_cli: return ''
+    max_cnt = max(len(by_cli[c]) for c in sorted_cli) or 1
+    COLORS = ['#f97316','#fb923c','#fbbf24','#ef4444','#a78bfa','#34d399',
+              '#60a5fa','#f472b6','#4ade80','#38bdf8','#c084fc','#facc15','#fd7c55','#84cc16']
+    lbl_w = 175; bar_max = 260; row_h = 30; pad = 10
+    h = len(sorted_cli) * row_h + pad * 2
+    w = lbl_w + bar_max + 55
+    parts = []
+    for i, cli in enumerate(sorted_cli):
+        cnt = len(by_cli[cli])
+        inc = sum(1 for t in by_cli[cli] if t['tipo'] == 'Incidente')
+        bw  = max(4, int(bar_max * cnt / max_cnt))
+        y   = pad + i * row_h
+        cor = COLORS[i % len(COLORS)]
+        lbl = (cli[:24]+'…') if len(cli) > 24 else cli
+        inc_txt = f' <tspan fill="#ef4444" font-size="10">+{inc}inc</tspan>' if inc else ''
+        parts.append(
+            f'<text x="{lbl_w-8}" y="{y+18}" text-anchor="end" fill="#9ca3af" font-size="11" font-family="sans-serif">{lbl}</text>'
+            f'<rect x="{lbl_w}" y="{y+5}" width="{bw}" height="18" rx="4" fill="{cor}" opacity=".82"/>'
+            f'<text x="{lbl_w+bw+8}" y="{y+18}" fill="{cor}" font-size="12" font-weight="bold" font-family="sans-serif">{cnt}{inc_txt}</text>'
+        )
+    return f'<svg width="100%" viewBox="0 0 {w} {h}" style="display:block">{"".join(parts)}</svg>'
+
 def _d_donut_chart(by_cli, clientes):
     total = sum(len(by_cli[c]) for c in clientes)
     if total == 0 or not clientes:
@@ -475,12 +508,21 @@ def gerar_html(all_tks, baixados_hoje=None):
     sust_tks = sorted([t for t in sul if t['atrib'] in SUST_ATRIB and t['code'] not in URG_ALL_EF], key=lambda x:-x['dias'])
     com_tks  = sorted([t for t in sul if t['atrib']=='Comercial' and t['code'] not in URG_ALL_EF], key=lambda x:-x['dias'])
 
+    n_urg_critico = len(pdv_tks) + len(erp_tks)
+
     # todos os tickets Sul não classificados nas seções anteriores
     _shown = URG_ALL_EF | {t['code'] for t in sust_tks} | {t['code'] for t in com_tks}
     pendente_tks = sorted([t for t in sul if t['code'] not in _shown], key=lambda x:-x['dias'])
 
     n_urg=len(pdv_tks)+len(erp_tks)+len(sust_tks)+len(com_tks)+len(pendente_tks)
     n_bklog=len(BACKLOG)
+
+    pct_nov=int(n_nov/tot*100) if tot else 0
+    pct_and=int(n_and/tot*100) if tot else 0
+    pct_ag =int(tot_ag/tot*100) if tot else 0
+    pct_inc=int(tot_inc/tot*100) if tot else 0
+    pct_req=int(n_req/tot*100) if tot else 0
+    pct_duv=int(n_duv/tot*100) if tot else 0
 
     # ── mobile HTML vars ──────────────────────────────────────────────────────
     idx=0
@@ -581,13 +623,22 @@ def gerar_html(all_tks, baixados_hoje=None):
                  f'<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">'
                  f'{_d_tbl_hdr(show_cli=True)}<tbody>{rows}</tbody></table></div></div>')
 
+    def _mob_kpi(label, val, cor, sub=''):
+        sub_html = f'<div style="color:#475569;font-size:9px;margin-top:2px">{sub}</div>' if sub else ''
+        return (f'<div style="background:#0d0d0d;border:1px solid {cor}30;border-top:3px solid {cor};border-radius:10px;padding:12px 10px;text-align:center">'
+                f'<div style="color:{cor};font-size:30px;font-weight:900;line-height:1">{val}</div>'
+                f'<div style="color:{cor}bb;font-size:9px;font-weight:700;letter-spacing:.5px;margin-top:7px">{label}</div>'
+                f'{sub_html}</div>')
+
     mob_res=(
         _priority_panel_html(tk_lkp,baixados_by_code,URG_PDV_EF,URG_ERP_EF)
         +f'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px">'
-        +f'<div style="background:#052e16;border:2px solid #22c55e;border-radius:12px;padding:14px;text-align:center"><div style="color:#4ade80;font-size:32px;font-weight:900">{n_hoje}</div><div style="color:#22c55e;font-size:11px;font-weight:700">ENTRARAM HOJE</div></div>'
-        +f'<div style="background:#0a0a16;border:2px solid #3b82f6;border-radius:12px;padding:14px;text-align:center"><div style="color:#60a5fa;font-size:32px;font-weight:900">{tot}</div><div style="color:#3b82f6;font-size:11px;font-weight:700">TOTAL ABERTOS</div></div>'
-        +f'<div style="background:#1a0000;border:2px solid #ef4444;border-radius:12px;padding:14px;text-align:center"><div style="color:#f87171;font-size:32px;font-weight:900">{tot_inc}</div><div style="color:#ef4444;font-size:11px;font-weight:700">INCIDENTES</div></div>'
-        +(f'<div style="background:#052e16;border:2px solid #22c55e;border-radius:12px;padding:14px;text-align:center"><div style="color:#4ade80;font-size:32px;font-weight:900">{n_resol}</div><div style="color:#22c55e;font-size:11px;font-weight:700">RESOLVIDOS HOJE</div></div>' if n_resol else f'<div style="background:#111;border:2px solid #1f2937;border-radius:12px;padding:14px;text-align:center"><div style="color:#374151;font-size:32px;font-weight:900">—</div><div style="color:#374151;font-size:11px;font-weight:700">RESOLVIDOS HOJE</div></div>')
+        +_mob_kpi('TOTAL ABERTOS',  tot,           '#3b82f6', f'{n_cli} clientes')
+        +_mob_kpi('INCIDENTES',     tot_inc,       '#ef4444', f'{pct_inc}%')
+        +_mob_kpi('URGENTES',       n_urg_critico, '#f97316', 'PDV+Corp')
+        +_mob_kpi('AGUARDANDO',     tot_ag,        '#d97706', f'{pct_ag}%')
+        +_mob_kpi('ENTRARAM HOJE',  n_hoje,        '#22c55e')
+        +(_mob_kpi('RESOLVIDOS HOJE', n_resol,     '#4ade80') if n_resol else _mob_kpi('RESOLVIDOS HOJE','—','#374151'))
         +f'</div>'
         +f'<div style="background:#161616;border-radius:12px;padding:16px;margin-bottom:14px">'
         +f'<div style="color:#64748b;font-size:11px;font-weight:700;letter-spacing:1px;margin-bottom:14px">STATUS</div>'
@@ -638,31 +689,37 @@ def gerar_html(all_tks, baixados_hoje=None):
                            f'<td style="padding:9px 12px"><span style="background:{cor}22;color:{cor};border-radius:4px;padding:3px 8px;font-size:10px;font-weight:900">{s.upper()}</span></td>'
                            f'</tr>')
 
-    pct_nov=int(n_nov/tot*100) if tot else 0
-    pct_and=int(n_and/tot*100) if tot else 0
-    pct_ag =int(tot_ag/tot*100) if tot else 0
-    pct_inc=int(tot_inc/tot*100) if tot else 0
-    pct_req=int(n_req/tot*100) if tot else 0
-    pct_duv=int(n_duv/tot*100) if tot else 0
+    dt_bar_chart = _d_exec_bar_chart(by_cli, clientes)
 
     dt_res_html=(
-        f'<div style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap">'
-        +_d_stat('ENTRARAM HOJE',n_hoje,'#22c55e')
-        +_d_stat('TOTAL ABERTOS',tot,'#3b82f6')
-        +_d_stat('INCIDENTES',tot_inc,'#ef4444')
-        +_d_stat('AGUARDANDO',tot_ag,'#d97706')
-        +(_d_stat('RESOLVIDOS HOJE',n_resol,'#22c55e') if n_resol else '')
+        # ── KPI cards ──────────────────────────────────────────────────────────
+        f'<div style="display:flex;gap:12px;margin-bottom:22px;flex-wrap:wrap">'
+        +_d_kpi_big('Total Abertos',  tot,           '#3b82f6', f'{n_cli} clientes')
+        +_d_kpi_big('Incidentes',     tot_inc,       '#ef4444', f'{pct_inc}% do total')
+        +_d_kpi_big('Urgentes',       n_urg_critico, '#f97316', 'PDV + Corporativo')
+        +_d_kpi_big('Aguardando',     tot_ag,        '#d97706', f'{pct_ag}% do total')
+        +_d_kpi_big('Entraram Hoje',  n_hoje,        '#22c55e')
+        +(_d_kpi_big('Resolvidos Hoje', n_resol,     '#4ade80') if n_resol else '')
         +f'</div>'
-        +f'<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">'
-        +f'<div style="background:#161616;border-radius:10px;padding:18px">'
-        +f'<div style="color:#64748b;font-size:10px;font-weight:700;letter-spacing:1px;margin-bottom:14px">STATUS</div>'
+        # ── gráfico de barras + STATUS/TIPO ────────────────────────────────────
+        +f'<div style="display:grid;grid-template-columns:3fr 2fr;gap:16px;margin-bottom:20px">'
+        +f'<div style="background:#161616;border-radius:10px;padding:20px 18px">'
+        +f'<div style="color:#64748b;font-size:10px;font-weight:700;letter-spacing:1px;margin-bottom:16px">CHAMADOS POR CLIENTE</div>'
+        +dt_bar_chart
+        +f'</div>'
+        +f'<div style="display:flex;flex-direction:column;gap:12px">'
+        +f'<div style="background:#161616;border-radius:10px;padding:16px 18px;flex:1">'
+        +f'<div style="color:#64748b;font-size:10px;font-weight:700;letter-spacing:1px;margin-bottom:12px">STATUS</div>'
         +_bar('Novo',n_nov,tot,'#22c55e')+_bar('Em Andamento',n_and,tot,'#3b82f6')+_bar('Aguardando',tot_ag,tot,'#d97706')
         +f'</div>'
-        +f'<div style="background:#161616;border-radius:10px;padding:18px">'
-        +f'<div style="color:#64748b;font-size:10px;font-weight:700;letter-spacing:1px;margin-bottom:14px">TIPO</div>'
+        +f'<div style="background:#161616;border-radius:10px;padding:16px 18px;flex:1">'
+        +f'<div style="color:#64748b;font-size:10px;font-weight:700;letter-spacing:1px;margin-bottom:12px">TIPO</div>'
         +_bar('Incidente',tot_inc,tot,'#ef4444')+_bar('Requisição',n_req,tot,'#3b82f6')+_bar('Dúvida/Outros',n_duv,tot,'#a78bfa')
         +f'</div></div>'
-        +f'<div style="margin-top:20px">{_priority_panel_html(tk_lkp,baixados_by_code,URG_PDV_EF,URG_ERP_EF)}</div>'
+        +f'</div>'
+        # ── painel de prioridades ───────────────────────────────────────────────
+        +f'<div style="margin-bottom:20px">{_priority_panel_html(tk_lkp,baixados_by_code,URG_PDV_EF,URG_ERP_EF)}</div>'
+        # ── ENTRARAM / RESOLVIDOS ───────────────────────────────────────────────
         +(f'<div style="display:flex;align-items:center;gap:14px;margin:20px 0 12px">'
           f'<span style="color:#22c55e;font-size:12px;font-weight:700;letter-spacing:1px">📥 ENTRARAM</span>'
           f'<select onchange="filtrarRes(\'dbe\',this.value)" style="background:#161616;color:#e5e7eb;border:1px solid #333;border-radius:6px;padding:6px 12px;font-size:13px">{ent_opts}</select>'
