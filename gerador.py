@@ -96,29 +96,43 @@ def _csec(emp, tks, idx):
     tks_s = sorted(tks, key=lambda x:(0 if x['tipo']=='Incidente' else 1,-x['dias']))
     inc = sum(1 for t in tks if t['tipo']=='Incidente')
     mx  = max(t['dias'] for t in tks) if tks else 0
-    fc,_ = _dc(mx)
-    itag = f' · <span style="color:#ef4444">⚠ {inc} inc</span>' if inc else ''
+    fc, _ = _dc(mx)
+    inc_tag = f'<span style="color:#ef4444;font-size:10px;font-weight:900;margin-right:4px">⚠{inc}</span>' if inc else ''
     cards = ''.join(_tk(t, sc=False) for t in tks_s)
-    return (f'<div style="margin-bottom:8px;border-radius:12px;overflow:hidden;border:1px solid #222">'
-            f'<div onclick="tog({idx})" style="background:#1a1a1a;padding:16px;display:flex;justify-content:space-between;align-items:center;cursor:pointer">'
-            f'<div><div style="color:#fff;font-size:15px;font-weight:900">{emp}</div>'
-            f'<div style="color:#64748b;font-size:12px;margin-top:2px">{len(tks)} chamados{itag} · até <span style="color:{fc}">{mx}d</span></div></div>'
-            f'<span id="chev{idx}" style="color:#475569;font-size:18px">▶</span></div>'
-            f'<div id="sec{idx}" style="display:none;padding:12px">{cards}</div></div>')
+    return (
+        f'<div style="margin-bottom:2px;border-radius:8px;overflow:hidden;border:1px solid #1e1e1e">'
+        f'<div onclick="tog({idx})" style="background:#141414;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;min-height:42px">'
+        f'<span style="color:#e5e7eb;font-size:13px;font-weight:700;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:8px">{emp}</span>'
+        f'<div style="display:flex;align-items:center;gap:6px;flex-shrink:0">'
+        f'{inc_tag}'
+        f'<span style="color:#64748b;font-size:11px">{len(tks)}ch</span>'
+        f'<span style="color:{fc};font-size:11px;font-weight:700;min-width:32px;text-align:right">{mx}d</span>'
+        f'<span id="chev{idx}" style="color:#374151;font-size:12px;margin-left:4px">▶</span>'
+        f'</div></div>'
+        f'<div id="sec{idx}" style="display:none;padding:10px;background:#0f0f0f">{cards}</div>'
+        f'</div>'
+    )
 
 def _rsec(resp, tks, idx, cor='#ea580c'):
     tks_s = sorted(tks, key=lambda x:(0 if x['tipo']=='Incidente' else 1,-x['dias']))
     inc = sum(1 for t in tks if t['tipo']=='Incidente')
     mx  = max(t['dias'] for t in tks) if tks else 0
-    fc,_ = _dc(mx)
-    itag = f' · <span style="color:#ef4444">⚠ {inc} inc</span>' if inc else ''
+    fc, _ = _dc(mx)
+    inc_tag = f'<span style="color:#ef4444;font-size:10px;font-weight:900;margin-right:4px">⚠{inc}</span>' if inc else ''
     cards = ''.join(_tk(t, sc=True) for t in tks_s)
-    return (f'<div style="margin-bottom:8px;border-radius:12px;overflow:hidden;border:1px solid #222">'
-            f'<div onclick="tog({idx})" style="background:#1a1a1a;padding:16px;display:flex;justify-content:space-between;align-items:center;cursor:pointer">'
-            f'<div><div style="color:{cor};font-size:15px;font-weight:900">{resp}</div>'
-            f'<div style="color:#64748b;font-size:12px;margin-top:2px">{len(tks)} chamados{itag} · até <span style="color:{fc}">{mx}d</span></div></div>'
-            f'<span id="chev{idx}" style="color:#475569;font-size:18px">▶</span></div>'
-            f'<div id="sec{idx}" style="display:none;padding:12px">{cards}</div></div>')
+    return (
+        f'<div style="margin-bottom:2px;border-radius:8px;overflow:hidden;border:1px solid #1e1e1e">'
+        f'<div onclick="tog({idx})" style="background:#141414;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;min-height:42px">'
+        f'<span style="color:{cor};font-size:13px;font-weight:700;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:8px">{resp}</span>'
+        f'<div style="display:flex;align-items:center;gap:6px;flex-shrink:0">'
+        f'{inc_tag}'
+        f'<span style="color:#64748b;font-size:11px">{len(tks)}ch</span>'
+        f'<span style="color:{fc};font-size:11px;font-weight:700;min-width:32px;text-align:right">{mx}d</span>'
+        f'<span id="chev{idx}" style="color:#374151;font-size:12px;margin-left:4px">▶</span>'
+        f'</div></div>'
+        f'<div id="sec{idx}" style="display:none;padding:10px;background:#0f0f0f">{cards}</div>'
+        f'</div>'
+    )
 
 def _ugrp(titulo, cor, bg, tks, sc=True):
     if not tks: return ''
