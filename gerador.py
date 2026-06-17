@@ -313,10 +313,10 @@ def _d_donut_chart(by_cli, clientes):
             f'<div style="color:#64748b;font-size:10px;font-weight:700;letter-spacing:1px;margin-bottom:10px">TODOS OS CLIENTES</div>'
             f'{legend_rows}</div></div></div>')
 
-def _priority_panel_html(tk_lkp, baixados_by_code):
+def _priority_panel_html(tk_lkp, baixados_by_code, urg_pdv=None, urg_erp=None):
     groups = [
-        ('🟢 PDV — Urgente',      '#4ade80', '#052e16', URG_PDV),
-        ('🔴 ERP — Urgente',      '#ef4444', '#1a0000', URG_ERP),
+        ('🟢 PDV — Urgente',      '#4ade80', '#052e16', urg_pdv or URG_PDV),
+        ('🔴 ERP — Urgente',      '#ef4444', '#1a0000', urg_erp or URG_ERP),
         ('💻 Dev / Sustentação',  '#a78bfa', '#0d0520', URG_DEV),
     ]
     html = '<div style="margin-bottom:24px;background:#0d0d0d;border:1px solid #1f2937;border-radius:10px;padding:16px 20px">'
@@ -404,13 +404,24 @@ def gerar_html(all_tks, baixados_hoje=None):
     n_resol=len(by_res.get(today_str,[])); n_hoje=sum(1 for t in sul if t['data']==today_str)
 
     tk_lkp = {t['code']:t for t in all_tks}
-    def _sec(codes): return [t for t in sul if t['code'] in codes]
-    def _sa(atr): return sorted([t for t in sul if t['atrib']==atr and t['code'] not in URG_ALL], key=lambda x:-x['dias'])
 
-    pdv_tks=_sec(URG_PDV); erp_tks=_sec(URG_ERP)
+    # urgentes dinâmicos: tickets Sul com prioridade=Urgente no CSV
+    csv_urg = {t['code'] for t in sul if t.get('prioridade','').strip().lower() == 'urgente'}
+    csv_urg_pdv = {c for c in csv_urg if 'pdv' in (tk_lkp.get(c,{}).get('produto','') or '').lower()}
+    csv_urg_erp = csv_urg - csv_urg_pdv
+
+    # merge hardcoded + dinâmico
+    URG_PDV_EF = URG_PDV | csv_urg_pdv
+    URG_ERP_EF = URG_ERP | csv_urg_erp
+    URG_ALL_EF = URG_PDV_EF | URG_ERP_EF | URG_DEV
+
+    def _sec(codes): return [t for t in sul if t['code'] in codes]
+    def _sa(atr): return sorted([t for t in sul if t['atrib']==atr and t['code'] not in URG_ALL_EF], key=lambda x:-x['dias'])
+
+    pdv_tks=_sec(URG_PDV_EF); erp_tks=_sec(URG_ERP_EF)
     eng_tks=_sa('Engenharia Software'); pdvd_tks=_sa('Desenv. PDV')
     sust_tks=_sa('Sustentação Desenv.'); com_tks=_sa('Comercial')
-    alta_tks=[t for t in sul if t['code'] not in URG_ALL and t['atrib'] not in RESP_OWN]
+    alta_tks=[t for t in sul if t['code'] not in URG_ALL_EF and t['atrib'] not in RESP_OWN]
 
     def _dtk(code,emp,desc):
         t=tk_lkp.get(code)
@@ -525,7 +536,7 @@ def gerar_html(all_tks, baixados_hoje=None):
                  f'{_d_tbl_hdr(show_cli=True)}<tbody>{rows}</tbody></table></div></div>')
 
     mob_res=(
-        _priority_panel_html(tk_lkp,baixados_by_code)
+        _priority_panel_html(tk_lkp,baixados_by_code,URG_PDV_EF,URG_ERP_EF)
         +f'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px">'
         +f'<div style="background:#052e16;border:2px solid #22c55e;border-radius:12px;padding:14px;text-align:center"><div style="color:#4ade80;font-size:32px;font-weight:900">{n_hoje}</div><div style="color:#22c55e;font-size:11px;font-weight:700">ENTRARAM HOJE</div></div>'
         +f'<div style="background:#0a0a16;border:2px solid #3b82f6;border-radius:12px;padding:14px;text-align:center"><div style="color:#60a5fa;font-size:32px;font-weight:900">{tot}</div><div style="color:#3b82f6;font-size:11px;font-weight:700">TOTAL ABERTOS</div></div>'
@@ -608,7 +619,7 @@ def gerar_html(all_tks, baixados_hoje=None):
         +f'<div style="color:#64748b;font-size:10px;font-weight:700;letter-spacing:1px;margin-bottom:14px">TIPO</div>'
         +_bar('Incidente',tot_inc,tot,'#ef4444')+_bar('Requisição',n_req,tot,'#3b82f6')+_bar('Dúvida/Outros',n_duv,tot,'#a78bfa')
         +f'</div></div>'
-        +f'<div style="margin-top:20px">{_priority_panel_html(tk_lkp,baixados_by_code)}</div>'
+        +f'<div style="margin-top:20px">{_priority_panel_html(tk_lkp,baixados_by_code,URG_PDV_EF,URG_ERP_EF)}</div>'
         +(f'<div style="display:flex;align-items:center;gap:14px;margin:20px 0 12px">'
           f'<span style="color:#22c55e;font-size:12px;font-weight:700;letter-spacing:1px">📥 ENTRARAM</span>'
           f'<select onchange="filtrarRes(\'dbe\',this.value)" style="background:#161616;color:#e5e7eb;border:1px solid #333;border-radius:6px;padding:6px 12px;font-size:13px">{ent_opts}</select>'

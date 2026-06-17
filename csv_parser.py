@@ -56,17 +56,18 @@ def parse_csv(content_bytes):
         res_raw  = g('Data e hora da resolução', 16)
         res_dt, _= _parse_date(res_raw.split(' ')[0]) if res_raw else ('', 0)
         tickets.append({
-            'code':     r[0].strip(),
-            'produto':  g('Produto', 1),
-            'status':   g('Status', 2),
-            'tipo':     g('Tipo', 3) if 'Tipo' in hdr else '',
-            'empresa':  g('Empresa', 7) or 'SEM EMPRESA',
-            'grupo':    g('Grupo', 8),
-            'atrib':    g('Atribuído', 9) or '— Sem Responsável —',
-            'assunto':  g('Assunto', 11),
-            'data':     dt,
-            'dias':     max(dias, 0),
-            'ordem':    g('Ordem - Logus Sul', 22) if 'Ordem - Logus Sul' in hdr else g('Ordem - Logus Sul', 23),
+            'code':      r[0].strip(),
+            'produto':   g('Produto', 1),
+            'status':    g('Status', 2),
+            'tipo':      g('Tipo', 3) if 'Tipo' in hdr else '',
+            'prioridade': r[hdr['Prioridade']].strip() if 'Prioridade' in hdr and hdr['Prioridade'] < len(r) else '',
+            'empresa':   g('Empresa', 7) or 'SEM EMPRESA',
+            'grupo':     g('Grupo', 8),
+            'atrib':     g('Atribuído', 9) or '— Sem Responsável —',
+            'assunto':   g('Assunto', 11),
+            'data':      dt,
+            'dias':      max(dias, 0),
+            'ordem':     g('Ordem - Logus Sul', 22) if 'Ordem - Logus Sul' in hdr else g('Ordem - Logus Sul', 23),
             'resolucao': res_dt,
         })
     return [t for t in tickets if t['code'].isdigit()]
