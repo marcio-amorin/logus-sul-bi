@@ -134,14 +134,26 @@ def _rsec(resp, tks, idx, cor='#ea580c'):
         f'</div>'
     )
 
-def _ugrp(titulo, cor, bg, tks, sc=True):
+def _ugrp(titulo, cor, bg, tks, sc=True, uid=None):
     if not tks: return ''
     cards = ''.join(_tk(t, sc=sc) for t in sorted(tks, key=lambda x:-x['dias']))
-    return (f'<div style="margin-bottom:16px">'
-            f'<div style="background:{bg};border-left:4px solid {cor};border-radius:8px;padding:10px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">'
-            f'<span style="color:{cor};font-size:13px;font-weight:900">{titulo}</span>'
-            f'<span style="color:{cor};font-size:20px;font-weight:900">{len(tks)}</span></div>'
-            f'{cards}</div>')
+    if uid is None:
+        return (f'<div style="margin-bottom:16px">'
+                f'<div style="background:{bg};border-left:4px solid {cor};border-radius:8px;padding:10px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">'
+                f'<span style="color:{cor};font-size:13px;font-weight:900">{titulo}</span>'
+                f'<span style="color:{cor};font-size:20px;font-weight:900">{len(tks)}</span></div>'
+                f'{cards}</div>')
+    return (
+        f'<div style="margin-bottom:3px;border-radius:8px;overflow:hidden;border:1px solid #1e1e1e">'
+        f'<div onclick="tog(\'{uid}\')" style="background:{bg};border-left:4px solid {cor};padding:10px 14px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;min-height:42px">'
+        f'<span style="color:{cor};font-size:13px;font-weight:900">{titulo}</span>'
+        f'<div style="display:flex;align-items:center;gap:8px">'
+        f'<span style="color:{cor};font-size:16px;font-weight:900">{len(tks)}</span>'
+        f'<span id="chev{uid}" style="color:{cor};font-size:12px">▶</span>'
+        f'</div></div>'
+        f'<div id="sec{uid}" style="display:none;padding:10px;background:#0f0f0f">{cards}</div>'
+        f'</div>'
+    )
 
 def _ccard(b):
     s = b['status']
@@ -261,8 +273,8 @@ def _d_urg_sec(titulo, cor, bg, tks):
             f'<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">'
             f'{_d_tbl_hdr(show_cli=True)}<tbody>{rows}</tbody></table></div></div>')
 
-def _ugrp_por_cli(titulo, cor, bg, tks):
-    """Seção mobile com tickets agrupados por cliente."""
+def _ugrp_por_cli(titulo, cor, bg, tks, uid='ugp'):
+    """Seção mobile com tickets agrupados por cliente — cada cliente colapsável."""
     if not tks: return ''
     by_emp = defaultdict(list)
     for t in tks:
@@ -271,17 +283,36 @@ def _ugrp_por_cli(titulo, cor, bg, tks):
     inner = ''
     for emp in clientes_ord:
         emp_tks = sorted(by_emp[emp], key=lambda x: (0 if x['tipo']=='Incidente' else 1, -x['dias']))
-        mx = max(t['dias'] for t in emp_tks)
+        inc = sum(1 for t in emp_tks if t['tipo']=='Incidente')
+        mx  = max(t['dias'] for t in emp_tks)
         fc, _ = _dc(mx)
-        inner += (f'<div style="color:{fc};font-size:12px;font-weight:900;padding:10px 4px 5px;'
-                  f'border-bottom:1px solid #222;margin-bottom:8px">'
-                  f'{emp} <span style="color:#475569;font-weight:400;font-size:11px">({len(emp_tks)} chamados · {mx}d)</span></div>')
-        inner += ''.join(_tk(t, sc=False) for t in emp_tks)
-    return (f'<div style="margin-bottom:16px">'
-            f'<div style="background:{bg};border-left:4px solid {cor};border-radius:8px;padding:10px 14px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center">'
-            f'<span style="color:{cor};font-size:13px;font-weight:900">{titulo}</span>'
-            f'<span style="color:{cor};font-size:20px;font-weight:900">{len(tks)}</span></div>'
-            f'{inner}</div>')
+        cid = uid + '_' + ''.join(c if c.isalnum() else '_' for c in emp)
+        inc_tag = f'<span style="color:#ef4444;font-size:10px;font-weight:900;margin-right:4px">⚠{inc}</span>' if inc else ''
+        cards = ''.join(_tk(t, sc=False) for t in emp_tks)
+        inner += (
+            f'<div style="margin-bottom:2px;border-radius:7px;overflow:hidden;border:1px solid #222">'
+            f'<div onclick="tog(\'{cid}\')" style="background:#141414;padding:9px 12px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;min-height:40px">'
+            f'<span style="color:#e5e7eb;font-size:13px;font-weight:700;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:8px">{emp}</span>'
+            f'<div style="display:flex;align-items:center;gap:6px;flex-shrink:0">'
+            f'{inc_tag}'
+            f'<span style="color:#64748b;font-size:11px">{len(emp_tks)}ch</span>'
+            f'<span style="color:{fc};font-size:11px;font-weight:700;min-width:32px;text-align:right">{mx}d</span>'
+            f'<span id="chev{cid}" style="color:#374151;font-size:12px;margin-left:4px">▶</span>'
+            f'</div></div>'
+            f'<div id="sec{cid}" style="display:none;padding:10px;background:#0f0f0f">{cards}</div>'
+            f'</div>'
+        )
+    return (
+        f'<div style="margin-bottom:3px;border-radius:8px;overflow:hidden;border:1px solid #1e1e1e">'
+        f'<div onclick="tog(\'{uid}\')" style="background:{bg};border-left:4px solid {cor};padding:10px 14px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;min-height:42px">'
+        f'<span style="color:{cor};font-size:13px;font-weight:900">{titulo}</span>'
+        f'<div style="display:flex;align-items:center;gap:8px">'
+        f'<span style="color:{cor};font-size:16px;font-weight:900">{len(tks)}</span>'
+        f'<span id="chev{uid}" style="color:{cor};font-size:12px">▶</span>'
+        f'</div></div>'
+        f'<div id="sec{uid}" style="display:none;padding:8px;background:#0a0a0a">{inner}</div>'
+        f'</div>'
+    )
 
 def _d_urg_por_cli(titulo, cor, bg, tks):
     """Seção desktop com tickets agrupados por cliente."""
@@ -550,11 +581,11 @@ def gerar_html(all_tks, baixados_hoje=None):
     for r in resp_logus: resp_secs+=_rsec(r,by_resp[r],idx,'#a78bfa'); idx+=1
 
     urg_html=(
-        _ugrp('🟢 PDV — Urgente',        '#4ade80','#052e16',pdv_tks)+
-        _ugrp('🔴 Corporativo — Urgente', '#ef4444','#1a0000',erp_tks)+
-        _ugrp('🛠️ Sustentação',           '#818cf8','#0d0f20',sust_tks)+
-        _ugrp('🤝 Comercial',             '#fbbf24','#1a1000',com_tks)+
-        _ugrp_por_cli('📋 Pendentes de Atendimento','#94a3b8','#0a0f14',pendente_tks)
+        _ugrp('🟢 PDV — Urgente',        '#4ade80','#052e16',pdv_tks, uid='ug0')+
+        _ugrp('🔴 Corporativo — Urgente', '#ef4444','#1a0000',erp_tks, uid='ug1')+
+        _ugrp('🛠️ Sustentação',           '#818cf8','#0d0f20',sust_tks,uid='ug2')+
+        _ugrp('🤝 Comercial',             '#fbbf24','#1a1000',com_tks, uid='ug3')+
+        _ugrp_por_cli('📋 Pendentes de Atendimento','#94a3b8','#0a0f14',pendente_tks,uid='ug4')
     )
 
     cust_html=''
