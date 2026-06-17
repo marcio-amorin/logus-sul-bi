@@ -897,7 +897,7 @@ window.onload=function(){{showTab('cli');dTab('cli')}};
 
 <!-- ═══════════════════════════════════════════════ DESKTOP -->
 <div id="dt">
-  <div style="position:sticky;top:0;z-index:100">
+  <div style="position:sticky;top:0;z-index:200;background:#0c0c0c;box-shadow:0 2px 12px #000">
   <div style="background:#0c0c0c;border-bottom:1px solid #1a1a1a;padding:14px 28px;display:flex;align-items:center;justify-content:space-between">
     <div style="display:flex;align-items:center;gap:14px">
       <img src="/static/logo.png" style="height:46px;background:#fff;border-radius:8px;padding:4px 10px">
