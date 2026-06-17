@@ -441,7 +441,7 @@ def _d_donut_chart(by_cli, clientes):
             f'<div style="color:#64748b;font-size:10px;font-weight:700;letter-spacing:1px;margin-bottom:10px">TODOS OS CLIENTES</div>'
             f'{legend_rows}</div></div></div>')
 
-def _priority_panel_html(tk_lkp, baixados_by_code, urg_pdv=None, urg_erp=None):
+def _priority_panel_html(tk_lkp, baixados_by_code, urg_pdv=None, urg_erp=None, prefix='prp'):
     groups = [
         ('🟢 PDV — Urgente',      '#4ade80', '#052e16', urg_pdv or URG_PDV),
         ('🔴 ERP — Urgente',      '#ef4444', '#1a0000', urg_erp or URG_ERP),
@@ -450,7 +450,7 @@ def _priority_panel_html(tk_lkp, baixados_by_code, urg_pdv=None, urg_erp=None):
     html = '<div style="margin-bottom:16px;background:#0d0d0d;border:1px solid #1f2937;border-radius:10px;padding:12px 14px">'
     html += '<div style="color:#64748b;font-size:10px;font-weight:700;letter-spacing:1px;margin-bottom:10px">🎯 ACOMPANHAMENTO DE PRIORIDADES</div>'
     for i, (titulo, cor, bg, codes) in enumerate(groups):
-        uid = f'prp{i}'
+        uid = f'{prefix}{i}'
         res_c = sum(1 for c in codes if c in baixados_by_code)
         tot_c = len(codes)
         all_done = res_c == tot_c
@@ -635,9 +635,24 @@ def gerar_html(all_tks, baixados_hoje=None, urg_tks=None):
     for dt in datas_show:
         safe=dt.replace('/','_')
         tks=sorted(by_res.get(dt,[]),key=lambda x:x.get('empresa',''))
-        show='block' if dt==today_str else 'none'
-        mob_bx+=f'<div id="mbx-{safe}" class="bx-s" style="display:{show}">'+\
-                (''.join(_tk(t) for t in tks) if tks else vazio)+'</div>'
+        uid=f'mbxd_{safe}'
+        is_today=dt==today_str
+        disp='block' if is_today else 'none'
+        chev='▼' if is_today else '▶'
+        cnt=len(tks)
+        lbl=f'✅ {dt} — HOJE' if is_today else f'📅 {dt}'
+        cards=''.join(_tk(t) for t in tks) if tks else vazio
+        mob_bx+=(
+            f'<div style="margin-bottom:3px;border-radius:8px;overflow:hidden;border:1px solid #1a2e1a">'
+            f'<div onclick="tog(\'{uid}\')" style="background:#0a1a0a;border-left:4px solid #4ade80;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;min-height:42px">'
+            f'<span style="color:#4ade80;font-size:13px;font-weight:700">{lbl}</span>'
+            f'<div style="display:flex;align-items:center;gap:8px">'
+            f'<span style="color:#4ade80;font-size:16px;font-weight:900">{cnt}</span>'
+            f'<span id="chev{uid}" style="color:#4ade80;font-size:12px">{chev}</span>'
+            f'</div></div>'
+            f'<div id="sec{uid}" style="display:{disp};padding:10px;background:#0f0f0f">{cards}</div>'
+            f'</div>'
+        )
 
     # seções desktop (tabelas) por data
     dt_bx=''
@@ -672,9 +687,24 @@ def gerar_html(all_tks, baixados_hoje=None, urg_tks=None):
     for dt in datas_ent_show:
         safe=dt.replace('/','_')
         tks=sorted(by_data.get(dt,[]),key=lambda x:x.get('empresa',''))
-        show='block' if dt==today_str else 'none'
-        mob_ent+=f'<div id="mbe-{safe}" class="bx-s" style="display:{show}">'+\
-                  (''.join(_tk(t) for t in tks) if tks else vazio_ent)+'</div>'
+        uid=f'mbed_{safe}'
+        is_today=dt==today_str
+        disp='block' if is_today else 'none'
+        chev='▼' if is_today else '▶'
+        cnt=len(tks)
+        lbl=f'📅 {dt} — HOJE' if is_today else f'📅 {dt}'
+        cards=''.join(_tk(t) for t in tks) if tks else vazio_ent
+        mob_ent+=(
+            f'<div style="margin-bottom:3px;border-radius:8px;overflow:hidden;border:1px solid #1a2e1a">'
+            f'<div onclick="tog(\'{uid}\')" style="background:#0a1a0a;border-left:4px solid #22c55e;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;min-height:42px">'
+            f'<span style="color:#22c55e;font-size:13px;font-weight:700">{lbl}</span>'
+            f'<div style="display:flex;align-items:center;gap:8px">'
+            f'<span style="color:#22c55e;font-size:16px;font-weight:900">{cnt}</span>'
+            f'<span id="chev{uid}" style="color:#22c55e;font-size:12px">{chev}</span>'
+            f'</div></div>'
+            f'<div id="sec{uid}" style="display:{disp};padding:10px;background:#0f0f0f">{cards}</div>'
+            f'</div>'
+        )
 
     dt_ent=''
     for dt in datas_ent_show:
@@ -714,14 +744,12 @@ def gerar_html(all_tks, baixados_hoje=None, urg_tks=None):
         +_bar('Incidente',tot_inc,tot,'#ef4444')+_bar('Requisição',n_req,tot,'#3b82f6')+_bar('Dúvida',n_duv,tot,'#a78bfa')
         +f'</div></div>'
         # Painel de prioridades colapsável
-        +_priority_panel_html(tk_lkp,baixados_by_code,URG_PDV_EF,URG_ERP_EF)
+        +_priority_panel_html(tk_lkp,baixados_by_code,URG_PDV_EF,URG_ERP_EF,prefix='mprp')
         # ENTRARAM
-        +(f'<div style="color:#22c55e;font-size:12px;font-weight:700;letter-spacing:1px;padding:4px 0 8px">📥 ENTRARAM</div>'
-          f'<select onchange="filtrarRes(\'mbe\',this.value)" style="width:100%;background:#161616;color:#e5e7eb;border:1px solid #333;border-radius:6px;padding:8px 10px;font-size:13px;margin-bottom:10px">{ent_opts}</select>'
+        +(f'<div style="color:#22c55e;font-size:12px;font-weight:700;letter-spacing:1px;padding:12px 0 6px">📥 ENTRARAM</div>'
           +mob_ent if datas_ent else '')
         # RESOLVIDOS
-        +(f'<div style="color:#22c55e;font-size:12px;font-weight:700;letter-spacing:1px;padding:8px 0 6px">📤 RESOLVIDOS</div>'
-          f'<select onchange="filtrarRes(\'mbx\',this.value)" style="width:100%;background:#161616;color:#e5e7eb;border:1px solid #333;border-radius:6px;padding:8px 10px;font-size:13px;margin-bottom:10px">{date_opts}</select>'
+        +(f'<div style="color:#4ade80;font-size:12px;font-weight:700;letter-spacing:1px;padding:12px 0 6px">📤 RESOLVIDOS</div>'
           +mob_bx if datas_res else '')
     )
 
@@ -787,7 +815,7 @@ def gerar_html(all_tks, baixados_hoje=None, urg_tks=None):
         +f'</div></div>'
         +f'</div>'
         # ── painel de prioridades ───────────────────────────────────────────────
-        +f'<div style="margin-bottom:20px">{_priority_panel_html(tk_lkp,baixados_by_code,URG_PDV_EF,URG_ERP_EF)}</div>'
+        +f'<div style="margin-bottom:20px">{_priority_panel_html(tk_lkp,baixados_by_code,URG_PDV_EF,URG_ERP_EF,prefix="dprp")}</div>'
         # ── ENTRARAM / RESOLVIDOS ───────────────────────────────────────────────
         +(f'<div style="display:flex;align-items:center;gap:14px;margin:20px 0 12px">'
           f'<span style="color:#22c55e;font-size:12px;font-weight:700;letter-spacing:1px">📥 ENTRARAM</span>'
