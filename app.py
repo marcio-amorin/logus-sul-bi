@@ -114,66 +114,90 @@ input:focus{border-color:#ea580c}
 </div>
 </body></html>'''
 
-UPLOAD_PAGE = '''<!DOCTYPE html><html lang="pt-BR"><head>
+UPLOAD_PAGE = """<!DOCTYPE html><html lang="pt-BR"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Logus Sul BI — Atualizar</title>
 <link rel="icon" href="/static/favicon.ico">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:#0c0c0c;color:#e5e7eb;font-family:"Segoe UI",Arial,sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
-.card{background:#0d0800;border:2px solid #ea580c;border-radius:12px;padding:36px 40px;width:100%;max-width:520px}
-label{display:block;color:#9ca3af;font-size:11px;font-weight:700;letter-spacing:.8px;margin-bottom:6px;margin-top:18px}
-.drop{border:2px dashed #2a1800;border-radius:8px;padding:20px;text-align:center;cursor:pointer;transition:border-color .2s;position:relative}
-.drop:hover,.drop.over{border-color:#f97316;background:#100700}
-.drop input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
-.drop .icon{font-size:28px;margin-bottom:6px}
-.drop .hint{color:#6b4c30;font-size:11px}
-.drop .fname{color:#f97316;font-size:12px;font-weight:700;margin-top:4px;display:none}
-.btn{display:block;width:100%;margin-top:28px;padding:14px;background:#ea580c;color:#fff;font-size:14px;font-weight:900;border:none;border-radius:8px;cursor:pointer;letter-spacing:.5px;transition:background .2s}
-.btn:hover{background:#f97316}
-.btn:disabled{background:#2a1800;color:#6b4c30;cursor:not-allowed}
-.tip{color:#374151;font-size:10px;margin-top:10px;line-height:1.5}
-.err{background:#1a0000;border:1px solid #ef4444;color:#f87171;border-radius:6px;padding:10px 14px;font-size:12px;margin-bottom:16px}
-.ok{background:#052e16;border:1px solid #22c55e;color:#4ade80;border-radius:6px;padding:10px 14px;font-size:12px;margin-bottom:16px}
-.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
-.sair{color:#6b4c30;font-size:10px;text-decoration:none}
-.sair:hover{color:#f97316}
-.ver{color:#22c55e;font-size:10px;text-decoration:none;margin-right:10px}
+.card{background:#0d0800;border:2px solid #ea580c;border-radius:14px;padding:32px 36px;width:100%;max-width:600px}
+.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
+.sair{color:#6b4c30;font-size:11px;text-decoration:none}.sair:hover{color:#f97316}
+.ver{color:#22c55e;font-size:11px;text-decoration:none;margin-right:12px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.slot{border-radius:10px;padding:18px 14px;text-align:center;cursor:pointer;position:relative;transition:border-color .2s,background .2s}
+.slot input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.slot .ico{font-size:28px;margin-bottom:8px}
+.slot .lbl{font-size:11px;font-weight:900;letter-spacing:.8px;margin-bottom:5px}
+.slot .hint{font-size:10px;opacity:.5;line-height:1.5}
+.slot .fname{font-size:11px;font-weight:700;margin-top:8px;display:none;word-break:break-all}
+.badge{display:inline-block;font-size:9px;font-weight:900;border-radius:4px;padding:2px 6px;margin-left:5px;vertical-align:middle}
+.req{background:#ef444422;color:#ef4444;border:1px solid #ef444466}
+.opt{background:#37415122;color:#6b7280;border:1px solid #37415166}
+.slot-urg{border:2px dashed #ef444455;background:#0f0000}
+.slot-urg:hover,.slot-urg.over{border-color:#ef4444;background:#1a0000}
+.slot-urg .lbl,.slot-urg .fname{color:#ef4444}
+.slot-main{border:2px dashed #f9731655;background:#0a0500}
+.slot-main:hover,.slot-main.over{border-color:#f97316;background:#120800}
+.slot-main .lbl,.slot-main .fname{color:#f97316}
+.slot-bx{border:2px dashed #22c55e55;background:#000f05}
+.slot-bx:hover,.slot-bx.over{border-color:#22c55e;background:#001a08}
+.slot-bx .lbl,.slot-bx .fname{color:#22c55e}
+.btn{display:block;width:100%;margin-top:20px;padding:15px;background:#ea580c;color:#fff;font-size:14px;font-weight:900;border:none;border-radius:10px;cursor:pointer;letter-spacing:.5px;transition:background .2s}
+.btn:hover{background:#f97316}.btn:disabled{background:#2a1800;color:#6b4c30;cursor:not-allowed}
+.tip{color:#374151;font-size:10px;margin-top:12px;line-height:1.7}
+.err{background:#1a0000;border:1px solid #ef4444;color:#f87171;border-radius:8px;padding:10px 14px;font-size:12px;margin-bottom:14px}
+.ok{background:#052e16;border:1px solid #22c55e;color:#4ade80;border-radius:8px;padding:10px 14px;font-size:12px;margin-bottom:14px}
 </style></head><body>
 <div class="card">
   <div class="top">
-    <img src="/static/logo.png" style="height:50px;background:#fff;border-radius:8px;padding:4px 10px">
+    <img src="/static/logo.png" style="height:46px;background:#fff;border-radius:8px;padding:4px 10px">
     <div><a href="/" class="ver">Ver painel →</a><a href="/admin/sair" class="sair">Sair</a></div>
   </div>
   {ultimo}
   {error}
   <form method="POST" action="/admin/gerar" enctype="multipart/form-data" id="form">
-    <label>CSV PRINCIPAL — Chamados Abertos *</label>
-    <div class="drop" id="drop1">
-      <input type="file" name="csv_main" accept=".csv" required onchange="setName(this,'n1')">
-      <div class="icon">📋</div>
-      <div class="hint">ex: <em>Logus Retail-16_06_2026.csv</em></div>
-      <div class="fname" id="n1"></div>
+    <div class="grid2">
+      <div class="slot slot-urg" id="drop1">
+        <input type="file" name="csv_urg" accept=".csv" onchange="setName(this,'n1')">
+        <div class="ico">🚨</div>
+        <div class="lbl">URGENTES <span class="badge opt">opcional</span></div>
+        <div class="hint">Filtre Prioridade = <strong>Urgente</strong> no Tolvdesk e exporte</div>
+        <div class="fname" id="n1"></div>
+      </div>
+      <div class="slot slot-main" id="drop2">
+        <input type="file" name="csv_main" accept=".csv" required onchange="setName(this,'n2')">
+        <div class="ico">📋</div>
+        <div class="lbl">ABERTOS <span class="badge req">obrigatório</span></div>
+        <div class="hint">Todos os chamados abertos (demais prioridades)</div>
+        <div class="fname" id="n2"></div>
+      </div>
     </div>
-    <label>CSV BAIXADOS — Chamados Resolvidos <span style="color:#374151;font-weight:400">(opcional)</span></label>
-    <div class="drop" id="drop2">
-      <input type="file" name="csv_baixados" accept=".csv" onchange="setName(this,'n2')">
-      <div class="icon">📤</div>
-      <div class="hint">ex: <em>Logus Retail-16_06_2026 (2).csv</em></div>
-      <div class="fname" id="n2"></div>
+    <div class="slot slot-bx" id="drop3" style="margin-bottom:4px">
+      <input type="file" name="csv_baixados" accept=".csv" onchange="setName(this,'n3')">
+      <div class="ico">📤</div>
+      <div class="lbl">BAIXADOS DO DIA <span class="badge opt">opcional</span></div>
+      <div class="hint">Chamados resolvidos — filtre por data de resolução = hoje e exporte</div>
+      <div class="fname" id="n3"></div>
     </div>
     <button class="btn" type="submit" id="btn">🚀 Publicar Painel</button>
-    <div class="tip">Após publicar, toda a equipe verá o painel atualizado automaticamente.</div>
+    <div class="tip">
+      <strong style="color:#6b7280">Como exportar no Tolvdesk:</strong><br>
+      1. <strong style="color:#ef4444">Urgentes:</strong> Filtrar → Prioridade = Urgente → Exportar CSV<br>
+      2. <strong style="color:#f97316">Abertos:</strong> Filtrar → Outros / Todos abertos → Exportar CSV<br>
+      3. <strong style="color:#22c55e">Baixados:</strong> Filtrar → Resolvidos hoje → Exportar CSV
+    </div>
   </form>
 </div>
 <script>
-function setName(inp,id){var n=document.getElementById(id);if(inp.files&&inp.files[0]){n.textContent='✓ '+inp.files[0].name;n.style.display='block';}}
-document.getElementById('form').addEventListener('submit',function(){var b=document.getElementById('btn');b.disabled=true;b.textContent='⏳ Publicando...';});
-['drop1','drop2'].forEach(function(id){var el=document.getElementById(id);
-el.addEventListener('dragover',function(e){e.preventDefault();el.classList.add('over');});
-el.addEventListener('dragleave',function(){el.classList.remove('over');});
-el.addEventListener('drop',function(){el.classList.remove('over');});});
-</script></body></html>'''
+function setName(inp,id){var n=document.getElementById(id);if(inp.files&&inp.files[0]){n.textContent="OK "+inp.files[0].name;n.style.display="block";}}
+document.getElementById("form").addEventListener("submit",function(){var b=document.getElementById("btn");b.disabled=true;b.textContent="Publicando...";});
+["drop1","drop2","drop3"].forEach(function(id){var el=document.getElementById(id);
+el.addEventListener("dragover",function(e){e.preventDefault();el.classList.add("over");});
+el.addEventListener("dragleave",function(){el.classList.remove("over");});
+el.addEventListener("drop",function(){el.classList.remove("over");});});
+</script></body></html>"""
 
 def admin_logado():
     return session.get('admin') == True
@@ -193,7 +217,7 @@ def viewer_login():
         if u == ADMIN_USER and s == ADMIN_PASS:
             session['admin'] = True
             return redirect('/admin')
-        err = '<div class="err">⚠ Usuário ou senha incorretos.</div>'
+        err = '<div class="err">&#9888; Usuário ou senha incorretos.</div>'
         return Response(VIEWER_LOGIN_PAGE.replace('{error}', err), mimetype='text/html', status=401)
     return Response(VIEWER_LOGIN_PAGE.replace('{error}', ''), mimetype='text/html')
 
@@ -217,7 +241,7 @@ def admin():
         return redirect('/admin/login')
     ultimo = ''
     if _painel['gerado_em']:
-        ultimo = f'<div class="ok">✓ Último painel publicado às {_painel["gerado_em"]}</div>'
+        ultimo = f'<div class="ok">&#10003; Último painel publicado às {_painel["gerado_em"]}</div>'
     return Response(UPLOAD_PAGE.replace('{error}', '').replace('{ultimo}', ultimo), mimetype='text/html')
 
 @app.route('/admin/login', methods=['GET', 'POST'])
@@ -228,7 +252,7 @@ def admin_login():
         if u == ADMIN_USER and s == ADMIN_PASS:
             session['admin'] = True
             return redirect('/admin')
-        err = '<div class="err">⚠ Usuário ou senha incorretos.</div>'
+        err = '<div class="err">&#9888; Usuário ou senha incorretos.</div>'
         return Response(LOGIN_PAGE.replace('{error}', err), mimetype='text/html', status=401)
     return Response(LOGIN_PAGE.replace('{error}', ''), mimetype='text/html')
 
@@ -244,17 +268,27 @@ def admin_gerar():
 
     f_main = request.files.get('csv_main')
     if not f_main or not f_main.filename:
-        err = '<div class="err">⚠ Selecione o CSV principal antes de continuar.</div>'
-        ultimo = f'<div class="ok">✓ Último painel publicado às {_painel["gerado_em"]}</div>' if _painel['gerado_em'] else ''
+        err = '<div class="err">&#9888; Selecione o CSV de Abertos antes de continuar.</div>'
+        ultimo = f'<div class="ok">&#10003; Último painel publicado às {_painel["gerado_em"]}</div>' if _painel['gerado_em'] else ''
         return Response(UPLOAD_PAGE.replace('{error}', err).replace('{ultimo}', ultimo), mimetype='text/html', status=400)
 
     try:
-        all_tks = parse_csv(f_main.read())
+        main_tks = parse_csv(f_main.read())
     except Exception as e:
-        err = f'<div class="err">⚠ Erro ao ler CSV: {e}</div>'
-        ultimo = f'<div class="ok">✓ Último painel publicado às {_painel["gerado_em"]}</div>' if _painel['gerado_em'] else ''
+        err = f'<div class="err">&#9888; Erro ao ler CSV Abertos: {e}</div>'
+        ultimo = f'<div class="ok">&#10003; Último painel publicado às {_painel["gerado_em"]}</div>' if _painel['gerado_em'] else ''
         return Response(UPLOAD_PAGE.replace('{error}', err).replace('{ultimo}', ultimo), mimetype='text/html', status=400)
 
+    # CSV Urgentes (opcional) — tickets deste arquivo vão direto para seções Urgente
+    urg_tks = []
+    f_urg = request.files.get('csv_urg')
+    if f_urg and f_urg.filename:
+        try:
+            urg_tks = parse_csv(f_urg.read())
+        except Exception:
+            pass
+
+    # CSV Baixados (opcional)
     baixados = []
     f_bx = request.files.get('csv_baixados')
     if f_bx and f_bx.filename:
@@ -264,10 +298,10 @@ def admin_gerar():
             pass
 
     try:
-        html = gerar_html(all_tks, baixados)
+        html = gerar_html(main_tks, baixados, urg_tks=urg_tks)
     except Exception as e:
-        err = f'<div class="err">⚠ Erro ao gerar painel: {e}</div>'
-        ultimo = f'<div class="ok">✓ Último painel publicado às {_painel["gerado_em"]}</div>' if _painel['gerado_em'] else ''
+        err = f'<div class="err">&#9888; Erro ao gerar painel: {e}</div>'
+        ultimo = f'<div class="ok">&#10003; Último painel publicado às {_painel["gerado_em"]}</div>' if _painel['gerado_em'] else ''
         return Response(UPLOAD_PAGE.replace('{error}', err).replace('{ultimo}', ultimo), mimetype='text/html', status=500)
 
     _painel['html'] = html

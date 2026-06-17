@@ -492,10 +492,15 @@ def _priority_panel_html(tk_lkp, baixados_by_code, urg_pdv=None, urg_erp=None):
 
 # ── main ──────────────────────────────────────────────────────────────────────
 
-def gerar_html(all_tks, baixados_hoje=None):
+def gerar_html(all_tks, baixados_hoje=None, urg_tks=None):
     today     = _hoje_brt()
     today_str = today.strftime('%d/%m/%Y')
     baixados_hoje = baixados_hoje or []
+    urg_tks   = urg_tks or []
+
+    # merge: urg_tks entram no pool geral (sem duplicatas)
+    urg_codes_extra = {t['code'] for t in urg_tks}
+    all_tks = [t for t in all_tks if t['code'] not in urg_codes_extra] + urg_tks
 
     for t in all_tks:
         if t['code'] in PATCHES:
@@ -541,14 +546,19 @@ def gerar_html(all_tks, baixados_hoje=None):
 
     tk_lkp = {t['code']:t for t in all_tks}
 
-    # urgentes dinâmicos: tickets Sul com prioridade=Urgente no CSV
-    csv_urg = {t['code'] for t in sul if _pnorm(t.get('prioridade','')) == 'urgente'}
+    # urgentes do CSV separado (upload "Urgentes") — mais confiável
+    urg_file_codes = {t['code'] for t in urg_tks if t['empresa'] in sul_emp}
+    urg_file_pdv   = {c for c in urg_file_codes if 'pdv' in (tk_lkp.get(c,{}).get('produto','') or '').lower()}
+    urg_file_erp   = urg_file_codes - urg_file_pdv
+
+    # urgentes dinâmicos: tickets Sul com prioridade=Urgente no CSV principal (fallback)
+    csv_urg     = {t['code'] for t in sul if _pnorm(t.get('prioridade','')) == 'urgente'}
     csv_urg_pdv = {c for c in csv_urg if 'pdv' in (tk_lkp.get(c,{}).get('produto','') or '').lower()}
     csv_urg_erp = csv_urg - csv_urg_pdv
 
-    # merge hardcoded + dinâmico
-    URG_PDV_EF = URG_PDV | csv_urg_pdv
-    URG_ERP_EF = URG_ERP | csv_urg_erp
+    # merge: hardcoded + arquivo urgentes + campo prioridade do CSV
+    URG_PDV_EF = URG_PDV | urg_file_pdv | csv_urg_pdv
+    URG_ERP_EF = URG_ERP | urg_file_erp | csv_urg_erp
     URG_ALL_EF = URG_PDV_EF | URG_ERP_EF | URG_DEV
 
     def _sec(codes): return [t for t in sul if t['code'] in codes]
