@@ -420,8 +420,8 @@ def gerar_html(all_tks, baixados_hoje=None):
     pdv_tks = _sec(URG_PDV_EF)
     erp_tks = _sec(URG_ERP_EF)
 
-    # Sustentação = todas as equipes internas de dev/sustentação
-    SUST_ATRIB = {'Sustentação Desenv.','Sust. Desenv.','Engenharia Software','Desenv. PDV'}
+    # Sustentação = apenas equipe Sustentação Desenv.
+    SUST_ATRIB = {'Sustentação Desenv.','Sust. Desenv.'}
     sust_tks = sorted([t for t in sul if t['atrib'] in SUST_ATRIB and t['code'] not in URG_ALL_EF], key=lambda x:-x['dias'])
     com_tks  = sorted([t for t in sul if t['atrib']=='Comercial' and t['code'] not in URG_ALL_EF], key=lambda x:-x['dias'])
 
