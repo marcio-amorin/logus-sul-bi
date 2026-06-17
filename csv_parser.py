@@ -60,7 +60,7 @@ def parse_csv(content_bytes):
             'produto':   g('Produto', 1),
             'status':    g('Status', 2),
             'tipo':      g('Tipo', 3) if 'Tipo' in hdr else '',
-            'prioridade': r[hdr['Prioridade']].strip() if 'Prioridade' in hdr and hdr['Prioridade'] < len(r) else '',
+            'prioridade': next((r[hdr[k]].strip() for k in ('Prioridade','Prioridade do ticket','Prioridade do chamado','Priority') if k in hdr and hdr[k] < len(r) and r[hdr[k]].strip()), ''),
             'empresa':   g('Empresa', 7) or 'SEM EMPRESA',
             'grupo':     g('Grupo', 8),
             'atrib':     g('Atribuído', 9) or '— Sem Responsável —',

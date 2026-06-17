@@ -1,6 +1,10 @@
 from datetime import date, datetime, timezone, timedelta
 from collections import defaultdict
-import math
+import math, unicodedata
+
+def _pnorm(s):
+    """Normaliza string de prioridade removendo acentos e lowercasing."""
+    return unicodedata.normalize('NFD', s).encode('ascii','ignore').decode('ascii').lower().strip()
 
 def _hoje_brt():
     return datetime.now(timezone(timedelta(hours=-3))).date()
@@ -406,7 +410,7 @@ def gerar_html(all_tks, baixados_hoje=None):
     tk_lkp = {t['code']:t for t in all_tks}
 
     # urgentes dinâmicos: tickets Sul com prioridade=Urgente no CSV
-    csv_urg = {t['code'] for t in sul if t.get('prioridade','').strip().lower() == 'urgente'}
+    csv_urg = {t['code'] for t in sul if _pnorm(t.get('prioridade','')) == 'urgente'}
     csv_urg_pdv = {c for c in csv_urg if 'pdv' in (tk_lkp.get(c,{}).get('produto','') or '').lower()}
     csv_urg_erp = csv_urg - csv_urg_pdv
 
@@ -425,14 +429,23 @@ def gerar_html(all_tks, baixados_hoje=None):
     sust_tks = sorted([t for t in sul if t['atrib'] in SUST_ATRIB and t['code'] not in URG_ALL_EF], key=lambda x:-x['dias'])
     com_tks  = sorted([t for t in sul if t['atrib']=='Comercial' and t['code'] not in URG_ALL_EF], key=lambda x:-x['dias'])
 
-    # prioridade por campo do CSV
+    # prioridade por campo do CSV — normalizado (remove acentos, lowercase)
     _shown = URG_ALL_EF | {t['code'] for t in sust_tks} | {t['code'] for t in com_tks}
+    _remaining = [t for t in sul if t['code'] not in _shown]
+
     def _by_pri(pri):
-        return sorted([t for t in sul if t.get('prioridade','').strip().lower()==pri.lower() and t['code'] not in _shown], key=lambda x:-x['dias'])
+        pri_n = _pnorm(pri)
+        return sorted([t for t in _remaining if _pnorm(t.get('prioridade','')) == pri_n], key=lambda x:-x['dias'])
 
     alta_tks  = _by_pri('Alta')
-    media_tks = _by_pri('Média')
-    baixa_tks = _by_pri('Baixa')
+    media_tks = _by_pri('Media')   # normalizado: "Média" → "media"
+    pri_classificados = {t['code'] for t in alta_tks} | {t['code'] for t in media_tks}
+    # Baixa = classificados como Baixa + todos sem prioridade reconhecida (fallback)
+    baixa_tks = sorted(
+        [t for t in _remaining if _pnorm(t.get('prioridade','')) == 'baixa' or
+         (t['code'] not in pri_classificados and _pnorm(t.get('prioridade','')) not in ('alta','media','urgente'))],
+        key=lambda x:-x['dias']
+    )
 
     n_urg=len(pdv_tks)+len(erp_tks)+len(sust_tks)+len(com_tks)+len(alta_tks)+len(media_tks)+len(baixa_tks)
     n_bklog=len(BACKLOG)
