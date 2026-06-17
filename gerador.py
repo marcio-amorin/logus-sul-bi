@@ -267,9 +267,9 @@ def _d_urg_sec(titulo, cor, bg, tks):
     if not tks: return ''
     rows = ''.join(_d_row(t, show_cli=True) for t in sorted(tks, key=lambda x:(0 if x['tipo']=='Incidente' else 1,-x['dias'])))
     return (f'<div style="margin-bottom:20px">'
-            f'<div style="background:{bg};border-left:4px solid {cor};border-radius:6px;padding:10px 16px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between">'
+            f'<div style="background:{bg};border-left:4px solid {cor};border-radius:6px;padding:10px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px">'
             f'<span style="color:{cor};font-size:13px;font-weight:900">{titulo}</span>'
-            f'<span style="color:{cor};font-size:18px;font-weight:900">{len(tks)}</span></div>'
+            f'<span style="color:{cor};font-size:22px;font-weight:900;line-height:1">{len(tks)}</span></div>'
             f'<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">'
             f'{_d_tbl_hdr(show_cli=True)}<tbody>{rows}</tbody></table></div></div>')
 
@@ -332,9 +332,9 @@ def _d_urg_por_cli(titulo, cor, bg, tks):
                  f'</td></tr>')
         rows += ''.join(_d_row(t, show_cli=False) for t in emp_tks)
     return (f'<div style="margin-bottom:20px">'
-            f'<div style="background:{bg};border-left:4px solid {cor};border-radius:6px;padding:10px 16px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between">'
+            f'<div style="background:{bg};border-left:4px solid {cor};border-radius:6px;padding:10px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px">'
             f'<span style="color:{cor};font-size:13px;font-weight:900">{titulo}</span>'
-            f'<span style="color:{cor};font-size:18px;font-weight:900">{len(tks)}</span></div>'
+            f'<span style="color:{cor};font-size:22px;font-weight:900;line-height:1">{len(tks)}</span></div>'
             f'<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">'
             f'{_d_tbl_hdr(show_cli=False)}<tbody>{rows}</tbody></table></div></div>')
 
