@@ -416,21 +416,25 @@ def gerar_html(all_tks, baixados_hoje=None):
     URG_ALL_EF = URG_PDV_EF | URG_ERP_EF | URG_DEV
 
     def _sec(codes): return [t for t in sul if t['code'] in codes]
-    def _sa(atr): return sorted([t for t in sul if t['atrib']==atr and t['code'] not in URG_ALL_EF], key=lambda x:-x['dias'])
 
-    pdv_tks=_sec(URG_PDV_EF); erp_tks=_sec(URG_ERP_EF)
-    eng_tks=_sa('Engenharia Software'); pdvd_tks=_sa('Desenv. PDV')
-    sust_tks=_sa('Sustentação Desenv.'); com_tks=_sa('Comercial')
-    alta_tks=[t for t in sul if t['code'] not in URG_ALL_EF and t['atrib'] not in RESP_OWN]
+    pdv_tks = _sec(URG_PDV_EF)
+    erp_tks = _sec(URG_ERP_EF)
 
-    def _dtk(code,emp,desc):
-        t=tk_lkp.get(code)
-        return t if t else {'code':code,'empresa':emp,'assunto':desc,'atrib':'—','status':'—','tipo':'Requisição','dias':0,'data':'','resolucao':''}
-    dev_tks=[_dtk('24760','GUMZ','Erro Finalização notas simples nacional'),
-             _dtk('24621','VICARI','Controle de trocas — Erro filtro Filiais'),
-             _dtk('25368','BEBIDA POP','Emissão de NF — Transformar Pedido em NF')]
+    # Sustentação = todas as equipes internas de dev/sustentação
+    SUST_ATRIB = {'Sustentação Desenv.','Sust. Desenv.','Engenharia Software','Desenv. PDV'}
+    sust_tks = sorted([t for t in sul if t['atrib'] in SUST_ATRIB and t['code'] not in URG_ALL_EF], key=lambda x:-x['dias'])
+    com_tks  = sorted([t for t in sul if t['atrib']=='Comercial' and t['code'] not in URG_ALL_EF], key=lambda x:-x['dias'])
 
-    n_urg=len(pdv_tks)+len(erp_tks)+len(alta_tks)+len(eng_tks)+len(pdvd_tks)+len(sust_tks)+3+len(com_tks)
+    # prioridade por campo do CSV
+    _shown = URG_ALL_EF | {t['code'] for t in sust_tks} | {t['code'] for t in com_tks}
+    def _by_pri(pri):
+        return sorted([t for t in sul if t.get('prioridade','').strip().lower()==pri.lower() and t['code'] not in _shown], key=lambda x:-x['dias'])
+
+    alta_tks  = _by_pri('Alta')
+    media_tks = _by_pri('Média')
+    baixa_tks = _by_pri('Baixa')
+
+    n_urg=len(pdv_tks)+len(erp_tks)+len(sust_tks)+len(com_tks)+len(alta_tks)+len(media_tks)+len(baixa_tks)
     n_bklog=len(BACKLOG)
 
     # ── mobile HTML vars ──────────────────────────────────────────────────────
@@ -445,14 +449,13 @@ def gerar_html(all_tks, baixados_hoje=None):
     for r in resp_logus: resp_secs+=_rsec(r,by_resp[r],idx,'#a78bfa'); idx+=1
 
     urg_html=(
-        _ugrp('🟢 PDV — Urgente','#4ade80','#052e16',pdv_tks)+
-        _ugrp('🔴 ERP — Urgente','#ef4444','#1a0000',erp_tks)+
-        _ugrp('📋 Em Alta','#60a5fa','#05152a',alta_tks)+
-        _ugrp('💻 Dev / Sustentação','#a78bfa','#0d0520',dev_tks)+
-        _ugrp('🔩 Engenharia','#94a3b8','#111827',eng_tks)+
-        _ugrp('🖥️ Desenv. PDV','#2dd4bf','#051a17',pdvd_tks)+
-        _ugrp('🛠️ Sustentação Desenv.','#818cf8','#0d0f20',sust_tks)+
-        _ugrp('🤝 Comercial','#fbbf24','#1a1000',com_tks)
+        _ugrp('🟢 PDV — Urgente',      '#4ade80','#052e16',pdv_tks)+
+        _ugrp('🔴 Corporativo — Urgente','#ef4444','#1a0000',erp_tks)+
+        _ugrp('🛠️ Sustentação',         '#818cf8','#0d0f20',sust_tks)+
+        _ugrp('🤝 Comercial',           '#fbbf24','#1a1000',com_tks)+
+        _ugrp('🔺 Alto',               '#fb923c','#1c0800',alta_tks)+
+        _ugrp('🟡 Média',              '#fde047','#1c1a00',media_tks)+
+        _ugrp('⬇️ Baixa',              '#4ade80','#051a0a',baixa_tks)
     )
 
     cust_html=''
@@ -571,14 +574,13 @@ def gerar_html(all_tks, baixados_hoje=None):
     dt_rlogus_det   = ''.join(_d_detail(r,by_resp[r],f'dtr-{_d_safe(r)}','dResp(null)') for r in resp_logus)
 
     dt_urg_html=(
-        _d_urg_sec('🟢 PDV — Urgente','#4ade80','#052e16',pdv_tks)+
-        _d_urg_sec('🔴 ERP — Urgente','#ef4444','#1a0000',erp_tks)+
-        _d_urg_sec('📋 Em Alta','#60a5fa','#05152a',alta_tks)+
-        _d_urg_sec('💻 Dev / Sustentação','#a78bfa','#0d0520',dev_tks)+
-        _d_urg_sec('🔩 Engenharia','#94a3b8','#111827',eng_tks)+
-        _d_urg_sec('🖥️ Desenv. PDV','#2dd4bf','#051a17',pdvd_tks)+
-        _d_urg_sec('🛠️ Sustentação Desenv.','#818cf8','#0d0f20',sust_tks)+
-        _d_urg_sec('🤝 Comercial','#fbbf24','#1a1000',com_tks)
+        _d_urg_sec('🟢 PDV — Urgente',       '#4ade80','#052e16',pdv_tks)+
+        _d_urg_sec('🔴 Corporativo — Urgente','#ef4444','#1a0000',erp_tks)+
+        _d_urg_sec('🛠️ Sustentação',          '#818cf8','#0d0f20',sust_tks)+
+        _d_urg_sec('🤝 Comercial',            '#fbbf24','#1a1000',com_tks)+
+        _d_urg_sec('🔺 Alto',                '#fb923c','#1c0800',alta_tks)+
+        _d_urg_sec('🟡 Média',               '#fde047','#1c1a00',media_tks)+
+        _d_urg_sec('⬇️ Baixa',               '#4ade80','#051a0a',baixa_tks)
     )
 
     dt_cust_rows=''
