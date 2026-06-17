@@ -447,38 +447,46 @@ def _priority_panel_html(tk_lkp, baixados_by_code, urg_pdv=None, urg_erp=None):
         ('🔴 ERP — Urgente',      '#ef4444', '#1a0000', urg_erp or URG_ERP),
         ('💻 Dev / Sustentação',  '#a78bfa', '#0d0520', URG_DEV),
     ]
-    html = '<div style="margin-bottom:24px;background:#0d0d0d;border:1px solid #1f2937;border-radius:10px;padding:16px 20px">'
-    html += '<div style="color:#64748b;font-size:10px;font-weight:700;letter-spacing:1px;margin-bottom:16px">🎯 ACOMPANHAMENTO DE PRIORIDADES</div>'
-    for titulo, cor, bg, codes in groups:
+    html = '<div style="margin-bottom:16px;background:#0d0d0d;border:1px solid #1f2937;border-radius:10px;padding:12px 14px">'
+    html += '<div style="color:#64748b;font-size:10px;font-weight:700;letter-spacing:1px;margin-bottom:10px">🎯 ACOMPANHAMENTO DE PRIORIDADES</div>'
+    for i, (titulo, cor, bg, codes) in enumerate(groups):
+        uid = f'prp{i}'
         res_c = sum(1 for c in codes if c in baixados_by_code)
         tot_c = len(codes)
         all_done = res_c == tot_c
-        sbadge = ('<span style="background:#052e16;color:#22c55e;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:900">✅ TUDO TRATADO</span>'
+        sbadge = ('<span style="background:#052e16;color:#22c55e;border-radius:4px;padding:2px 7px;font-size:10px;font-weight:900">✅ OK</span>'
                   if all_done else
-                  f'<span style="color:{cor};font-size:11px;font-weight:700">{res_c}/{tot_c} resolvidos</span>')
-        html += (f'<div style="background:{bg};border-left:4px solid {cor};border-radius:6px;'
-                 f'padding:8px 14px;margin-bottom:4px;display:flex;align-items:center;justify-content:space-between">'
-                 f'<span style="color:{cor};font-size:12px;font-weight:900">{titulo}</span>'
-                 f'{sbadge}</div>')
+                  f'<span style="color:{cor};font-size:11px;font-weight:700">{res_c}/{tot_c}</span>')
+        tickets_html = ''
         for code in sorted(codes):
-            t = tk_lkp.get(code)
-            assunto = (t['assunto'] if t else f'Ticket #{code}')[:90]
+            t     = tk_lkp.get(code)
+            assunto = (t['assunto'] if t else f'Ticket #{code}')[:80]
             empresa = t['empresa'] if t else '—'
             res_t = baixados_by_code.get(code)
             if res_t:
-                res_date = res_t.get('resolucao','')
-                rbadge = f'<span style="color:#22c55e;font-size:10px;font-weight:900;white-space:nowrap">✅ {res_date}</span>'
+                rbadge = f'<span style="color:#22c55e;font-size:10px;font-weight:900;white-space:nowrap">✅ {res_t.get("resolucao","")}</span>'
             else:
                 st = (t['status'] if t else '—') or '—'
-                at = (t['atrib'] if t else '—') or '—'
-                rbadge = f'<span style="color:#ef4444;font-size:10px;font-weight:700;white-space:nowrap">⏳ {st} · {at}</span>'
-            html += (f'<div style="display:flex;align-items:center;gap:10px;padding:6px 12px 6px 20px;'
-                     f'border-bottom:1px solid #111;flex-wrap:wrap">'
-                     f'<span style="color:#f97316;font-size:12px;font-weight:900;min-width:58px">#{code}</span>'
-                     f'<span style="color:#fed7aa;font-size:11px;font-weight:700;min-width:85px;white-space:nowrap">{empresa}</span>'
-                     f'<span style="color:#94a3b8;font-size:12px;flex:1;min-width:120px">{assunto}</span>'
-                     f'{rbadge}</div>')
-        html += '<div style="margin-bottom:14px"></div>'
+                at = (t['atrib']  if t else '—') or '—'
+                rbadge = f'<span style="color:#ef4444;font-size:10px;font-weight:700;white-space:nowrap">⏳ {st}</span>'
+            tickets_html += (
+                f'<div style="display:flex;align-items:flex-start;gap:8px;padding:7px 10px;border-bottom:1px solid #111;flex-wrap:wrap">'
+                f'<span style="color:#f97316;font-size:12px;font-weight:900;min-width:54px">#{code}</span>'
+                f'<span style="color:#fed7aa;font-size:11px;font-weight:700;white-space:nowrap">{empresa}</span>'
+                f'<span style="color:#94a3b8;font-size:11px;flex:1;min-width:100px">{assunto}</span>'
+                f'{rbadge}</div>'
+            )
+        html += (
+            f'<div style="margin-bottom:3px;border-radius:6px;overflow:hidden;border:1px solid #1e1e1e">'
+            f'<div onclick="tog(\'{uid}\')" style="background:{bg};border-left:4px solid {cor};padding:9px 12px;display:flex;align-items:center;justify-content:space-between;cursor:pointer">'
+            f'<span style="color:{cor};font-size:12px;font-weight:900">{titulo}</span>'
+            f'<div style="display:flex;align-items:center;gap:8px">'
+            f'{sbadge}'
+            f'<span id="chev{uid}" style="color:{cor};font-size:12px;margin-left:4px">▶</span>'
+            f'</div></div>'
+            f'<div id="sec{uid}" style="display:none;background:#0a0a0a">{tickets_html}</div>'
+            f'</div>'
+        )
     html += '</div>'
     return html
 
@@ -676,8 +684,8 @@ def gerar_html(all_tks, baixados_hoje=None):
                 f'{sub_html}</div>')
 
     mob_res=(
-        _priority_panel_html(tk_lkp,baixados_by_code,URG_PDV_EF,URG_ERP_EF)
-        +f'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px">'
+        # KPIs — dashboard no topo
+        f'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">'
         +_mob_kpi('TOTAL ABERTOS',  tot,           '#3b82f6', f'{n_cli} clientes')
         +_mob_kpi('INCIDENTES',     tot_inc,       '#ef4444', f'{pct_inc}%')
         +_mob_kpi('URGENTES',       n_urg_critico, '#f97316', 'PDV+Corp')
@@ -685,17 +693,23 @@ def gerar_html(all_tks, baixados_hoje=None):
         +_mob_kpi('ENTRARAM HOJE',  n_hoje,        '#22c55e')
         +(_mob_kpi('RESOLVIDOS HOJE', n_resol,     '#4ade80') if n_resol else _mob_kpi('RESOLVIDOS HOJE','—','#374151'))
         +f'</div>'
-        +f'<div style="background:#161616;border-radius:12px;padding:16px;margin-bottom:14px">'
-        +f'<div style="color:#64748b;font-size:11px;font-weight:700;letter-spacing:1px;margin-bottom:14px">STATUS</div>'
-        +_bar('Novo',n_nov,tot,'#22c55e')+_bar('Em Andamento',n_and,tot,'#3b82f6')+_bar('Aguardando',tot_ag,tot,'#d97706')
+        # STATUS + TIPO em grid compacto
+        +f'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">'
+        +f'<div style="background:#161616;border-radius:10px;padding:12px 14px">'
+        +f'<div style="color:#64748b;font-size:10px;font-weight:700;letter-spacing:1px;margin-bottom:10px">STATUS</div>'
+        +_bar('Novo',n_nov,tot,'#22c55e')+_bar('Em And.',n_and,tot,'#3b82f6')+_bar('Aguard.',tot_ag,tot,'#d97706')
         +f'</div>'
-        +f'<div style="background:#161616;border-radius:12px;padding:16px;margin-bottom:14px">'
-        +f'<div style="color:#64748b;font-size:11px;font-weight:700;letter-spacing:1px;margin-bottom:14px">TIPO</div>'
-        +_bar('Incidente',tot_inc,tot,'#ef4444')+_bar('Requisição',n_req,tot,'#3b82f6')+_bar('Dúvida/Outros',n_duv,tot,'#a78bfa')
-        +f'</div>'
+        +f'<div style="background:#161616;border-radius:10px;padding:12px 14px">'
+        +f'<div style="color:#64748b;font-size:10px;font-weight:700;letter-spacing:1px;margin-bottom:10px">TIPO</div>'
+        +_bar('Incidente',tot_inc,tot,'#ef4444')+_bar('Requisição',n_req,tot,'#3b82f6')+_bar('Dúvida',n_duv,tot,'#a78bfa')
+        +f'</div></div>'
+        # Painel de prioridades colapsável
+        +_priority_panel_html(tk_lkp,baixados_by_code,URG_PDV_EF,URG_ERP_EF)
+        # ENTRARAM
         +(f'<div style="color:#22c55e;font-size:12px;font-weight:700;letter-spacing:1px;padding:4px 0 8px">📥 ENTRARAM</div>'
           f'<select onchange="filtrarRes(\'mbe\',this.value)" style="width:100%;background:#161616;color:#e5e7eb;border:1px solid #333;border-radius:6px;padding:8px 10px;font-size:13px;margin-bottom:10px">{ent_opts}</select>'
           +mob_ent if datas_ent else '')
+        # RESOLVIDOS
         +(f'<div style="color:#22c55e;font-size:12px;font-weight:700;letter-spacing:1px;padding:8px 0 6px">📤 RESOLVIDOS</div>'
           f'<select onchange="filtrarRes(\'mbx\',this.value)" style="width:100%;background:#161616;color:#e5e7eb;border:1px solid #333;border-radius:6px;padding:8px 10px;font-size:13px;margin-bottom:10px">{date_opts}</select>'
           +mob_bx if datas_res else '')
