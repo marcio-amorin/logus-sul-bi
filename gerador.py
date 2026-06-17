@@ -570,14 +570,15 @@ def gerar_html(all_tks, baixados_hoje=None, urg_tks=None):
     SUST_ATRIB = {'Sustentação Desenv.','Sust. Desenv.'}
     sust_tks = sorted([t for t in sul if t['atrib'] in SUST_ATRIB and t['code'] not in URG_ALL_EF], key=lambda x:-x['dias'])
     com_tks  = sorted([t for t in sul if t['atrib']=='Comercial' and t['code'] not in URG_ALL_EF], key=lambda x:-x['dias'])
+    eng_tks  = sorted([t for t in sul if t['atrib']=='Engenharia Software' and t['code'] not in URG_ALL_EF], key=lambda x:-x['dias'])
 
     n_urg_critico = len(pdv_tks) + len(erp_tks)
 
     # todos os tickets Sul não classificados nas seções anteriores
-    _shown = URG_ALL_EF | {t['code'] for t in sust_tks} | {t['code'] for t in com_tks}
+    _shown = URG_ALL_EF | {t['code'] for t in sust_tks} | {t['code'] for t in com_tks} | {t['code'] for t in eng_tks}
     pendente_tks = sorted([t for t in sul if t['code'] not in _shown], key=lambda x:-x['dias'])
 
-    n_urg=len(pdv_tks)+len(erp_tks)+len(sust_tks)+len(com_tks)+len(pendente_tks)
+    n_urg=len(pdv_tks)+len(erp_tks)+len(sust_tks)+len(com_tks)+len(eng_tks)+len(pendente_tks)
     n_bklog=len(BACKLOG)
 
     pct_nov=int(n_nov/tot*100) if tot else 0
@@ -603,6 +604,7 @@ def gerar_html(all_tks, baixados_hoje=None, urg_tks=None):
         _ugrp('🔴 Corporativo — Urgente', '#ef4444','#1a0000',erp_tks, uid='ug1')+
         _ugrp('🛠️ Sustentação',           '#818cf8','#0d0f20',sust_tks,uid='ug2')+
         _ugrp('🤝 Comercial',             '#fbbf24','#1a1000',com_tks, uid='ug3')+
+        _ugrp('⚙️ Engenharia Software',   '#60a5fa','#051025',eng_tks, uid='ug5')+
         _ugrp_por_cli('📋 Pendentes de Atendimento','#94a3b8','#0a0f14',pendente_tks,uid='ug4')
     )
 
@@ -769,6 +771,7 @@ def gerar_html(all_tks, baixados_hoje=None, urg_tks=None):
         _d_urg_sec('🔴 Corporativo — Urgente', '#ef4444','#1a0000',erp_tks)+
         _d_urg_sec('🛠️ Sustentação',           '#818cf8','#0d0f20',sust_tks)+
         _d_urg_sec('🤝 Comercial',             '#fbbf24','#1a1000',com_tks)+
+        _d_urg_sec('⚙️ Engenharia Software',   '#60a5fa','#051025',eng_tks)+
         _d_urg_por_cli('📋 Pendentes de Atendimento','#94a3b8','#0a0f14',pendente_tks)
     )
 
