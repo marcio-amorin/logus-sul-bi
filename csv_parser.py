@@ -44,23 +44,30 @@ def parse_csv(content_bytes):
 
     reader = csv.reader(io.StringIO(text), delimiter=delimiter)
     hdr = {}
+    pri_col = None   # índice da coluna de prioridade (detectado por nome parcial)
     tickets = []
     for r in reader:
         if not r:
             continue
         if not hdr:
             hdr = {v.strip(): i for i, v in enumerate(r)}
+            # detecta coluna de prioridade por correspondência parcial (case-insensitive)
+            for k, idx in hdr.items():
+                if 'priorid' in k.lower() or k.lower() in ('priority',):
+                    pri_col = idx
+                    break
             continue
         g = lambda col, fb: r[hdr[col]].strip() if col in hdr and hdr[col] < len(r) else (r[fb].strip() if len(r) > fb else '')
         dt, dias = _parse_date(g('Data e hora de abertura', 12))
         res_raw  = g('Data e hora da resolução', 16)
         res_dt, _= _parse_date(res_raw.split(' ')[0]) if res_raw else ('', 0)
+        pri_val  = r[pri_col].strip() if pri_col is not None and pri_col < len(r) else ''
         tickets.append({
             'code':      r[0].strip(),
             'produto':   g('Produto', 1),
             'status':    g('Status', 2),
             'tipo':      g('Tipo', 3) if 'Tipo' in hdr else '',
-            'prioridade': next((r[hdr[k]].strip() for k in ('Prioridade','Prioridade do ticket','Prioridade do chamado','Priority') if k in hdr and hdr[k] < len(r) and r[hdr[k]].strip()), ''),
+            'prioridade': pri_val,
             'empresa':   g('Empresa', 7) or 'SEM EMPRESA',
             'grupo':     g('Grupo', 8),
             'atrib':     g('Atribuído', 9) or '— Sem Responsável —',
