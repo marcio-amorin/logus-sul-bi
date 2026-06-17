@@ -561,10 +561,10 @@ def gerar_html(all_tks, baixados_hoje=None, urg_tks=None):
     URG_ERP_EF = URG_ERP | urg_file_erp | csv_urg_erp
     URG_ALL_EF = URG_PDV_EF | URG_ERP_EF | URG_DEV
 
-    def _sec(codes): return [t for t in sul if t['code'] in codes]
+    def _sec(codes, excl=None): return [t for t in sul if t['code'] in codes and (excl is None or t['code'] not in excl)]
 
     pdv_tks = _sec(URG_PDV_EF)
-    erp_tks = _sec(URG_ERP_EF)
+    erp_tks = _sec(URG_ERP_EF, excl=URG_PDV_EF)
 
     # Sustentação = apenas equipe Sustentação Desenv.
     SUST_ATRIB = {'Sustentação Desenv.','Sust. Desenv.'}
