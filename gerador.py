@@ -249,7 +249,7 @@ def _d_detail(label, tks, div_id, close_fn):
     fc,_ = _dc(mx)
     resps = sorted(set(t['atrib'] for t in tks))
     rtags = ''.join(f'<span style="background:#fff7ed;color:#ea580c;border-radius:4px;padding:3px 10px;font-size:11px;font-weight:700;margin-right:6px">{r}</span>' for r in resps)
-    rows  = ''.join(_d_row(t) for t in sorted(tks, key=lambda x:(0 if x['tipo']=='Incidente' else 1,-x['dias'])))
+    rows  = ''.join(_d_row(t, show_cli=True) for t in sorted(tks, key=lambda x:(0 if x['tipo']=='Incidente' else 1,-x['dias'])))
     ispn  = f'<span style="color:#dc2626;font-size:12px">⚠ {inc} inc</span> ' if inc else ''
     return (f'<div id="{div_id}" class="ddet" style="display:none;background:#ffffff;border:1px solid #e2e8f0;border-radius:8px;margin-top:10px;padding:16px 20px;box-shadow:0 1px 4px rgba(0,0,0,0.06)">'
             f'<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:10px">'
@@ -261,7 +261,7 @@ def _d_detail(label, tks, div_id, close_fn):
             f'</div>'
             f'<div style="margin-bottom:12px">{rtags}</div>'
             f'<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">'
-            f'{_d_tbl_hdr()}<tbody>{rows}</tbody></table></div></div>')
+            f'{_d_tbl_hdr(show_cli=True)}<tbody>{rows}</tbody></table></div></div>')
 
 def _d_urg_sec(titulo, cor, bg, tks):
     if not tks: return ''
