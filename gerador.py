@@ -850,11 +850,9 @@ def gerar_html(all_tks, baixados_hoje=None, urg_tks=None):
     def _d_stat_sm(label, val, cor, tab=''):
         if not val: return ''
         click = f' onclick="dTab(\'{tab}\')" title="Ir para {label}"' if tab else ''
-        return (f'<div class="dstat"{click} style="border:1px solid {cor}55;border-radius:6px;padding:6px 14px;text-align:center;cursor:pointer">'
-                f'<div style="display:flex;align-items:baseline;gap:5px;justify-content:center">'
-                f'<span style="color:{cor};font-size:22px;font-weight:900;line-height:1">{val}</span>'
-                f'</div>'
-                f'<div style="color:{cor};font-size:8px;font-weight:700;letter-spacing:.5px;margin-top:3px">{label}</div>'
+        return (f'<div class="dstat"{click} style="border:1px solid {cor}55;border-radius:6px;padding:8px 18px;text-align:center;cursor:pointer">'
+                f'<div style="color:{cor};font-size:30px;font-weight:900;line-height:1">{val}</div>'
+                f'<div style="color:{cor};font-size:10px;font-weight:700;letter-spacing:.5px;margin-top:4px">{label}</div>'
                 f'</div>')
 
     dt_hdr_stats=(
