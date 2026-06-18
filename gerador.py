@@ -63,16 +63,16 @@ BACKLOG = [{'num': 1, 'ticket': '21979', 'cliente': 'YPÊ', 'desc': 'Emissão de
 # ── shared helpers ────────────────────────────────────────────────────────────
 
 def _dc(d):
-    if d<=3:  return '#4ade80','#052e16'
-    if d<=7:  return '#fde047','#1c1a00'
-    if d<=14: return '#fb923c','#1c0a00'
-    if d<=30: return '#f87171','#1c0000'
-    return '#ef4444','#150000'
+    if d<=3:  return '#16a34a','#dcfce7'
+    if d<=7:  return '#ca8a04','#fef9c3'
+    if d<=14: return '#ea580c','#fff7ed'
+    if d<=30: return '#dc2626','#fee2e2'
+    return '#991b1b','#fee2e2'
 
 def _sbadge(s):
-    m = {'Novo':('22c55e','NOVO'),'Em andamento':('3b82f6','EM ANDAMENTO'),'Aguardando':('d97706','AGUARDANDO')}
-    c,l = m.get(s,('6b7280',s.upper()))
-    return f'<span style="color:#{c};font-size:10px;font-weight:900;border:1px solid #{c};border-radius:4px;padding:3px 8px">{l}</span>'
+    m = {'Novo':('16a34a','dcfce7','NOVO'),'Em andamento':('2563eb','dbeafe','EM ANDAMENTO'),'Aguardando':('d97706','fef3c7','AGUARDANDO')}
+    c,bg,l = m.get(s,('64748b','f1f5f9',s.upper()))
+    return f'<span style="color:#{c};background:#{bg};font-size:10px;font-weight:700;border-radius:4px;padding:3px 8px">{l}</span>'
 
 def _ticon(t):
     return {'Incidente':'🔴','Requisição':'🔵','Dúvida':'🟣'}.get(t,'⚪')
@@ -81,15 +81,15 @@ def _ticon(t):
 
 def _tk(t, sc=True):
     fc,bg = _dc(t['dias'])
-    cli = f'<div style="color:#f97316;font-size:13px;font-weight:900;margin-bottom:4px">{t["empresa"]}</div>' if sc else ''
-    return (f'<div style="background:#161616;border-radius:12px;padding:14px 16px;margin-bottom:10px;border-left:5px solid {fc}">'
+    cli = f'<div style="color:#ea580c;font-size:13px;font-weight:700;margin-bottom:4px">{t["empresa"]}</div>' if sc else ''
+    return (f'<div style="background:#ffffff;border-radius:10px;padding:14px 16px;margin-bottom:10px;border-left:4px solid {fc};box-shadow:0 1px 4px rgba(0,0,0,0.08)">'
             f'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'
-            f'<span style="color:{fc};font-size:18px;font-weight:900">#{t["code"]}</span>'
-            f'<span style="background:{bg};color:{fc};font-size:20px;font-weight:900;padding:4px 12px;border-radius:8px">{t["dias"]}d</span></div>'
+            f'<span style="color:{fc};font-size:17px;font-weight:900">#{t["code"]}</span>'
+            f'<span style="background:{bg};color:{fc};font-size:16px;font-weight:900;padding:3px 10px;border-radius:6px">{t["dias"]}d</span></div>'
             f'{cli}'
-            f'<div style="color:#e2e8f0;font-size:14px;line-height:1.5;margin-bottom:10px">{_ticon(t["tipo"])} {t["assunto"]}</div>'
+            f'<div style="color:#1e293b;font-size:13px;line-height:1.5;margin-bottom:10px">{_ticon(t["tipo"])} {t["assunto"]}</div>'
             f'<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px">'
-            f'<span style="color:#94a3b8;font-size:12px">{t["atrib"]}</span>'
+            f'<span style="color:#64748b;font-size:12px">{t["atrib"]}</span>'
             f'{_sbadge(t["status"])}</div></div>')
 
 def _csec(emp, tks, idx):
@@ -97,19 +97,19 @@ def _csec(emp, tks, idx):
     inc = sum(1 for t in tks if t['tipo']=='Incidente')
     mx  = max(t['dias'] for t in tks) if tks else 0
     fc, _ = _dc(mx)
-    inc_tag = f'<span style="color:#ef4444;font-size:10px;font-weight:900;margin-right:4px">⚠{inc}</span>' if inc else ''
+    inc_tag = f'<span style="color:#dc2626;font-size:10px;font-weight:900;margin-right:4px">⚠{inc}</span>' if inc else ''
     cards = ''.join(_tk(t, sc=False) for t in tks_s)
     return (
-        f'<div style="margin-bottom:2px;border-radius:8px;overflow:hidden;border:1px solid #1e1e1e">'
-        f'<div onclick="tog({idx})" style="background:#141414;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;min-height:42px">'
-        f'<span style="color:#e5e7eb;font-size:13px;font-weight:700;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:8px">{emp}</span>'
+        f'<div style="margin-bottom:2px;border-radius:8px;overflow:hidden;border:1px solid #e2e8f0">'
+        f'<div onclick="tog({idx})" style="background:#ffffff;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;min-height:42px">'
+        f'<span style="color:#1e293b;font-size:13px;font-weight:700;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:8px">{emp}</span>'
         f'<div style="display:flex;align-items:center;gap:6px;flex-shrink:0">'
         f'{inc_tag}'
         f'<span style="color:#64748b;font-size:11px">{len(tks)}ch</span>'
         f'<span style="color:{fc};font-size:11px;font-weight:700;min-width:32px;text-align:right">{mx}d</span>'
-        f'<span id="chev{idx}" style="color:#374151;font-size:12px;margin-left:4px">▶</span>'
+        f'<span id="chev{idx}" style="color:#94a3b8;font-size:12px;margin-left:4px">▶</span>'
         f'</div></div>'
-        f'<div id="sec{idx}" style="display:none;padding:10px;background:#0f0f0f">{cards}</div>'
+        f'<div id="sec{idx}" style="display:none;padding:10px;background:#f8fafc">{cards}</div>'
         f'</div>'
     )
 
@@ -118,19 +118,19 @@ def _rsec(resp, tks, idx, cor='#ea580c'):
     inc = sum(1 for t in tks if t['tipo']=='Incidente')
     mx  = max(t['dias'] for t in tks) if tks else 0
     fc, _ = _dc(mx)
-    inc_tag = f'<span style="color:#ef4444;font-size:10px;font-weight:900;margin-right:4px">⚠{inc}</span>' if inc else ''
+    inc_tag = f'<span style="color:#dc2626;font-size:10px;font-weight:900;margin-right:4px">⚠{inc}</span>' if inc else ''
     cards = ''.join(_tk(t, sc=True) for t in tks_s)
     return (
-        f'<div style="margin-bottom:2px;border-radius:8px;overflow:hidden;border:1px solid #1e1e1e">'
-        f'<div onclick="tog({idx})" style="background:#141414;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;min-height:42px">'
+        f'<div style="margin-bottom:2px;border-radius:8px;overflow:hidden;border:1px solid #e2e8f0">'
+        f'<div onclick="tog({idx})" style="background:#ffffff;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;min-height:42px">'
         f'<span style="color:{cor};font-size:13px;font-weight:700;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:8px">{resp}</span>'
         f'<div style="display:flex;align-items:center;gap:6px;flex-shrink:0">'
         f'{inc_tag}'
         f'<span style="color:#64748b;font-size:11px">{len(tks)}ch</span>'
         f'<span style="color:{fc};font-size:11px;font-weight:700;min-width:32px;text-align:right">{mx}d</span>'
-        f'<span id="chev{idx}" style="color:#374151;font-size:12px;margin-left:4px">▶</span>'
+        f'<span id="chev{idx}" style="color:#94a3b8;font-size:12px;margin-left:4px">▶</span>'
         f'</div></div>'
-        f'<div id="sec{idx}" style="display:none;padding:10px;background:#0f0f0f">{cards}</div>'
+        f'<div id="sec{idx}" style="display:none;padding:10px;background:#f8fafc">{cards}</div>'
         f'</div>'
     )
 
@@ -144,27 +144,27 @@ def _ugrp(titulo, cor, bg, tks, sc=True, uid=None):
                 f'<span style="color:{cor};font-size:20px;font-weight:900">{len(tks)}</span></div>'
                 f'{cards}</div>')
     return (
-        f'<div style="margin-bottom:3px;border-radius:8px;overflow:hidden;border:1px solid #1e1e1e">'
+        f'<div style="margin-bottom:3px;border-radius:8px;overflow:hidden;border:1px solid #e2e8f0">'
         f'<div onclick="tog(\'{uid}\')" style="background:{bg};border-left:4px solid {cor};padding:10px 14px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;min-height:42px">'
         f'<span style="color:{cor};font-size:13px;font-weight:900">{titulo}</span>'
         f'<div style="display:flex;align-items:center;gap:8px">'
         f'<span style="color:{cor};font-size:16px;font-weight:900">{len(tks)}</span>'
         f'<span id="chev{uid}" style="color:{cor};font-size:12px">▶</span>'
         f'</div></div>'
-        f'<div id="sec{uid}" style="display:none;padding:10px;background:#0f0f0f">{cards}</div>'
+        f'<div id="sec{uid}" style="display:none;padding:10px;background:#f8fafc">{cards}</div>'
         f'</div>'
     )
 
 def _ccard(b):
     s = b['status']
-    cor = {'Urgente':'#ef4444','Homologado':'#22c55e','Em Homologação':'#fb923c','Em Roadmap':'#60a5fa'}.get(s,'#6b7280')
-    bg  = {'Urgente':'#1a0000','Homologado':'#052e16','Em Homologação':'#1a0800','Em Roadmap':'#051525'}.get(s,'#111')
+    cor = {'Urgente':'#b91c1c','Homologado':'#15803d','Em Homologação':'#c2410c','Em Roadmap':'#1d4ed8'}.get(s,'#475569')
+    bg  = {'Urgente':'#fef2f2','Homologado':'#f0fdf4','Em Homologação':'#fff7ed','Em Roadmap':'#eff6ff'}.get(s,'#f8fafc')
     return (f'<div style="background:{bg};border-radius:10px;padding:12px 14px;margin-bottom:8px;border-left:4px solid {cor}">'
             f'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">'
-            f'<span style="color:#f97316;font-size:15px;font-weight:900">#{b["ticket"]}</span>'
-            f'<span style="color:{cor};font-size:10px;font-weight:900;border:1px solid {cor};border-radius:4px;padding:2px 8px">{s.upper()}</span></div>'
-            f'<div style="color:#fed7aa;font-size:12px;font-weight:700;margin-bottom:4px">{b["cliente"]}</div>'
-            f'<div style="color:#e2e8f0;font-size:13px;line-height:1.4">{b["desc"]}</div>'
+            f'<span style="color:#ea580c;font-size:15px;font-weight:900">#{b["ticket"]}</span>'
+            f'<span style="color:{cor};background:{bg};font-size:10px;font-weight:700;border:1px solid {cor};border-radius:4px;padding:2px 8px">{s.upper()}</span></div>'
+            f'<div style="color:#92400e;font-size:12px;font-weight:700;margin-bottom:4px">{b["cliente"]}</div>'
+            f'<div style="color:#1e293b;font-size:13px;line-height:1.4">{b["desc"]}</div>'
             +(f'<div style="color:{cor};font-size:11px;font-weight:700;margin-top:6px">Est.: {b["est"]}</div>' if b['est'] else '')
             +'</div>')
 
@@ -172,9 +172,9 @@ def _bar(lbl, v, tot, cor):
     pct = int(v/tot*100) if tot else 0
     return (f'<div style="margin-bottom:14px">'
             f'<div style="display:flex;justify-content:space-between;margin-bottom:5px">'
-            f'<span style="color:#9ca3af;font-size:13px">{lbl}</span>'
-            f'<span style="color:{cor};font-size:16px;font-weight:900">{v} <span style="color:#374151;font-size:11px">{pct}%</span></span></div>'
-            f'<div style="background:#1f2937;border-radius:6px;height:10px"><div style="width:{pct}%;background:{cor};height:100%;border-radius:6px"></div></div></div>')
+            f'<span style="color:#64748b;font-size:13px">{lbl}</span>'
+            f'<span style="color:{cor};font-size:16px;font-weight:900">{v} <span style="color:#94a3b8;font-size:11px">{pct}%</span></span></div>'
+            f'<div style="background:#e2e8f0;border-radius:6px;height:10px"><div style="width:{pct}%;background:{cor};height:100%;border-radius:6px"></div></div></div>')
 
 # ── desktop helpers ───────────────────────────────────────────────────────────
 
@@ -183,38 +183,38 @@ def _d_safe(s):
 
 def _d_stat(label, val, cor, tab=''):
     click = f' onclick="dTab(\'{tab}\')" title="Ir para {label}"' if tab else ''
-    return (f'<div class="dstat"{click} style="border:1px solid {cor};border-radius:6px;padding:8px 18px;text-align:center;min-width:90px">'
+    return (f'<div class="dstat"{click} style="background:#fff;border:1px solid {cor}33;border-radius:8px;padding:8px 18px;text-align:center;min-width:90px;box-shadow:0 1px 3px rgba(0,0,0,0.06)">'
             f'<div style="color:{cor};font-size:26px;font-weight:900;line-height:1.1">{val}</div>'
-            f'<div style="color:{cor};font-size:9px;font-weight:700;opacity:.6;margin-top:4px;letter-spacing:.5px">{label}</div></div>')
+            f'<div style="color:#64748b;font-size:9px;font-weight:700;margin-top:4px;letter-spacing:.5px">{label}</div></div>')
 
 def _d_row(t, show_cli=False):
     fc,_ = _dc(t['dias'])
     tipo = t['tipo'] or '—'
     tc = '#ef4444' if t['tipo']=='Incidente' else '#3b82f6' if t['tipo']=='Requisição' else '#6b7280'
     ec = {'Novo':'#22c55e','Em andamento':'#3b82f6','Aguardando':'#d97706','Resolvido':'#22c55e','Fechado':'#22c55e'}.get(t['status'],'#6b7280')
-    cli = f'<td style="color:#f97316;font-size:12px;font-weight:700;padding:9px 12px;white-space:nowrap">{t["empresa"]}</td>' if show_cli else ''
-    return (f'<tr style="border-bottom:1px solid #111">'
-            f'<td style="color:#f97316;font-weight:900;padding:9px 12px;white-space:nowrap">#{t["code"]}</td>'
+    cli = f'<td style="color:#ea580c;font-size:12px;font-weight:700;padding:9px 12px;white-space:nowrap">{t["empresa"]}</td>' if show_cli else ''
+    return (f'<tr style="border-bottom:1px solid #f1f5f9">'
+            f'<td style="color:#ea580c;font-weight:900;padding:9px 12px;white-space:nowrap">#{t["code"]}</td>'
             f'{cli}'
             f'<td style="padding:9px 12px"><span style="background:{tc}22;color:{tc};border-radius:4px;padding:3px 8px;font-size:10px;font-weight:900">{tipo.upper()}</span></td>'
-            f'<td style="color:#e2e8f0;padding:9px 12px;font-size:13px">{t["assunto"]}</td>'
+            f'<td style="color:#1e293b;padding:9px 12px;font-size:13px">{t["assunto"]}</td>'
             f'<td style="padding:9px 12px"><span style="background:{ec}22;color:{ec};border-radius:4px;padding:3px 8px;font-size:10px;font-weight:900">{t["status"].upper()}</span></td>'
-            f'<td style="color:#94a3b8;padding:9px 12px;font-size:12px;white-space:nowrap">{t["atrib"]}</td>'
-            f'<td style="color:#64748b;padding:9px 12px;font-size:12px;white-space:nowrap">{t["data"]}</td>'
+            f'<td style="color:#64748b;padding:9px 12px;font-size:12px;white-space:nowrap">{t["atrib"]}</td>'
+            f'<td style="color:#94a3b8;padding:9px 12px;font-size:12px;white-space:nowrap">{t["data"]}</td>'
             f'<td style="color:{fc};font-weight:900;padding:9px 12px;text-align:right;white-space:nowrap">{t["dias"]}</td>'
             f'</tr>')
 
 def _d_tbl_hdr(show_cli=False):
-    cli = '<th style="color:#475569;font-size:10px;font-weight:700;text-align:left;padding:8px 12px">CLIENTE</th>' if show_cli else ''
-    return ('<thead><tr style="border-bottom:2px solid #1f2937">'
-            '<th style="color:#475569;font-size:10px;font-weight:700;text-align:left;padding:8px 12px">TICKET</th>'
+    cli = '<th style="color:#475569;font-size:10px;font-weight:700;text-align:left;padding:8px 12px;background:#f8fafc">CLIENTE</th>' if show_cli else ''
+    return ('<thead><tr style="border-bottom:2px solid #e2e8f0">'
+            '<th style="color:#475569;font-size:10px;font-weight:700;text-align:left;padding:8px 12px;background:#f8fafc">TICKET</th>'
             f'{cli}'
-            '<th style="color:#475569;font-size:10px;font-weight:700;text-align:left;padding:8px 12px">TIPO</th>'
-            '<th style="color:#475569;font-size:10px;font-weight:700;text-align:left;padding:8px 12px">ASSUNTO</th>'
-            '<th style="color:#475569;font-size:10px;font-weight:700;text-align:left;padding:8px 12px">ESTADO</th>'
-            '<th style="color:#475569;font-size:10px;font-weight:700;text-align:left;padding:8px 12px">COM QUEM</th>'
-            '<th style="color:#475569;font-size:10px;font-weight:700;text-align:left;padding:8px 12px">ABERTURA</th>'
-            '<th style="color:#475569;font-size:10px;font-weight:700;text-align:right;padding:8px 12px">DIAS</th>'
+            '<th style="color:#475569;font-size:10px;font-weight:700;text-align:left;padding:8px 12px;background:#f8fafc">TIPO</th>'
+            '<th style="color:#475569;font-size:10px;font-weight:700;text-align:left;padding:8px 12px;background:#f8fafc">ASSUNTO</th>'
+            '<th style="color:#475569;font-size:10px;font-weight:700;text-align:left;padding:8px 12px;background:#f8fafc">ESTADO</th>'
+            '<th style="color:#475569;font-size:10px;font-weight:700;text-align:left;padding:8px 12px;background:#f8fafc">COM QUEM</th>'
+            '<th style="color:#475569;font-size:10px;font-weight:700;text-align:left;padding:8px 12px;background:#f8fafc">ABERTURA</th>'
+            '<th style="color:#475569;font-size:10px;font-weight:700;text-align:right;padding:8px 12px;background:#f8fafc">DIAS</th>'
             '</tr></thead>')
 
 def _d_clibox(emp, tks):
@@ -222,11 +222,11 @@ def _d_clibox(emp, tks):
     mx  = max(t['dias'] for t in tks) if tks else 0
     fc,_ = _dc(mx)
     sid = _d_safe(emp)
-    itag = f'<div style="color:#ef4444;font-size:11px;margin-top:2px">⚠ {inc} inc</div>' if inc else ''
+    itag = f'<div style="color:#dc2626;font-size:11px;margin-top:2px">⚠ {inc} inc</div>' if inc else ''
     return (f'<div class="dcbox" data-id="{sid}" onclick="dCli(\'{sid}\')" '
-            f'style="border:1px solid #3a1800;border-radius:8px;padding:12px 14px;cursor:pointer;background:#0d0800;min-width:130px">'
-            f'<div style="color:#f97316;font-size:12px;font-weight:900;margin-bottom:3px">{emp}</div>'
-            f'<div style="color:#fb923c;font-size:12px">{len(tks)} tickets</div>'
+            f'style="border:1px solid #e2e8f0;border-radius:8px;padding:12px 14px;cursor:pointer;background:#ffffff;min-width:130px;box-shadow:0 1px 4px rgba(0,0,0,0.06)">'
+            f'<div style="color:#ea580c;font-size:12px;font-weight:900;margin-bottom:3px">{emp}</div>'
+            f'<div style="color:#64748b;font-size:12px">{len(tks)} tickets</div>'
             f'{itag}'
             f'<div style="color:{fc};font-size:13px;font-weight:700;margin-top:4px">{mx}d</div></div>')
 
@@ -235,9 +235,9 @@ def _d_respbox(resp, tks, cor):
     mx  = max(t['dias'] for t in tks) if tks else 0
     fc,_ = _dc(mx)
     sid = _d_safe(resp)
-    itag = f'<div style="color:#ef4444;font-size:11px;margin-top:2px">⚠ {inc} inc</div>' if inc else ''
+    itag = f'<div style="color:#dc2626;font-size:11px;margin-top:2px">⚠ {inc} inc</div>' if inc else ''
     return (f'<div class="drbox" onclick="dResp(\'{sid}\')" '
-            f'style="border:1px solid #1e1040;border-radius:8px;padding:12px 14px;cursor:pointer;background:#0a0814;min-width:150px">'
+            f'style="border:1px solid #e2e8f0;border-radius:8px;padding:12px 14px;cursor:pointer;background:#ffffff;min-width:150px;box-shadow:0 1px 4px rgba(0,0,0,0.06)">'
             f'<div style="color:{cor};font-size:12px;font-weight:900;margin-bottom:3px">{resp}</div>'
             f'<div style="color:#64748b;font-size:12px">{len(tks)} chamados</div>'
             f'{itag}'
@@ -248,16 +248,16 @@ def _d_detail(label, tks, div_id, close_fn):
     mx  = max(t['dias'] for t in tks) if tks else 0
     fc,_ = _dc(mx)
     resps = sorted(set(t['atrib'] for t in tks))
-    rtags = ''.join(f'<span style="background:#ea580c22;color:#f97316;border-radius:4px;padding:3px 10px;font-size:11px;font-weight:700;margin-right:6px">{r}</span>' for r in resps)
+    rtags = ''.join(f'<span style="background:#fff7ed;color:#ea580c;border-radius:4px;padding:3px 10px;font-size:11px;font-weight:700;margin-right:6px">{r}</span>' for r in resps)
     rows  = ''.join(_d_row(t) for t in sorted(tks, key=lambda x:(0 if x['tipo']=='Incidente' else 1,-x['dias'])))
-    ispn  = f'<span style="color:#ef4444;font-size:12px">⚠ {inc} inc</span> ' if inc else ''
-    return (f'<div id="{div_id}" class="ddet" style="display:none;background:#090500;border:1px solid #3a1800;border-radius:8px;margin-top:10px;padding:16px 20px">'
+    ispn  = f'<span style="color:#dc2626;font-size:12px">⚠ {inc} inc</span> ' if inc else ''
+    return (f'<div id="{div_id}" class="ddet" style="display:none;background:#ffffff;border:1px solid #e2e8f0;border-radius:8px;margin-top:10px;padding:16px 20px;box-shadow:0 1px 4px rgba(0,0,0,0.06)">'
             f'<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:10px">'
             f'<div style="display:flex;align-items:center;gap:14px">'
-            f'<span style="color:#f97316;font-size:16px;font-weight:900">{label}</span>'
-            f'<span style="color:#94a3b8;font-size:12px">{len(tks)} chamados</span>'
+            f'<span style="color:#ea580c;font-size:16px;font-weight:900">{label}</span>'
+            f'<span style="color:#64748b;font-size:12px">{len(tks)} chamados</span>'
             f'{ispn}<span style="color:{fc};font-size:13px;font-weight:700">{mx}d</span></div>'
-            f'<button onclick="{close_fn}" style="background:none;border:1px solid #333;color:#6b7280;border-radius:4px;padding:4px 10px;cursor:pointer;font-size:11px">✕ fechar</button>'
+            f'<button onclick="{close_fn}" style="background:none;border:1px solid #e2e8f0;color:#64748b;border-radius:4px;padding:4px 10px;cursor:pointer;font-size:11px">✕ fechar</button>'
             f'</div>'
             f'<div style="margin-bottom:12px">{rtags}</div>'
             f'<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">'
@@ -266,8 +266,8 @@ def _d_detail(label, tks, div_id, close_fn):
 def _d_urg_sec(titulo, cor, bg, tks):
     if not tks: return ''
     rows = ''.join(_d_row(t, show_cli=True) for t in sorted(tks, key=lambda x:(0 if x['tipo']=='Incidente' else 1,-x['dias'])))
-    return (f'<div style="margin-bottom:20px">'
-            f'<div style="background:{bg};border-left:4px solid {cor};border-radius:6px;padding:10px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px">'
+    return (f'<div style="margin-bottom:20px;background:#ffffff;border-radius:10px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.06)">'
+            f'<div style="background:{bg};border-left:4px solid {cor};padding:12px 16px;display:flex;align-items:center;gap:12px">'
             f'<span style="color:{cor};font-size:13px;font-weight:900">{titulo}</span>'
             f'<span style="color:{cor};font-size:22px;font-weight:900;line-height:1">{len(tks)}</span></div>'
             f'<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">'
@@ -287,30 +287,30 @@ def _ugrp_por_cli(titulo, cor, bg, tks, uid='ugp'):
         mx  = max(t['dias'] for t in emp_tks)
         fc, _ = _dc(mx)
         cid = uid + '_' + ''.join(c if c.isalnum() else '_' for c in emp)
-        inc_tag = f'<span style="color:#ef4444;font-size:10px;font-weight:900;margin-right:4px">⚠{inc}</span>' if inc else ''
+        inc_tag = f'<span style="color:#dc2626;font-size:10px;font-weight:900;margin-right:4px">⚠{inc}</span>' if inc else ''
         cards = ''.join(_tk(t, sc=False) for t in emp_tks)
         inner += (
-            f'<div style="margin-bottom:2px;border-radius:7px;overflow:hidden;border:1px solid #222">'
-            f'<div onclick="tog(\'{cid}\')" style="background:#141414;padding:9px 12px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;min-height:40px">'
-            f'<span style="color:#e5e7eb;font-size:13px;font-weight:700;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:8px">{emp}</span>'
+            f'<div style="margin-bottom:2px;border-radius:7px;overflow:hidden;border:1px solid #e2e8f0">'
+            f'<div onclick="tog(\'{cid}\')" style="background:#ffffff;padding:9px 12px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;min-height:40px">'
+            f'<span style="color:#1e293b;font-size:13px;font-weight:700;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:8px">{emp}</span>'
             f'<div style="display:flex;align-items:center;gap:6px;flex-shrink:0">'
             f'{inc_tag}'
             f'<span style="color:#64748b;font-size:11px">{len(emp_tks)}ch</span>'
             f'<span style="color:{fc};font-size:11px;font-weight:700;min-width:32px;text-align:right">{mx}d</span>'
-            f'<span id="chev{cid}" style="color:#374151;font-size:12px;margin-left:4px">▶</span>'
+            f'<span id="chev{cid}" style="color:#94a3b8;font-size:12px;margin-left:4px">▶</span>'
             f'</div></div>'
-            f'<div id="sec{cid}" style="display:none;padding:10px;background:#0f0f0f">{cards}</div>'
+            f'<div id="sec{cid}" style="display:none;padding:10px;background:#f8fafc">{cards}</div>'
             f'</div>'
         )
     return (
-        f'<div style="margin-bottom:3px;border-radius:8px;overflow:hidden;border:1px solid #1e1e1e">'
+        f'<div style="margin-bottom:3px;border-radius:8px;overflow:hidden;border:1px solid #e2e8f0">'
         f'<div onclick="tog(\'{uid}\')" style="background:{bg};border-left:4px solid {cor};padding:10px 14px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;min-height:42px">'
         f'<span style="color:{cor};font-size:13px;font-weight:900">{titulo}</span>'
         f'<div style="display:flex;align-items:center;gap:8px">'
         f'<span style="color:{cor};font-size:16px;font-weight:900">{len(tks)}</span>'
         f'<span id="chev{uid}" style="color:{cor};font-size:12px">▶</span>'
         f'</div></div>'
-        f'<div id="sec{uid}" style="display:none;padding:8px;background:#0a0a0a">{inner}</div>'
+        f'<div id="sec{uid}" style="display:none;padding:8px;background:#f8fafc">{inner}</div>'
         f'</div>'
     )
 
@@ -326,23 +326,23 @@ def _d_urg_por_cli(titulo, cor, bg, tks):
         emp_tks = sorted(by_emp[emp], key=lambda x: (0 if x['tipo']=='Incidente' else 1, -x['dias']))
         mx = max(t['dias'] for t in emp_tks)
         fc, _ = _dc(mx)
-        rows += (f'<tr><td colspan="7" style="padding:8px 12px;background:#0d0800;border-top:2px solid #1f2937">'
+        rows += (f'<tr><td colspan="7" style="padding:8px 12px;background:#f8fafc;border-top:2px solid #e2e8f0">'
                  f'<span style="color:{fc};font-size:12px;font-weight:900">{emp}</span>'
-                 f'<span style="color:#475569;font-size:11px;margin-left:10px">{len(emp_tks)} chamados · {mx}d</span>'
+                 f'<span style="color:#64748b;font-size:11px;margin-left:10px">{len(emp_tks)} chamados · {mx}d</span>'
                  f'</td></tr>')
         rows += ''.join(_d_row(t, show_cli=False) for t in emp_tks)
-    return (f'<div style="margin-bottom:20px">'
-            f'<div style="background:{bg};border-left:4px solid {cor};border-radius:6px;padding:10px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px">'
+    return (f'<div style="margin-bottom:20px;background:#ffffff;border-radius:10px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.06)">'
+            f'<div style="background:{bg};border-left:4px solid {cor};padding:12px 16px;display:flex;align-items:center;gap:12px">'
             f'<span style="color:{cor};font-size:13px;font-weight:900">{titulo}</span>'
             f'<span style="color:{cor};font-size:22px;font-weight:900;line-height:1">{len(tks)}</span></div>'
             f'<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">'
             f'{_d_tbl_hdr(show_cli=False)}<tbody>{rows}</tbody></table></div></div>')
 
 def _d_kpi_big(label, val, cor, sub=''):
-    sub_html = f'<div style="color:#475569;font-size:10px;margin-top:4px">{sub}</div>' if sub else ''
-    return (f'<div style="background:#0d0d0d;border:1px solid {cor}30;border-top:3px solid {cor};border-radius:10px;padding:18px 22px;flex:1;min-width:110px">'
+    sub_html = f'<div style="color:#94a3b8;font-size:10px;margin-top:4px">{sub}</div>' if sub else ''
+    return (f'<div style="background:#ffffff;border:1px solid #e2e8f0;border-top:3px solid {cor};border-radius:10px;padding:18px 22px;flex:1;min-width:110px;box-shadow:0 1px 4px rgba(0,0,0,0.06)">'
             f'<div style="color:{cor};font-size:40px;font-weight:900;line-height:1;font-variant-numeric:tabular-nums">{val}</div>'
-            f'<div style="color:{cor}bb;font-size:10px;font-weight:700;letter-spacing:.8px;margin-top:10px;text-transform:uppercase">{label}</div>'
+            f'<div style="color:#64748b;font-size:10px;font-weight:700;letter-spacing:.8px;margin-top:10px;text-transform:uppercase">{label}</div>'
             f'{sub_html}</div>')
 
 def _d_exec_bar_chart(by_cli, clientes):
@@ -363,9 +363,9 @@ def _d_exec_bar_chart(by_cli, clientes):
         y   = pad + i * row_h
         cor = COLORS[i % len(COLORS)]
         lbl = (cli[:24]+'…') if len(cli) > 24 else cli
-        inc_txt = f' <tspan fill="#ef4444" font-size="10">+{inc}inc</tspan>' if inc else ''
+        inc_txt = f' <tspan fill="#dc2626" font-size="10">+{inc}inc</tspan>' if inc else ''
         parts.append(
-            f'<text x="{lbl_w-8}" y="{y+18}" text-anchor="end" fill="#9ca3af" font-size="11" font-family="sans-serif">{lbl}</text>'
+            f'<text x="{lbl_w-8}" y="{y+18}" text-anchor="end" fill="#64748b" font-size="11" font-family="sans-serif">{lbl}</text>'
             f'<rect x="{lbl_w}" y="{y+5}" width="{bw}" height="18" rx="4" fill="{cor}" opacity=".82"/>'
             f'<text x="{lbl_w+bw+8}" y="{y+18}" fill="{cor}" font-size="12" font-weight="bold" font-family="sans-serif">{cnt}{inc_txt}</text>'
         )
@@ -396,43 +396,43 @@ def _d_donut_chart(by_cli, clientes):
              f'L{x3:.2f} {y3:.2f} A{r} {r} 0 {lg} 0 {x4:.2f} {y4:.2f} Z')
         inc = sum(1 for t in by_cli[cli] if t['tipo'] == 'Incidente')
         tip = f'{cli} · {cnt} tickets ({pct*100:.1f}%)' + (f' · {inc} incidentes' if inc else '')
-        paths.append(f'<path class="dslice" d="{d}" fill="{color}" stroke="#0c0c0c" stroke-width="2"><title>{tip}</title></path>')
+        paths.append(f'<path class="dslice" d="{d}" fill="{color}" stroke="#f1f5f9" stroke-width="2"><title>{tip}</title></path>')
         angle += sweep + GAP
     svg = (f'<svg width="240" height="240" viewBox="0 0 240 240" style="display:block;flex-shrink:0">'
            f'<style>.dslice{{opacity:.85;transition:opacity .15s,filter .15s}}.dslice:hover{{opacity:1;filter:brightness(1.3)}}</style>'
            + ''.join(paths)
-           + f'<text x="{cx}" y="{cy-8}" text-anchor="middle" fill="#f97316" font-size="26" font-weight="900" font-family="Segoe UI,sans-serif">{total}</text>'
-           + f'<text x="{cx}" y="{cy+10}" text-anchor="middle" fill="#6b7280" font-size="10" font-weight="700" font-family="Segoe UI,sans-serif" letter-spacing="1">TICKETS</text>'
-           + f'<text x="{cx}" y="{cy+24}" text-anchor="middle" fill="#374151" font-size="10" font-family="Segoe UI,sans-serif">{len(clientes)} clientes</text>'
+           + f'<text x="{cx}" y="{cy-8}" text-anchor="middle" fill="#ea580c" font-size="26" font-weight="900" font-family="Segoe UI,sans-serif">{total}</text>'
+           + f'<text x="{cx}" y="{cy+10}" text-anchor="middle" fill="#64748b" font-size="10" font-weight="700" font-family="Segoe UI,sans-serif" letter-spacing="1">TICKETS</text>'
+           + f'<text x="{cx}" y="{cy+24}" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="Segoe UI,sans-serif">{len(clientes)} clientes</text>'
            + '</svg>')
     top_cli = sorted_cli[0];  top_pct = len(by_cli[top_cli]) / total * 100
     bot_cli = sorted_cli[-1]; bot_pct = len(by_cli[bot_cli]) / total * 100
     # callout no topo, largura total
     callout = (f'<div style="display:flex;gap:10px;margin-bottom:14px">'
-               f'<div style="background:#1a0800;border:1px solid #ea580c;border-radius:6px;padding:8px 14px;flex:1">'
-               f'<div style="color:#6b4c30;font-size:9px;font-weight:700;letter-spacing:.5px">MAIOR CONCENTRAÇÃO</div>'
-               f'<div style="color:#f97316;font-size:20px;font-weight:900;margin-top:2px">{top_pct:.1f}%</div>'
-               f'<div style="color:#fb923c;font-size:11px;font-weight:700">{top_cli}</div></div>'
-               f'<div style="background:#0d1a0d;border:1px solid #166534;border-radius:6px;padding:8px 14px;flex:1">'
-               f'<div style="color:#14532d;font-size:9px;font-weight:700;letter-spacing:.5px">MENOR CONCENTRAÇÃO</div>'
-               f'<div style="color:#4ade80;font-size:20px;font-weight:900;margin-top:2px">{bot_pct:.1f}%</div>'
-               f'<div style="color:#22c55e;font-size:11px;font-weight:700">{bot_cli}</div></div></div>')
+               f'<div style="background:#fff7ed;border:1px solid #ea580c;border-radius:6px;padding:8px 14px;flex:1">'
+               f'<div style="color:#94a3b8;font-size:9px;font-weight:700;letter-spacing:.5px">MAIOR CONCENTRAÇÃO</div>'
+               f'<div style="color:#ea580c;font-size:20px;font-weight:900;margin-top:2px">{top_pct:.1f}%</div>'
+               f'<div style="color:#b45309;font-size:11px;font-weight:700">{top_cli}</div></div>'
+               f'<div style="background:#f0fdf4;border:1px solid #16a34a;border-radius:6px;padding:8px 14px;flex:1">'
+               f'<div style="color:#94a3b8;font-size:9px;font-weight:700;letter-spacing:.5px">MENOR CONCENTRAÇÃO</div>'
+               f'<div style="color:#16a34a;font-size:20px;font-weight:900;margin-top:2px">{bot_pct:.1f}%</div>'
+               f'<div style="color:#15803d;font-size:11px;font-weight:700">{bot_cli}</div></div></div>')
     legend_rows = ''
     for i, cli in enumerate(sorted_cli):
         cnt = len(by_cli[cli]); pct = cnt / total * 100
         color = COLORS[i % len(COLORS)]
         inc = sum(1 for t in by_cli[cli] if t['tipo'] == 'Incidente')
         bw = int(pct * 1.7)
-        inc_tag = f'<span style="color:#ef4444;font-size:10px"> ⚠{inc}</span>' if inc else ''
+        inc_tag = f'<span style="color:#dc2626;font-size:10px"> ⚠{inc}</span>' if inc else ''
         legend_rows += (f'<div style="margin-bottom:9px">'
                         f'<div style="display:flex;align-items:center;gap:7px;margin-bottom:3px">'
                         f'<div style="width:9px;height:9px;border-radius:2px;background:{color};flex-shrink:0"></div>'
-                        f'<span style="color:#e2e8f0;font-size:11px;font-weight:700;flex:1">{cli}</span>'
+                        f'<span style="color:#1e293b;font-size:11px;font-weight:700;flex:1">{cli}</span>'
                         f'<span style="color:{color};font-size:12px;font-weight:900">{pct:.1f}%</span>'
-                        f'<span style="color:#374151;font-size:10px;margin-left:4px">{cnt}tk{inc_tag}</span></div>'
-                        f'<div style="background:#1f2937;border-radius:3px;height:4px">'
+                        f'<span style="color:#94a3b8;font-size:10px;margin-left:4px">{cnt}tk{inc_tag}</span></div>'
+                        f'<div style="background:#e2e8f0;border-radius:3px;height:4px">'
                         f'<div style="width:{min(bw,170)}px;background:{color};height:100%;border-radius:3px"></div></div></div>')
-    return (f'<div style="background:#0d0d0d;border:1px solid #1f2937;border-radius:12px;padding:18px 22px;margin-top:14px">'
+    return (f'<div style="background:#ffffff;border:1px solid #e2e8f0;border-radius:12px;padding:18px 22px;margin-top:14px;box-shadow:0 1px 4px rgba(0,0,0,0.06)">'
             f'<div style="color:#64748b;font-size:10px;font-weight:700;letter-spacing:1px;margin-bottom:14px">DISTRIBUIÇÃO POR CLIENTE</div>'
             f'{callout}'
             f'<div style="display:flex;gap:20px;align-items:flex-start">'
@@ -443,18 +443,18 @@ def _d_donut_chart(by_cli, clientes):
 
 def _priority_panel_html(tk_lkp, baixados_by_code, urg_pdv=None, urg_erp=None, prefix='prp'):
     groups = [
-        ('🟢 PDV — Urgente',      '#4ade80', '#052e16', urg_pdv or URG_PDV),
-        ('🔴 ERP — Urgente',      '#ef4444', '#1a0000', urg_erp or URG_ERP),
-        ('💻 Dev / Sustentação',  '#a78bfa', '#0d0520', URG_DEV),
+        ('🟢 PDV — Urgente',      '#15803d', '#f0fdf4', urg_pdv or URG_PDV),
+        ('🔴 ERP — Urgente',      '#b91c1c', '#fef2f2', urg_erp or URG_ERP),
+        ('💻 Dev / Sustentação',  '#6d28d9', '#f5f3ff', URG_DEV),
     ]
-    html = '<div style="margin-bottom:16px;background:#0d0d0d;border:1px solid #1f2937;border-radius:10px;padding:12px 14px">'
-    html += '<div style="color:#64748b;font-size:10px;font-weight:700;letter-spacing:1px;margin-bottom:10px">🎯 ACOMPANHAMENTO DE PRIORIDADES</div>'
+    html = '<div style="margin-bottom:16px;background:#ffffff;border:1px solid #e2e8f0;border-radius:10px;padding:12px 14px;box-shadow:0 1px 4px rgba(0,0,0,0.06)">'
+    html += '<div style="color:#ea580c;font-size:10px;font-weight:700;letter-spacing:1px;margin-bottom:10px;background:#ea580c;color:#fff;border-radius:6px;padding:6px 12px">🎯 ACOMPANHAMENTO DE PRIORIDADES</div>'
     for i, (titulo, cor, bg, codes) in enumerate(groups):
         uid = f'{prefix}{i}'
         res_c = sum(1 for c in codes if c in baixados_by_code)
         tot_c = len(codes)
         all_done = res_c == tot_c
-        sbadge = ('<span style="background:#052e16;color:#22c55e;border-radius:4px;padding:2px 7px;font-size:10px;font-weight:900">✅ OK</span>'
+        sbadge = ('<span style="background:#f0fdf4;color:#15803d;border-radius:4px;padding:2px 7px;font-size:10px;font-weight:900">✅ OK</span>'
                   if all_done else
                   f'<span style="color:{cor};font-size:11px;font-weight:700">{res_c}/{tot_c}</span>')
         tickets_html = ''
@@ -464,27 +464,27 @@ def _priority_panel_html(tk_lkp, baixados_by_code, urg_pdv=None, urg_erp=None, p
             empresa = t['empresa'] if t else '—'
             res_t = baixados_by_code.get(code)
             if res_t:
-                rbadge = f'<span style="color:#22c55e;font-size:10px;font-weight:900;white-space:nowrap">✅ {res_t.get("resolucao","")}</span>'
+                rbadge = f'<span style="color:#15803d;font-size:10px;font-weight:900;white-space:nowrap">✅ {res_t.get("resolucao","")}</span>'
             else:
                 st = (t['status'] if t else '—') or '—'
                 at = (t['atrib']  if t else '—') or '—'
-                rbadge = f'<span style="color:#ef4444;font-size:10px;font-weight:700;white-space:nowrap">⏳ {st}</span>'
+                rbadge = f'<span style="color:#dc2626;font-size:10px;font-weight:700;white-space:nowrap">⏳ {st}</span>'
             tickets_html += (
-                f'<div style="display:flex;align-items:flex-start;gap:8px;padding:7px 10px;border-bottom:1px solid #111;flex-wrap:wrap">'
-                f'<span style="color:#f97316;font-size:12px;font-weight:900;min-width:54px">#{code}</span>'
-                f'<span style="color:#fed7aa;font-size:11px;font-weight:700;white-space:nowrap">{empresa}</span>'
-                f'<span style="color:#94a3b8;font-size:11px;flex:1;min-width:100px">{assunto}</span>'
+                f'<div style="display:flex;align-items:flex-start;gap:8px;padding:7px 10px;border-bottom:1px solid #f1f5f9;flex-wrap:wrap">'
+                f'<span style="color:#ea580c;font-size:12px;font-weight:900;min-width:54px">#{code}</span>'
+                f'<span style="color:#92400e;font-size:11px;font-weight:700;white-space:nowrap">{empresa}</span>'
+                f'<span style="color:#64748b;font-size:11px;flex:1;min-width:100px">{assunto}</span>'
                 f'{rbadge}</div>'
             )
         html += (
-            f'<div style="margin-bottom:3px;border-radius:6px;overflow:hidden;border:1px solid #1e1e1e">'
+            f'<div style="margin-bottom:3px;border-radius:6px;overflow:hidden;border:1px solid #e2e8f0">'
             f'<div onclick="tog(\'{uid}\')" style="background:{bg};border-left:4px solid {cor};padding:9px 12px;display:flex;align-items:center;justify-content:space-between;cursor:pointer">'
             f'<span style="color:{cor};font-size:12px;font-weight:900">{titulo}</span>'
             f'<div style="display:flex;align-items:center;gap:8px">'
             f'{sbadge}'
             f'<span id="chev{uid}" style="color:{cor};font-size:12px;margin-left:4px">▶</span>'
             f'</div></div>'
-            f'<div id="sec{uid}" style="display:none;background:#0a0a0a">{tickets_html}</div>'
+            f'<div id="sec{uid}" style="display:none;background:#f8fafc">{tickets_html}</div>'
             f'</div>'
         )
     html += '</div>'
@@ -611,27 +611,27 @@ def gerar_html(all_tks, baixados_hoje=None, urg_tks=None):
     for emp in sorted(clientes, key=lambda e:(-sum(1 for t in by_cli[e] if t['tipo']=='Incidente'),-len(by_cli[e]))):
         cli_secs+=_csec(emp,by_cli[emp],idx); idx+=1
 
-    resp_secs='<div style="color:#f97316;font-size:11px;font-weight:700;letter-spacing:1px;padding:8px 4px 6px">🌿 EQUIPE SUL</div>'
-    for r in resp_sul:   resp_secs+=_rsec(r,by_resp[r],idx,'#f97316'); idx+=1
-    resp_secs+='<div style="color:#a78bfa;font-size:11px;font-weight:700;letter-spacing:1px;padding:14px 4px 6px">🏢 EQUIPE LOGUS</div>'
-    for r in resp_logus: resp_secs+=_rsec(r,by_resp[r],idx,'#a78bfa'); idx+=1
+    resp_secs='<div style="color:#ea580c;font-size:11px;font-weight:700;letter-spacing:1px;padding:8px 4px 6px">🌿 EQUIPE SUL</div>'
+    for r in resp_sul:   resp_secs+=_rsec(r,by_resp[r],idx,'#ea580c'); idx+=1
+    resp_secs+='<div style="color:#7c3aed;font-size:11px;font-weight:700;letter-spacing:1px;padding:14px 4px 6px">🏢 EQUIPE LOGUS</div>'
+    for r in resp_logus: resp_secs+=_rsec(r,by_resp[r],idx,'#7c3aed'); idx+=1
 
     urg_html=(
-        _ugrp('🟢 PDV — Urgente',        '#4ade80','#052e16',pdv_tks, uid='ug0')+
-        _ugrp('🔴 Corporativo — Urgente', '#ef4444','#1a0000',erp_tks, uid='ug1')+
-        _ugrp('🛠️ Sustentação',           '#818cf8','#0d0f20',sust_tks,     uid='ug2')+
-        _ugrp('⚙️ Engenharia Software',   '#60a5fa','#051025',eng_tks,     uid='ug5')+
-        _ugrp('🤝 Comercial',             '#fbbf24','#1a1000',com_tks,     uid='ug3')+
-        _ugrp('🖥️ Desenv. PDV',           '#c084fc','#150a25',desenv_pdv_tks,uid='ug6')+
-        _ugrp('🧪 Homologação',           '#22d3ee','#031a1f',homolog_tks, uid='ug7')+
-        _ugrp_por_cli('📋 Pendentes de Atendimento','#94a3b8','#0a0f14',pendente_tks,uid='ug4')
+        _ugrp('🟢 PDV — Urgente',        '#15803d','#f0fdf4',pdv_tks, uid='ug0')+
+        _ugrp('🔴 Corporativo — Urgente', '#b91c1c','#fef2f2',erp_tks, uid='ug1')+
+        _ugrp('🛠️ Sustentação',           '#6d28d9','#f5f3ff',sust_tks,     uid='ug2')+
+        _ugrp('⚙️ Engenharia Software',   '#1d4ed8','#eff6ff',eng_tks,     uid='ug5')+
+        _ugrp('🤝 Comercial',             '#b45309','#fffbeb',com_tks,     uid='ug3')+
+        _ugrp('🖥️ Desenv. PDV',           '#7e22ce','#faf5ff',desenv_pdv_tks,uid='ug6')+
+        _ugrp('🧪 Homologação',           '#0e7490','#ecfeff',homolog_tks, uid='ug7')+
+        _ugrp_por_cli('📋 Pendentes de Atendimento','#475569','#f8fafc',pendente_tks,uid='ug4')
     )
 
     cust_html=''
     for st in ['Urgente','Em Homologação','Em Roadmap','Pendente','Homologado']:
         grp=[b for b in BACKLOG if b['status']==st]
         if not grp: continue
-        cor={'Urgente':'#ef4444','Em Homologação':'#fb923c','Em Roadmap':'#60a5fa','Homologado':'#22c55e'}.get(st,'#6b7280')
+        cor={'Urgente':'#b91c1c','Em Homologação':'#c2410c','Em Roadmap':'#1d4ed8','Homologado':'#15803d'}.get(st,'#475569')
         cust_html+=(f'<div style="color:{cor};font-size:11px;font-weight:700;letter-spacing:1px;padding:10px 4px 6px">{st.upper()} — {len(grp)}</div>'
                     +''.join(_ccard(b) for b in grp))
 
@@ -649,7 +649,7 @@ def gerar_html(all_tks, baixados_hoje=None, urg_tks=None):
         sel='selected' if dt==today_str else ''
         date_opts+=f'<option value="{safe}" {sel}>{lbl}</option>'
 
-    vazio='<div style="color:#374151;text-align:center;padding:24px;font-size:13px">Nenhum chamado resolvido neste dia.</div>'
+    vazio='<div style="color:#94a3b8;text-align:center;padding:24px;font-size:13px">Nenhum chamado resolvido neste dia.</div>'
 
     # seções mobile (cards) por data
     mob_bx_chips=''; mob_bx_content=''
@@ -659,11 +659,11 @@ def gerar_html(all_tks, baixados_hoje=None, urg_tks=None):
         is_today=dt==today_str
         cnt=len(tks)
         lbl=f'HOJE · {cnt}' if is_today else f'{dt[:5]} · {cnt}'
-        bg='#0a1a0a' if is_today else '#111'
-        bdr='#4ade80' if is_today else '#4ade8044'
+        bg='#dcfce7' if is_today else '#f1f5f9'
+        bdr='#16a34a' if is_today else '#16a34a44'
         cards=''.join(_tk(t) for t in tks) if tks else vazio
-        mob_bx_chips+=(f'<button onclick="selDate(\'mbxs\',\'{safe}\')" id="mbxs_btn_{safe}" data-grp="mbxs" data-cor="#4ade80" data-bg="#0a1a0a"'
-                       f' style="background:{bg};color:#4ade80;border:1px solid {bdr};border-radius:20px;padding:7px 14px;font-size:12px;font-weight:700;white-space:nowrap;cursor:pointer;flex-shrink:0">'
+        mob_bx_chips+=(f'<button onclick="selDate(\'mbxs\',\'{safe}\')" id="mbxs_btn_{safe}" data-grp="mbxs" data-cor="#16a34a" data-bg="#dcfce7"'
+                       f' style="background:{bg};color:#16a34a;border:1px solid {bdr};border-radius:20px;padding:7px 14px;font-size:12px;font-weight:700;white-space:nowrap;cursor:pointer;flex-shrink:0">'
                        f'{lbl}</button>')
         mob_bx_content+=f'<div id="mbxs_c_{safe}" style="display:{"block" if is_today else "none"}">{cards}</div>'
     mob_bx=(f'<div style="overflow-x:auto;display:flex;gap:6px;padding:4px 0 10px;scrollbar-width:none;-webkit-overflow-scrolling:touch">{mob_bx_chips}</div>'
@@ -696,7 +696,7 @@ def gerar_html(all_tks, baixados_hoje=None, urg_tks=None):
         sel='selected' if dt==today_str else ''
         ent_opts+=f'<option value="{safe}" {sel}>{lbl}</option>'
 
-    vazio_ent='<div style="color:#374151;text-align:center;padding:24px;font-size:13px">Nenhum chamado aberto neste dia.</div>'
+    vazio_ent='<div style="color:#94a3b8;text-align:center;padding:24px;font-size:13px">Nenhum chamado aberto neste dia.</div>'
 
     mob_ent_chips=''; mob_ent_content=''
     for dt in datas_ent_show:
@@ -705,11 +705,11 @@ def gerar_html(all_tks, baixados_hoje=None, urg_tks=None):
         is_today=dt==today_str
         cnt=len(tks)
         lbl=f'HOJE · {cnt}' if is_today else f'{dt[:5]} · {cnt}'
-        bg='#0a2a0a' if is_today else '#111'
-        bdr='#22c55e' if is_today else '#22c55e44'
+        bg='#dcfce7' if is_today else '#f1f5f9'
+        bdr='#16a34a' if is_today else '#16a34a44'
         cards=''.join(_tk(t) for t in tks) if tks else vazio_ent
-        mob_ent_chips+=(f'<button onclick="selDate(\'mbeds\',\'{safe}\')" id="mbeds_btn_{safe}" data-grp="mbeds" data-cor="#22c55e" data-bg="#0a2a0a"'
-                        f' style="background:{bg};color:#22c55e;border:1px solid {bdr};border-radius:20px;padding:7px 14px;font-size:12px;font-weight:700;white-space:nowrap;cursor:pointer;flex-shrink:0">'
+        mob_ent_chips+=(f'<button onclick="selDate(\'mbeds\',\'{safe}\')" id="mbeds_btn_{safe}" data-grp="mbeds" data-cor="#16a34a" data-bg="#dcfce7"'
+                        f' style="background:{bg};color:#16a34a;border:1px solid {bdr};border-radius:20px;padding:7px 14px;font-size:12px;font-weight:700;white-space:nowrap;cursor:pointer;flex-shrink:0">'
                         f'{lbl}</button>')
         mob_ent_content+=f'<div id="mbeds_c_{safe}" style="display:{"block" if is_today else "none"}">{cards}</div>'
     mob_ent=(f'<div style="overflow-x:auto;display:flex;gap:6px;padding:4px 0 10px;scrollbar-width:none;-webkit-overflow-scrolling:touch">{mob_ent_chips}</div>'
@@ -726,10 +726,10 @@ def gerar_html(all_tks, baixados_hoje=None, urg_tks=None):
                  f'{_d_tbl_hdr(show_cli=True)}<tbody>{rows}</tbody></table></div></div>')
 
     def _mob_kpi(label, val, cor, sub=''):
-        sub_html = f'<div style="color:#475569;font-size:9px;margin-top:2px">{sub}</div>' if sub else ''
-        return (f'<div style="background:#0d0d0d;border:1px solid {cor}30;border-top:3px solid {cor};border-radius:10px;padding:12px 10px;text-align:center">'
-                f'<div style="color:{cor};font-size:30px;font-weight:900;line-height:1">{val}</div>'
-                f'<div style="color:{cor}bb;font-size:9px;font-weight:700;letter-spacing:.5px;margin-top:7px">{label}</div>'
+        sub_html = f'<div style="color:#94a3b8;font-size:9px;margin-top:2px">{sub}</div>' if sub else ''
+        return (f'<div style="background:#ffffff;border:1px solid {cor}22;border-top:3px solid {cor};border-radius:10px;padding:12px 10px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,0.06)">'
+                f'<div style="color:{cor};font-size:28px;font-weight:900;line-height:1">{val}</div>'
+                f'<div style="color:#64748b;font-size:9px;font-weight:700;letter-spacing:.5px;margin-top:7px">{label}</div>'
                 f'{sub_html}</div>')
 
     mob_res=(
@@ -744,13 +744,13 @@ def gerar_html(all_tks, baixados_hoje=None, urg_tks=None):
         +f'</div>'
         # STATUS + TIPO em grid compacto
         +f'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">'
-        +f'<div style="background:#161616;border-radius:10px;padding:12px 14px">'
+        +f'<div style="background:#ffffff;border-radius:10px;padding:12px 14px;box-shadow:0 1px 4px rgba(0,0,0,0.06)">'
         +f'<div style="color:#64748b;font-size:10px;font-weight:700;letter-spacing:1px;margin-bottom:10px">STATUS</div>'
-        +_bar('Novo',n_nov,tot,'#22c55e')+_bar('Em And.',n_and,tot,'#3b82f6')+_bar('Aguard.',tot_ag,tot,'#d97706')
+        +_bar('Novo',n_nov,tot,'#16a34a')+_bar('Em And.',n_and,tot,'#2563eb')+_bar('Aguard.',tot_ag,tot,'#d97706')
         +f'</div>'
-        +f'<div style="background:#161616;border-radius:10px;padding:12px 14px">'
+        +f'<div style="background:#ffffff;border-radius:10px;padding:12px 14px;box-shadow:0 1px 4px rgba(0,0,0,0.06)">'
         +f'<div style="color:#64748b;font-size:10px;font-weight:700;letter-spacing:1px;margin-bottom:10px">TIPO</div>'
-        +_bar('Incidente',tot_inc,tot,'#ef4444')+_bar('Requisição',n_req,tot,'#3b82f6')+_bar('Dúvida',n_duv,tot,'#a78bfa')
+        +_bar('Incidente',tot_inc,tot,'#dc2626')+_bar('Requisição',n_req,tot,'#2563eb')+_bar('Dúvida',n_duv,tot,'#7c3aed')
         +f'</div></div>'
         # ENTRARAM
         +(f'<div style="color:#22c55e;font-size:12px;font-weight:700;letter-spacing:1px;padding:12px 0 6px">📥 ENTRARAM</div>'
@@ -772,14 +772,14 @@ def gerar_html(all_tks, baixados_hoje=None, urg_tks=None):
     dt_rlogus_det   = ''.join(_d_detail(r,by_resp[r],f'dtr-{_d_safe(r)}','dResp(null)') for r in resp_logus)
 
     dt_urg_html=(
-        _d_urg_sec('🟢 PDV — Urgente',        '#4ade80','#052e16',pdv_tks)+
-        _d_urg_sec('🔴 Corporativo — Urgente', '#ef4444','#1a0000',erp_tks)+
-        _d_urg_sec('🛠️ Sustentação',           '#818cf8','#0d0f20',sust_tks)+
-        _d_urg_sec('⚙️ Engenharia Software',   '#60a5fa','#051025',eng_tks)+
-        _d_urg_sec('🤝 Comercial',             '#fbbf24','#1a1000',com_tks)+
-        _d_urg_sec('🖥️ Desenv. PDV',           '#c084fc','#150a25',desenv_pdv_tks)+
-        _d_urg_sec('🧪 Homologação',           '#22d3ee','#031a1f',homolog_tks)+
-        _d_urg_por_cli('📋 Pendentes de Atendimento','#94a3b8','#0a0f14',pendente_tks)
+        _d_urg_sec('🟢 PDV — Urgente',        '#15803d','#f0fdf4',pdv_tks)+
+        _d_urg_sec('🔴 Corporativo — Urgente', '#b91c1c','#fef2f2',erp_tks)+
+        _d_urg_sec('🛠️ Sustentação',           '#6d28d9','#f5f3ff',sust_tks)+
+        _d_urg_sec('⚙️ Engenharia Software',   '#1d4ed8','#eff6ff',eng_tks)+
+        _d_urg_sec('🤝 Comercial',             '#b45309','#fffbeb',com_tks)+
+        _d_urg_sec('🖥️ Desenv. PDV',           '#7e22ce','#faf5ff',desenv_pdv_tks)+
+        _d_urg_sec('🧪 Homologação',           '#0e7490','#ecfeff',homolog_tks)+
+        _d_urg_por_cli('📋 Pendentes de Atendimento','#475569','#f8fafc',pendente_tks)
     )
 
     dt_cust_rows=''
@@ -788,10 +788,10 @@ def gerar_html(all_tks, baixados_hoje=None, urg_tks=None):
             s=b['status']
             cor={'Urgente':'#ef4444','Homologado':'#22c55e','Em Homologação':'#fb923c','Em Roadmap':'#60a5fa'}.get(s,'#6b7280')
             est=b['est'] if b['est'] else '—'
-            dt_cust_rows+=(f'<tr style="border-bottom:1px solid #111">'
-                           f'<td style="color:#f97316;font-weight:900;padding:9px 12px;white-space:nowrap">#{b["ticket"]}</td>'
-                           f'<td style="color:#fed7aa;padding:9px 12px;font-size:12px;font-weight:700">{b["cliente"]}</td>'
-                           f'<td style="color:#e2e8f0;padding:9px 12px;font-size:13px">{b["desc"]}</td>'
+            dt_cust_rows+=(f'<tr style="border-bottom:1px solid #f1f5f9">'
+                           f'<td style="color:#ea580c;font-weight:900;padding:9px 12px;white-space:nowrap">#{b["ticket"]}</td>'
+                           f'<td style="color:#92400e;padding:9px 12px;font-size:12px;font-weight:700">{b["cliente"]}</td>'
+                           f'<td style="color:#1e293b;padding:9px 12px;font-size:13px">{b["desc"]}</td>'
                            f'<td style="color:{cor};padding:9px 12px;font-size:11px;white-space:nowrap">{est}</td>'
                            f'<td style="padding:9px 12px"><span style="background:{cor}22;color:{cor};border-radius:4px;padding:3px 8px;font-size:10px;font-weight:900">{s.upper()}</span></td>'
                            f'</tr>')
@@ -810,51 +810,51 @@ def gerar_html(all_tks, baixados_hoje=None, urg_tks=None):
         +f'</div>'
         # ── gráfico de barras + STATUS/TIPO ────────────────────────────────────
         +f'<div style="display:grid;grid-template-columns:3fr 2fr;gap:16px;margin-bottom:20px">'
-        +f'<div style="background:#161616;border-radius:10px;padding:20px 18px">'
+        +f'<div style="background:#ffffff;border-radius:10px;padding:20px 18px;box-shadow:0 1px 4px rgba(0,0,0,0.06)">'
         +f'<div style="color:#64748b;font-size:10px;font-weight:700;letter-spacing:1px;margin-bottom:16px">CHAMADOS POR CLIENTE</div>'
         +dt_bar_chart
         +f'</div>'
         +f'<div style="display:flex;flex-direction:column;gap:12px">'
-        +f'<div style="background:#161616;border-radius:10px;padding:16px 18px;flex:1">'
+        +f'<div style="background:#ffffff;border-radius:10px;padding:16px 18px;flex:1;box-shadow:0 1px 4px rgba(0,0,0,0.06)">'
         +f'<div style="color:#64748b;font-size:10px;font-weight:700;letter-spacing:1px;margin-bottom:12px">STATUS</div>'
-        +_bar('Novo',n_nov,tot,'#22c55e')+_bar('Em Andamento',n_and,tot,'#3b82f6')+_bar('Aguardando',tot_ag,tot,'#d97706')
+        +_bar('Novo',n_nov,tot,'#16a34a')+_bar('Em Andamento',n_and,tot,'#2563eb')+_bar('Aguardando',tot_ag,tot,'#d97706')
         +f'</div>'
-        +f'<div style="background:#161616;border-radius:10px;padding:16px 18px;flex:1">'
+        +f'<div style="background:#ffffff;border-radius:10px;padding:16px 18px;flex:1;box-shadow:0 1px 4px rgba(0,0,0,0.06)">'
         +f'<div style="color:#64748b;font-size:10px;font-weight:700;letter-spacing:1px;margin-bottom:12px">TIPO</div>'
-        +_bar('Incidente',tot_inc,tot,'#ef4444')+_bar('Requisição',n_req,tot,'#3b82f6')+_bar('Dúvida/Outros',n_duv,tot,'#a78bfa')
+        +_bar('Incidente',tot_inc,tot,'#dc2626')+_bar('Requisição',n_req,tot,'#2563eb')+_bar('Dúvida/Outros',n_duv,tot,'#7c3aed')
         +f'</div></div>'
         +f'</div>'
         # ── ENTRARAM / RESOLVIDOS ───────────────────────────────────────────────
         +(f'<div style="display:flex;align-items:center;gap:14px;margin:20px 0 12px">'
-          f'<span style="color:#22c55e;font-size:12px;font-weight:700;letter-spacing:1px">📥 ENTRARAM</span>'
-          f'<select onchange="filtrarRes(\'dbe\',this.value)" style="background:#161616;color:#e5e7eb;border:1px solid #333;border-radius:6px;padding:6px 12px;font-size:13px">{ent_opts}</select>'
+          f'<span style="color:#16a34a;font-size:12px;font-weight:700;letter-spacing:1px">📥 ENTRARAM</span>'
+          f'<select onchange="filtrarRes(\'dbe\',this.value)" style="background:#ffffff;color:#1e293b;border:1px solid #e2e8f0;border-radius:6px;padding:6px 12px;font-size:13px">{ent_opts}</select>'
           f'</div>{dt_ent}' if datas_ent else '')
         +(f'<div style="display:flex;align-items:center;gap:14px;margin:20px 0 12px">'
-          f'<span style="color:#22c55e;font-size:12px;font-weight:700;letter-spacing:1px">📤 RESOLVIDOS</span>'
-          f'<select onchange="filtrarRes(\'dbx\',this.value)" style="background:#161616;color:#e5e7eb;border:1px solid #333;border-radius:6px;padding:6px 12px;font-size:13px">{date_opts}</select>'
+          f'<span style="color:#16a34a;font-size:12px;font-weight:700;letter-spacing:1px">📤 RESOLVIDOS</span>'
+          f'<select onchange="filtrarRes(\'dbx\',this.value)" style="background:#ffffff;color:#1e293b;border:1px solid #e2e8f0;border-radius:6px;padding:6px 12px;font-size:13px">{date_opts}</select>'
           f'</div>{dt_bx}' if datas_res else '')
     )
 
     def _d_stat_sm(label, val, cor, tab=''):
         if not val: return ''
         click = f' onclick="dTab(\'{tab}\')" title="Ir para {label}"' if tab else ''
-        return (f'<div class="dstat"{click} style="border:1px solid {cor}55;border-radius:6px;padding:8px 18px;text-align:center;cursor:pointer">'
+        return (f'<div class="dstat"{click} style="background:#fff;border:1px solid {cor}33;border-radius:8px;padding:8px 18px;text-align:center;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,0.06)">'
                 f'<div style="color:{cor};font-size:30px;font-weight:900;line-height:1">{val}</div>'
-                f'<div style="color:{cor};font-size:10px;font-weight:700;letter-spacing:.5px;margin-top:4px">{label}</div>'
+                f'<div style="color:#64748b;font-size:10px;font-weight:700;letter-spacing:.5px;margin-top:4px">{label}</div>'
                 f'</div>')
 
     dt_hdr_stats=(
-        _d_stat('CLIENTES',  n_cli,    '#f97316','cli')
-       +_d_stat('CHAMADOS',  tot,      '#fb923c','cli')
-       +_d_stat('INCIDENTES',tot_inc,  '#ef4444','urg')
+        _d_stat('CLIENTES',  n_cli,    '#ea580c','cli')
+       +_d_stat('CHAMADOS',  tot,      '#ea580c','cli')
+       +_d_stat('INCIDENTES',tot_inc,  '#dc2626','urg')
        +_d_stat('AGUARDANDO',tot_ag,   '#d97706','resp')
-       +_d_stat('NOVOS',     n_nov,    '#22c55e','res')
-       +f'<div style="width:1px;background:#222;margin:0 4px"></div>'
-       +_d_stat_sm('SUST.',      len(sust_tks),       '#818cf8','urg')
-       +_d_stat_sm('ENG.SW',     len(eng_tks),        '#60a5fa','urg')
-       +_d_stat_sm('COMERCIAL',  len(com_tks),        '#fbbf24','urg')
-       +_d_stat_sm('DESENV.PDV', len(desenv_pdv_tks), '#c084fc','urg')
-       +_d_stat_sm('HOMOLOG.',   len(homolog_tks),    '#22d3ee','urg')
+       +_d_stat('NOVOS',     n_nov,    '#16a34a','res')
+       +f'<div style="width:1px;background:#e2e8f0;margin:0 4px"></div>'
+       +_d_stat_sm('SUST.',      len(sust_tks),       '#6d28d9','urg')
+       +_d_stat_sm('ENG.SW',     len(eng_tks),        '#1d4ed8','urg')
+       +_d_stat_sm('COMERCIAL',  len(com_tks),        '#b45309','urg')
+       +_d_stat_sm('DESENV.PDV', len(desenv_pdv_tks), '#7e22ce','urg')
+       +_d_stat_sm('HOMOLOG.',   len(homolog_tks),    '#0e7490','urg')
     )
 
     return f"""<!DOCTYPE html><html lang="pt-BR"><head>
@@ -870,37 +870,37 @@ def gerar_html(all_tks, baixados_hoje=None, urg_tks=None):
 <link rel="apple-touch-icon" href="/static/icon-192.png">
 <style>
 *{{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}}
-html,body{{background:#0c0c0c;color:#e5e7eb;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}}
-@keyframes pulse{{0%,100%{{opacity:.5}}50%{{opacity:1}}}}
-/* ── mobile (padrão) ── */
+html,body{{background:#f1f5f9;color:#1e293b;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}}
+@keyframes pulse{{0%,100%{{opacity:.6}}50%{{opacity:1}}}}
+/* mobile */
 #dt{{display:none}}
 #mob{{display:block}}
 body{{padding-bottom:70px}}
-#hdr{{position:sticky;top:0;z-index:100;background:#0c0c0c;border-bottom:1px solid #1a1a1a;padding:10px 14px}}
+#hdr{{position:sticky;top:0;z-index:100;background:#ffffff;border-bottom:1px solid #e2e8f0;padding:10px 14px;box-shadow:0 1px 4px rgba(0,0,0,0.06)}}
 .hdr-top{{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}}
 .hdr-logo{{height:36px;background:#fff;border-radius:7px;padding:3px 8px}}
 .stats{{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}}
-.stat{{background:#161616;border-radius:8px;padding:7px 4px;text-align:center}}
+.stat{{background:#ffffff;border-radius:8px;padding:7px 4px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,0.06)}}
 .stat-n{{font-size:20px;font-weight:900}}
-.stat-l{{font-size:9px;font-weight:700;letter-spacing:.3px;margin-top:1px}}
+.stat-l{{font-size:9px;font-weight:700;letter-spacing:.3px;margin-top:1px;color:#64748b}}
 #content{{padding:12px 14px}}
 .view{{display:none}}.view.on{{display:block}}
-#nav{{position:fixed;bottom:0;left:0;right:0;background:#111;border-top:1px solid #1f2937;display:flex;z-index:100;padding-bottom:env(safe-area-inset-bottom)}}
-.nb{{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 4px 10px;cursor:pointer;border:none;background:none;color:#4b5563;font-size:9px;font-weight:700;gap:3px;transition:color .15s}}
+#nav{{position:fixed;bottom:0;left:0;right:0;background:#ffffff;border-top:1px solid #e2e8f0;display:flex;z-index:100;padding-bottom:env(safe-area-inset-bottom);box-shadow:0 -1px 8px rgba(0,0,0,0.06)}}
+.nb{{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 4px 10px;cursor:pointer;border:none;background:none;color:#94a3b8;font-size:9px;font-weight:700;gap:3px;transition:color .15s}}
 .nb .ni{{font-size:22px;line-height:1}}
-.nb.on{{color:#f97316}}.nb.on-urg{{color:#ef4444}}.nb.on-res{{color:#22c55e}}.nb.on-cust{{color:#a78bfa}}
+.nb.on{{color:#ea580c}}.nb.on-urg{{color:#dc2626}}.nb.on-res{{color:#16a34a}}.nb.on-cust{{color:#7c3aed}}
 .sec-hdr{{color:#64748b;font-size:11px;font-weight:700;letter-spacing:1px;padding:6px 0 10px}}
-/* ── desktop (sobrescreve mobile acima de 768px) ── */
+/* desktop */
 @media(min-width:768px){{
   body{{padding:0}}
   #dt{{display:block}}
   #mob{{display:none}}
   .dtab{{background:none;border:none;color:#64748b;font-size:13px;font-weight:700;padding:11px 22px;cursor:pointer;border-bottom:3px solid transparent;transition:color .15s}}
-  .dtab:hover{{color:#e5e7eb}}
-  .dtab.on{{color:#f97316;border-bottom-color:#f97316}}
+  .dtab:hover{{color:#1e293b}}
+  .dtab.on{{color:#ea580c;border-bottom-color:#ea580c}}
   .dview{{display:none}}.dview.on{{display:block}}
-  .dcbox:hover,.drbox:hover{{background:#1a0800!important}}
-  .dcbox.sel{{background:#1a0800!important;border-color:#f97316!important}}
+  .dcbox:hover,.drbox:hover{{background:#fff7ed!important;border-color:#ea580c!important}}
+  .dcbox.sel{{background:#fff7ed!important;border-color:#ea580c!important}}
   .dstat{{cursor:pointer;transition:opacity .15s}}.dstat:hover{{opacity:.75}}
 }}
 </style>
@@ -939,7 +939,7 @@ function filtrarRes(prefix,val){{
 }}
 function selDate(grp,safe){{
   document.querySelectorAll('[data-grp="'+grp+'"]').forEach(function(b){{
-    b.style.background='#111';
+    b.style.background='#f1f5f9';
     b.style.borderColor=b.getAttribute('data-cor')+'44';
   }});
   var btn=document.getElementById(grp+'_btn_'+safe);
@@ -959,26 +959,26 @@ window.onload=function(){{showTab('cli');dTab('cli')}};
 
 <!-- ═══════════════════════════════════════════════ DESKTOP -->
 <div id="dt">
-  <div style="position:sticky;top:0;z-index:200;background:#0c0c0c;box-shadow:0 2px 12px #000">
-  <div style="background:#0c0c0c;border-bottom:1px solid #1a1a1a;padding:14px 28px;display:flex;align-items:center;justify-content:space-between">
+  <div style="position:sticky;top:0;z-index:200;background:#ffffff;box-shadow:0 2px 8px rgba(0,0,0,0.08)">
+  <div style="background:#ffffff;border-bottom:1px solid #e2e8f0;padding:14px 28px;display:flex;align-items:center;justify-content:space-between">
     <div style="display:flex;align-items:center;gap:14px">
       <img src="/static/logo.png" style="height:46px;background:#fff;border-radius:8px;padding:4px 10px">
       <div>
-        <span style="color:#ea580c;font-size:10px;font-weight:900;background:#1a0800;border:1px solid #ea580c;border-radius:4px;padding:2px 8px;letter-spacing:.5px">SUL</span>
-        <div style="color:#6b4c30;font-size:11px;margin-top:4px">Painel de Chamados · {today_str}</div>
+        <span style="color:#ea580c;font-size:10px;font-weight:900;background:#fff7ed;border:1px solid #ea580c;border-radius:4px;padding:2px 8px;letter-spacing:.5px">SUL</span>
+        <div style="color:#94a3b8;font-size:11px;margin-top:4px">Painel de Chamados · {today_str}</div>
       </div>
     </div>
     <div style="display:flex;gap:10px;align-items:center">{dt_hdr_stats}</div>
   </div>
-  <div style="background:#0a0a0a;border-bottom:1px solid #111;padding:8px 28px;display:flex;gap:8px;align-items:center">
-    <span style="color:#4b5563;font-size:10px;font-weight:700;margin-right:4px">DIAS EM ABERTO:</span>
-    <span style="background:#052e16;color:#4ade80;border-radius:4px;padding:3px 10px;font-size:11px;font-weight:700">0-3d</span>
-    <span style="background:#1c1a00;color:#fde047;border-radius:4px;padding:3px 10px;font-size:11px;font-weight:700">4-7d</span>
-    <span style="background:#1c0a00;color:#fb923c;border-radius:4px;padding:3px 10px;font-size:11px;font-weight:700">8-14d</span>
-    <span style="background:#1c0000;color:#f87171;border-radius:4px;padding:3px 10px;font-size:11px;font-weight:700">15-30d</span>
-    <span style="background:#150000;color:#ef4444;border-radius:4px;padding:3px 10px;font-size:11px;font-weight:700">+30d</span>
+  <div style="background:#f8fafc;border-bottom:1px solid #e2e8f0;padding:8px 28px;display:flex;gap:8px;align-items:center">
+    <span style="color:#64748b;font-size:10px;font-weight:700;margin-right:4px">DIAS EM ABERTO:</span>
+    <span style="background:#dcfce7;color:#16a34a;border-radius:4px;padding:3px 10px;font-size:11px;font-weight:700">0-3d</span>
+    <span style="background:#fef9c3;color:#ca8a04;border-radius:4px;padding:3px 10px;font-size:11px;font-weight:700">4-7d</span>
+    <span style="background:#fff7ed;color:#ea580c;border-radius:4px;padding:3px 10px;font-size:11px;font-weight:700">8-14d</span>
+    <span style="background:#fee2e2;color:#dc2626;border-radius:4px;padding:3px 10px;font-size:11px;font-weight:700">15-30d</span>
+    <span style="background:#fee2e2;color:#991b1b;border-radius:4px;padding:3px 10px;font-size:11px;font-weight:700">+30d</span>
   </div>
-  <div style="background:#0c0c0c;border-bottom:1px solid #1a1a1a;padding:0 28px;display:flex">
+  <div style="background:#ffffff;border-bottom:1px solid #e2e8f0;padding:0 28px;display:flex">
     <button id="dtb-cli"  class="dtab on" onclick="dTab('cli')">Por Cliente</button>
     <button id="dtb-resp" class="dtab"    onclick="dTab('resp')">Por Responsável</button>
     <button id="dtb-cust" class="dtab"    onclick="dTab('cust')">Customizações {n_bklog}</button>
@@ -993,21 +993,21 @@ window.onload=function(){{showTab('cli');dTab('cli')}};
       {dt_cli_details}
     </div>
     <div id="dv-resp" class="dview">
-      <div style="color:#f97316;font-size:10px;font-weight:700;letter-spacing:1px;margin-bottom:8px">🌿 EQUIPE SUL</div>
+      <div style="color:#ea580c;font-size:10px;font-weight:700;letter-spacing:1px;margin-bottom:8px">🌿 EQUIPE SUL</div>
       <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px">{dt_rsul_grid}</div>
       {dt_rsul_det}
-      <div style="color:#a78bfa;font-size:10px;font-weight:700;letter-spacing:1px;margin:20px 0 8px">🏢 EQUIPE LOGUS</div>
+      <div style="color:#7c3aed;font-size:10px;font-weight:700;letter-spacing:1px;margin:20px 0 8px">🏢 EQUIPE LOGUS</div>
       <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px">{dt_rlogus_grid}</div>
       {dt_rlogus_det}
     </div>
     <div id="dv-cust" class="dview">
       <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">
-        <thead><tr style="border-bottom:2px solid #1f2937">
-          <th style="color:#475569;font-size:10px;font-weight:700;text-align:left;padding:8px 12px">TICKET</th>
-          <th style="color:#475569;font-size:10px;font-weight:700;text-align:left;padding:8px 12px">CLIENTE</th>
-          <th style="color:#475569;font-size:10px;font-weight:700;text-align:left;padding:8px 12px">DESCRIÇÃO</th>
-          <th style="color:#475569;font-size:10px;font-weight:700;text-align:left;padding:8px 12px">ESTIMATIVA</th>
-          <th style="color:#475569;font-size:10px;font-weight:700;text-align:left;padding:8px 12px">STATUS</th>
+        <thead><tr style="border-bottom:2px solid #e2e8f0">
+          <th style="color:#475569;font-size:10px;font-weight:700;text-align:left;padding:8px 12px;background:#f8fafc">TICKET</th>
+          <th style="color:#475569;font-size:10px;font-weight:700;text-align:left;padding:8px 12px;background:#f8fafc">CLIENTE</th>
+          <th style="color:#475569;font-size:10px;font-weight:700;text-align:left;padding:8px 12px;background:#f8fafc">DESCRIÇÃO</th>
+          <th style="color:#475569;font-size:10px;font-weight:700;text-align:left;padding:8px 12px;background:#f8fafc">ESTIMATIVA</th>
+          <th style="color:#475569;font-size:10px;font-weight:700;text-align:left;padding:8px 12px;background:#f8fafc">STATUS</th>
         </tr></thead>
         <tbody>{dt_cust_rows}</tbody>
       </table></div>
@@ -1025,10 +1025,10 @@ window.onload=function(){{showTab('cli');dTab('cli')}};
     <span style="color:#6b4c30;font-size:11px">📅 {today_str}</span>
   </div>
   <div class="stats">
-    <div class="stat"><div class="stat-n" style="color:#f97316">{n_cli}</div><div class="stat-l" style="color:#6b4c30">CLIENTES</div></div>
-    <div class="stat"><div class="stat-n" style="color:#fb923c">{tot}</div><div class="stat-l" style="color:#6b4c30">CHAMADOS</div></div>
-    <div class="stat"><div class="stat-n" style="color:#ef4444">{tot_inc}</div><div class="stat-l" style="color:#6b4c30">INCIDENTES</div></div>
-    <div class="stat"><div class="stat-n" style="color:#f97316;animation:pulse 1.4s infinite">{n_urg}</div><div class="stat-l" style="color:#6b4c30">URGENTES</div></div>
+    <div class="stat"><div class="stat-n" style="color:#ea580c">{n_cli}</div><div class="stat-l">CLIENTES</div></div>
+    <div class="stat"><div class="stat-n" style="color:#ea580c">{tot}</div><div class="stat-l">CHAMADOS</div></div>
+    <div class="stat"><div class="stat-n" style="color:#dc2626">{tot_inc}</div><div class="stat-l">INCIDENTES</div></div>
+    <div class="stat"><div class="stat-n" style="color:#ea580c;animation:pulse 1.4s infinite">{n_urg}</div><div class="stat-l">URGENTES</div></div>
   </div>
 </div>
 <div id="content">
