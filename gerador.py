@@ -740,10 +740,8 @@ def gerar_html(all_tks, baixados_hoje=None, urg_tks=None):
                 f'{sub_html}</div>')
 
     mob_res=(
-        # Chamados por seção (igual aba Urgentes) — no topo
-        urg_html
         # KPIs
-        +f'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:16px 0 14px">'
+        f'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">'
         +_mob_kpi('TOTAL ABERTOS',  tot,           '#3b82f6', f'{n_cli} clientes')
         +_mob_kpi('INCIDENTES',     tot_inc,       '#ef4444', f'{pct_inc}%')
         +_mob_kpi('URGENTES',       n_urg_critico, '#f97316', 'PDV+Corp')
@@ -806,10 +804,8 @@ def gerar_html(all_tks, baixados_hoje=None, urg_tks=None):
     dt_bar_chart = _d_exec_bar_chart(by_cli, clientes)
 
     dt_res_html=(
-        # ── chamados por seção (igual aba Urgentes) ─────────────────────────────
-        dt_urg_html
         # ── KPI cards ──────────────────────────────────────────────────────────
-        +f'<div style="display:flex;gap:12px;margin:24px 0 22px;flex-wrap:wrap">'
+        f'<div style="display:flex;gap:12px;margin-bottom:22px;flex-wrap:wrap">'
         +_d_kpi_big('Total Abertos',  tot,           '#3b82f6', f'{n_cli} clientes')
         +_d_kpi_big('Incidentes',     tot_inc,       '#ef4444', f'{pct_inc}% do total')
         +_d_kpi_big('Urgentes',       n_urg_critico, '#f97316', 'PDV + Corporativo')
