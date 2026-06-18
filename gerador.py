@@ -652,28 +652,22 @@ def gerar_html(all_tks, baixados_hoje=None, urg_tks=None):
     vazio='<div style="color:#374151;text-align:center;padding:24px;font-size:13px">Nenhum chamado resolvido neste dia.</div>'
 
     # seções mobile (cards) por data
-    mob_bx=''
+    mob_bx_chips=''; mob_bx_content=''
     for dt in datas_show:
         safe=dt.replace('/','_')
         tks=sorted(by_res.get(dt,[]),key=lambda x:x.get('empresa',''))
-        uid=f'mbxd_{safe}'
         is_today=dt==today_str
-        disp='block' if is_today else 'none'
-        chev='▼' if is_today else '▶'
         cnt=len(tks)
-        lbl=f'✅ {dt} — HOJE' if is_today else f'📅 {dt}'
+        lbl=f'HOJE · {cnt}' if is_today else f'{dt[:5]} · {cnt}'
+        bg='#0a1a0a' if is_today else '#111'
+        bdr='#4ade80' if is_today else '#4ade8044'
         cards=''.join(_tk(t) for t in tks) if tks else vazio
-        mob_bx+=(
-            f'<div style="margin-bottom:3px;border-radius:8px;overflow:hidden;border:1px solid #1a2e1a">'
-            f'<div onclick="tog(\'{uid}\')" style="background:#0a1a0a;border-left:4px solid #4ade80;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;min-height:42px">'
-            f'<span style="color:#4ade80;font-size:13px;font-weight:700">{lbl}</span>'
-            f'<div style="display:flex;align-items:center;gap:8px">'
-            f'<span style="color:#4ade80;font-size:16px;font-weight:900">{cnt}</span>'
-            f'<span id="chev{uid}" style="color:#4ade80;font-size:12px">{chev}</span>'
-            f'</div></div>'
-            f'<div id="sec{uid}" style="display:{disp};padding:10px;background:#0f0f0f">{cards}</div>'
-            f'</div>'
-        )
+        mob_bx_chips+=(f'<button onclick="selDate(\'mbxs\',\'{safe}\')" id="mbxs_btn_{safe}" data-grp="mbxs" data-cor="#4ade80" data-bg="#0a1a0a"'
+                       f' style="background:{bg};color:#4ade80;border:1px solid {bdr};border-radius:20px;padding:7px 14px;font-size:12px;font-weight:700;white-space:nowrap;cursor:pointer;flex-shrink:0">'
+                       f'{lbl}</button>')
+        mob_bx_content+=f'<div id="mbxs_c_{safe}" style="display:{"block" if is_today else "none"}">{cards}</div>'
+    mob_bx=(f'<div style="overflow-x:auto;display:flex;gap:6px;padding:4px 0 10px;scrollbar-width:none;-webkit-overflow-scrolling:touch">{mob_bx_chips}</div>'
+            +mob_bx_content)
 
     # seções desktop (tabelas) por data
     dt_bx=''
@@ -704,28 +698,22 @@ def gerar_html(all_tks, baixados_hoje=None, urg_tks=None):
 
     vazio_ent='<div style="color:#374151;text-align:center;padding:24px;font-size:13px">Nenhum chamado aberto neste dia.</div>'
 
-    mob_ent=''
+    mob_ent_chips=''; mob_ent_content=''
     for dt in datas_ent_show:
         safe=dt.replace('/','_')
         tks=sorted(by_data.get(dt,[]),key=lambda x:x.get('empresa',''))
-        uid=f'mbed_{safe}'
         is_today=dt==today_str
-        disp='block' if is_today else 'none'
-        chev='▼' if is_today else '▶'
         cnt=len(tks)
-        lbl=f'📅 {dt} — HOJE' if is_today else f'📅 {dt}'
+        lbl=f'HOJE · {cnt}' if is_today else f'{dt[:5]} · {cnt}'
+        bg='#0a2a0a' if is_today else '#111'
+        bdr='#22c55e' if is_today else '#22c55e44'
         cards=''.join(_tk(t) for t in tks) if tks else vazio_ent
-        mob_ent+=(
-            f'<div style="margin-bottom:3px;border-radius:8px;overflow:hidden;border:1px solid #1a2e1a">'
-            f'<div onclick="tog(\'{uid}\')" style="background:#0a1a0a;border-left:4px solid #22c55e;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;min-height:42px">'
-            f'<span style="color:#22c55e;font-size:13px;font-weight:700">{lbl}</span>'
-            f'<div style="display:flex;align-items:center;gap:8px">'
-            f'<span style="color:#22c55e;font-size:16px;font-weight:900">{cnt}</span>'
-            f'<span id="chev{uid}" style="color:#22c55e;font-size:12px">{chev}</span>'
-            f'</div></div>'
-            f'<div id="sec{uid}" style="display:{disp};padding:10px;background:#0f0f0f">{cards}</div>'
-            f'</div>'
-        )
+        mob_ent_chips+=(f'<button onclick="selDate(\'mbeds\',\'{safe}\')" id="mbeds_btn_{safe}" data-grp="mbeds" data-cor="#22c55e" data-bg="#0a2a0a"'
+                        f' style="background:{bg};color:#22c55e;border:1px solid {bdr};border-radius:20px;padding:7px 14px;font-size:12px;font-weight:700;white-space:nowrap;cursor:pointer;flex-shrink:0">'
+                        f'{lbl}</button>')
+        mob_ent_content+=f'<div id="mbeds_c_{safe}" style="display:{"block" if is_today else "none"}">{cards}</div>'
+    mob_ent=(f'<div style="overflow-x:auto;display:flex;gap:6px;padding:4px 0 10px;scrollbar-width:none;-webkit-overflow-scrolling:touch">{mob_ent_chips}</div>'
+             +mob_ent_content)
 
     dt_ent=''
     for dt in datas_ent_show:
@@ -948,6 +936,16 @@ function showTab(t){{
 function filtrarRes(prefix,val){{
   document.querySelectorAll('[id^="'+prefix+'-"]').forEach(function(el){{el.style.display='none'}});
   var el=document.getElementById(prefix+'-'+val); if(el)el.style.display='block';
+}}
+function selDate(grp,safe){{
+  document.querySelectorAll('[data-grp="'+grp+'"]').forEach(function(b){{
+    b.style.background='#111';
+    b.style.borderColor=b.getAttribute('data-cor')+'44';
+  }});
+  var btn=document.getElementById(grp+'_btn_'+safe);
+  if(btn){{btn.style.background=btn.getAttribute('data-bg');btn.style.borderColor=btn.getAttribute('data-cor');}}
+  document.querySelectorAll('[id^="'+grp+'_c_"]').forEach(function(el){{el.style.display='none'}});
+  var el=document.getElementById(grp+'_c_'+safe); if(el)el.style.display='block';
 }}
 function tog(i){{
   var s=document.getElementById('sec'+i);
