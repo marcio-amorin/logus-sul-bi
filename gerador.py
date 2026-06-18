@@ -847,11 +847,26 @@ def gerar_html(all_tks, baixados_hoje=None, urg_tks=None):
           f'</div>{dt_bx}' if datas_res else '')
     )
 
-    dt_hdr_stats=(_d_stat('CLIENTES',n_cli,'#f97316','cli')
-                  +_d_stat('CHAMADOS',tot,'#fb923c','cli')
-                  +_d_stat('INCIDENTES',tot_inc,'#ef4444','urg')
-                  +_d_stat('AGUARDANDO',tot_ag,'#d97706','resp')
-                  +_d_stat('NOVOS',n_nov,'#22c55e','res'))
+    def _d_stat_sm(label, val, cor, tab=''):
+        if not val: return ''
+        click = f' onclick="dTab(\'{tab}\')" title="Ir para {label}"' if tab else ''
+        return (f'<div class="dstat"{click} style="border:1px solid {cor}55;border-radius:6px;padding:6px 12px;text-align:center;min-width:70px">'
+                f'<div style="color:{cor};font-size:20px;font-weight:900;line-height:1.1">{val}</div>'
+                f'<div style="color:{cor};font-size:8px;font-weight:700;opacity:.55;margin-top:3px;letter-spacing:.5px">{label}</div></div>')
+
+    dt_hdr_stats=(
+        _d_stat('CLIENTES',  n_cli,    '#f97316','cli')
+       +_d_stat('CHAMADOS',  tot,      '#fb923c','cli')
+       +_d_stat('INCIDENTES',tot_inc,  '#ef4444','urg')
+       +_d_stat('AGUARDANDO',tot_ag,   '#d97706','resp')
+       +_d_stat('NOVOS',     n_nov,    '#22c55e','res')
+       +f'<div style="width:1px;background:#222;margin:0 4px"></div>'
+       +_d_stat_sm('SUST.',      len(sust_tks),       '#818cf8','urg')
+       +_d_stat_sm('ENG.SW',     len(eng_tks),        '#60a5fa','urg')
+       +_d_stat_sm('COMERCIAL',  len(com_tks),        '#fbbf24','urg')
+       +_d_stat_sm('DESENV.PDV', len(desenv_pdv_tks), '#c084fc','urg')
+       +_d_stat_sm('HOMOLOG.',   len(homolog_tks),    '#22d3ee','urg')
+    )
 
     return f"""<!DOCTYPE html><html lang="pt-BR"><head>
 <meta charset="UTF-8">
