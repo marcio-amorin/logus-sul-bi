@@ -561,35 +561,34 @@ def gerar_html(all_tks, baixados_hoje=None, urg_tks=None):
     URG_ERP_EF = URG_ERP | urg_file_erp | csv_urg_erp
     URG_ALL_EF = URG_PDV_EF | URG_ERP_EF | URG_DEV
 
-    # Ordem de prioridade das seções:
-    # 1) PDV Urgente  — sempre ganha (sem exclusão)
-    # 2) Eng Software — ganha sobre ERP urgente (mas não sobre PDV)
-    # 3) ERP Urgente  — exclui PDV e Eng Software
-    # 4) Sustentação  — tickets NÃO urgentes com atrib Sustentação
-    # 5) Comercial    — tickets NÃO urgentes com atrib Comercial
-    # 6) Pendentes    — todo o resto
+    # Regra: atrib define a seção — time ganha sobre lista de urgente
+    # 1) Sustentação (atrib) → sempre Sustentação
+    # 2) Engenharia Software (atrib) → sempre Eng Software
+    # 3) PDV Urgente — exclui Sust e Eng
+    # 4) ERP Urgente — exclui PDV, Sust e Eng
+    # 5) Comercial   — não urgentes
+    # 6) Pendentes   — todo o resto
 
-    pdv_tks   = sorted([t for t in sul if t['code'] in URG_PDV_EF], key=lambda x:-x['dias'])
-    pdv_codes = {t['code'] for t in pdv_tks}
-
-    # Eng Software inclui todos com atrib, exceto os já em PDV
     SUST_ATRIB = {'Sustentação Desenv.','Sust. Desenv.'}
-    eng_tks   = sorted([t for t in sul if t['atrib']=='Engenharia Software' and t['code'] not in pdv_codes], key=lambda x:-x['dias'])
+    sust_tks  = sorted([t for t in sul if t['atrib'] in SUST_ATRIB], key=lambda x:-x['dias'])
+    sust_codes = {t['code'] for t in sust_tks}
+
+    eng_tks   = sorted([t for t in sul if t['atrib']=='Engenharia Software'], key=lambda x:-x['dias'])
     eng_codes = {t['code'] for t in eng_tks}
 
-    # ERP urgente exclui PDV e Eng Software
-    erp_tks   = sorted([t for t in sul if t['code'] in URG_ERP_EF and t['code'] not in pdv_codes and t['code'] not in eng_codes], key=lambda x:-x['dias'])
+    team_codes = sust_codes | eng_codes
+
+    pdv_tks   = sorted([t for t in sul if t['code'] in URG_PDV_EF and t['code'] not in team_codes], key=lambda x:-x['dias'])
+    pdv_codes = {t['code'] for t in pdv_tks}
+
+    erp_tks   = sorted([t for t in sul if t['code'] in URG_ERP_EF and t['code'] not in team_codes and t['code'] not in pdv_codes], key=lambda x:-x['dias'])
     erp_codes = {t['code'] for t in erp_tks}
 
-    # Sustentação: somente tickets NÃO urgentes (urgentes ficam em PDV/ERP)
-    sust_tks  = sorted([t for t in sul if t['atrib'] in SUST_ATRIB and t['code'] not in pdv_codes and t['code'] not in erp_codes and t['code'] not in eng_codes], key=lambda x:-x['dias'])
-
-    com_tks   = sorted([t for t in sul if t['atrib']=='Comercial' and t['code'] not in URG_ALL_EF], key=lambda x:-x['dias'])
+    com_tks   = sorted([t for t in sul if t['atrib']=='Comercial' and t['code'] not in team_codes and t['code'] not in pdv_codes and t['code'] not in erp_codes], key=lambda x:-x['dias'])
 
     n_urg_critico = len(pdv_tks) + len(erp_tks)
 
-    # todos os tickets Sul não classificados nas seções anteriores
-    _shown_codes = pdv_codes | erp_codes | eng_codes | {t['code'] for t in sust_tks} | {t['code'] for t in com_tks}
+    _shown_codes = pdv_codes | erp_codes | team_codes | {t['code'] for t in com_tks}
     pendente_tks = sorted([t for t in sul if t['code'] not in _shown_codes], key=lambda x:-x['dias'])
 
     n_urg=len(pdv_tks)+len(erp_tks)+len(eng_tks)+len(sust_tks)+len(com_tks)+len(pendente_tks)
