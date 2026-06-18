@@ -569,22 +569,20 @@ def gerar_html(all_tks, baixados_hoje=None, urg_tks=None):
     # 5) Comercial   — não urgentes
     # 6) Pendentes   — todo o resto
 
+    # Times dedicados — NUNCA vão para PDV/ERP Urgente, independente de urgência
     SUST_ATRIB = {'Sustentação Desenv.','Sust. Desenv.'}
     sust_tks  = sorted([t for t in sul if t['atrib'] in SUST_ATRIB], key=lambda x:-x['dias'])
-    sust_codes = {t['code'] for t in sust_tks}
-
     eng_tks   = sorted([t for t in sul if t['atrib']=='Engenharia Software'], key=lambda x:-x['dias'])
-    eng_codes = {t['code'] for t in eng_tks}
+    com_tks   = sorted([t for t in sul if t['atrib']=='Comercial'], key=lambda x:-x['dias'])
 
-    team_codes = sust_codes | eng_codes
+    team_codes = {t['code'] for t in sust_tks} | {t['code'] for t in eng_tks} | {t['code'] for t in com_tks}
 
+    # PDV/ERP Urgente — apenas tickets sem time dedicado
     pdv_tks   = sorted([t for t in sul if t['code'] in URG_PDV_EF and t['code'] not in team_codes], key=lambda x:-x['dias'])
     pdv_codes = {t['code'] for t in pdv_tks}
 
     erp_tks   = sorted([t for t in sul if t['code'] in URG_ERP_EF and t['code'] not in team_codes and t['code'] not in pdv_codes], key=lambda x:-x['dias'])
     erp_codes = {t['code'] for t in erp_tks}
-
-    com_tks   = sorted([t for t in sul if t['atrib']=='Comercial' and t['code'] not in team_codes and t['code'] not in pdv_codes and t['code'] not in erp_codes], key=lambda x:-x['dias'])
 
     n_urg_critico = len(pdv_tks) + len(erp_tks)
 
