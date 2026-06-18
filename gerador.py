@@ -193,6 +193,7 @@ def _d_row(t, show_cli=False):
     tc = '#ef4444' if t['tipo']=='Incidente' else '#3b82f6' if t['tipo']=='Requisição' else '#6b7280'
     ec = {'Novo':'#22c55e','Em andamento':'#3b82f6','Aguardando':'#d97706','Resolvido':'#22c55e','Fechado':'#22c55e'}.get(t['status'],'#6b7280')
     cli = f'<td style="color:#ea580c;font-size:12px;font-weight:700;padding:9px 12px;white-space:nowrap">{t["empresa"]}</td>' if show_cli else ''
+    url = f'https://logusretail.tolvdesk.com/webapp/#/tickets/{t["code"]}'
     return (f'<tr style="border-bottom:1px solid #f1f5f9">'
             f'<td style="color:#ea580c;font-weight:900;padding:9px 12px;white-space:nowrap">#{t["code"]}</td>'
             f'{cli}'
@@ -202,7 +203,9 @@ def _d_row(t, show_cli=False):
             f'<td style="color:#374151;padding:9px 12px;font-size:12px;font-weight:600;white-space:nowrap">{t["atrib"]}</td>'
             f'<td style="color:#64748b;padding:9px 12px;font-size:12px;white-space:nowrap">{t["data"]}</td>'
             f'<td style="color:{fc};font-weight:900;padding:9px 12px;text-align:right;white-space:nowrap">{t["dias"]}</td>'
-            f'</tr>')
+            f'<td style="padding:9px 8px;white-space:nowrap">'
+            f'<a href="{url}" target="_blank" style="background:#ea580c;color:#fff;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:700;text-decoration:none;white-space:nowrap">🔗 Ver</a>'
+            f'</td></tr>')
 
 def _d_tbl_hdr(show_cli=False):
     cli = '<th style="color:#475569;font-size:10px;font-weight:700;text-align:left;padding:8px 12px;background:#f8fafc">CLIENTE</th>' if show_cli else ''
@@ -215,6 +218,7 @@ def _d_tbl_hdr(show_cli=False):
             '<th style="color:#475569;font-size:10px;font-weight:700;text-align:left;padding:8px 12px;background:#f8fafc">COM QUEM</th>'
             '<th style="color:#475569;font-size:10px;font-weight:700;text-align:left;padding:8px 12px;background:#f8fafc">ABERTURA</th>'
             '<th style="color:#475569;font-size:10px;font-weight:700;text-align:right;padding:8px 12px;background:#f8fafc">DIAS</th>'
+            '<th style="background:#f8fafc;padding:8px 8px"></th>'
             '</tr></thead>')
 
 def _d_clibox(emp, tks):
