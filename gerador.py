@@ -561,14 +561,19 @@ def gerar_html(all_tks, baixados_hoje=None, urg_tks=None):
     URG_ERP_EF = URG_ERP | urg_file_erp | csv_urg_erp
     URG_ALL_EF = URG_PDV_EF | URG_ERP_EF | URG_DEV
 
-    def _sec(codes, excl=None): return [t for t in sul if t['code'] in codes and (excl is None or t['code'] not in excl)]
+    # Sustentação tem prioridade — todos os tickets com esse atrib ficam aqui,
+    # mesmo que estejam marcados como urgente em outras listas
+    SUST_ATRIB = {'Sustentação Desenv.','Sust. Desenv.'}
+    sust_tks  = sorted([t for t in sul if t['atrib'] in SUST_ATRIB], key=lambda x:-x['dias'])
+    sust_codes = {t['code'] for t in sust_tks}
+
+    def _sec(codes, excl=None):
+        excl_all = sust_codes | (excl or set())
+        return [t for t in sul if t['code'] in codes and t['code'] not in excl_all]
 
     pdv_tks = _sec(URG_PDV_EF)
     erp_tks = _sec(URG_ERP_EF, excl=URG_PDV_EF)
 
-    # Sustentação = apenas equipe Sustentação Desenv.
-    SUST_ATRIB = {'Sustentação Desenv.','Sust. Desenv.'}
-    sust_tks = sorted([t for t in sul if t['atrib'] in SUST_ATRIB and t['code'] not in URG_ALL_EF], key=lambda x:-x['dias'])
     com_tks  = sorted([t for t in sul if t['atrib']=='Comercial' and t['code'] not in URG_ALL_EF], key=lambda x:-x['dias'])
     eng_tks  = sorted([t for t in sul if t['atrib']=='Engenharia Software' and t['code'] not in URG_ALL_EF], key=lambda x:-x['dias'])
 
