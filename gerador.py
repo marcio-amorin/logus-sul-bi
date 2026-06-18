@@ -81,15 +81,15 @@ def _ticon(t):
 
 def _tk(t, sc=True):
     fc,bg = _dc(t['dias'])
-    cli = f'<div style="color:#ea580c;font-size:13px;font-weight:700;margin-bottom:4px">{t["empresa"]}</div>' if sc else ''
-    return (f'<div style="background:#ffffff;border-radius:10px;padding:14px 16px;margin-bottom:10px;border-left:4px solid {fc};box-shadow:0 1px 4px rgba(0,0,0,0.08)">'
+    cli = f'<div style="color:#ea580c;font-size:15px;font-weight:800;margin-bottom:6px">{t["empresa"]}</div>' if sc else ''
+    return (f'<div style="background:#ffffff;border-radius:12px;padding:14px 16px;margin-bottom:10px;border-left:6px solid {fc};box-shadow:0 3px 10px rgba(0,0,0,0.1)">'
             f'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'
-            f'<span style="color:{fc};font-size:17px;font-weight:900">#{t["code"]}</span>'
-            f'<span style="background:{bg};color:{fc};font-size:16px;font-weight:900;padding:3px 10px;border-radius:6px">{t["dias"]}d</span></div>'
+            f'<span style="color:{fc};font-size:20px;font-weight:900">#{t["code"]}</span>'
+            f'<span style="background:{bg};color:{fc};font-size:18px;font-weight:900;padding:4px 12px;border-radius:8px;border:1px solid {fc}33">{t["dias"]}d</span></div>'
             f'{cli}'
-            f'<div style="color:#111827;font-size:13px;font-weight:500;line-height:1.5;margin-bottom:10px">{_ticon(t["tipo"])} {t["assunto"]}</div>'
+            f'<div style="color:#111827;font-size:14px;font-weight:600;line-height:1.5;margin-bottom:10px">{_ticon(t["tipo"])} {t["assunto"]}</div>'
             f'<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px">'
-            f'<span style="color:#374151;font-size:12px;font-weight:600">{t["atrib"]}</span>'
+            f'<span style="color:#374151;font-size:13px;font-weight:700">{t["atrib"]}</span>'
             f'{_sbadge(t["status"])}</div></div>')
 
 def _csec(emp, tks, idx):
@@ -100,14 +100,14 @@ def _csec(emp, tks, idx):
     inc_tag = f'<span style="color:#dc2626;font-size:10px;font-weight:900;margin-right:4px">⚠{inc}</span>' if inc else ''
     cards = ''.join(_tk(t, sc=False) for t in tks_s)
     return (
-        f'<div style="margin-bottom:2px;border-radius:8px;overflow:hidden;border:1px solid #e2e8f0">'
-        f'<div onclick="tog({idx})" style="background:#ffffff;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;min-height:42px">'
-        f'<span style="color:#1e293b;font-size:13px;font-weight:700;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:8px">{emp}</span>'
+        f'<div style="margin-bottom:4px;border-radius:10px;overflow:hidden;border:1px solid #d1d5db;box-shadow:0 1px 4px rgba(0,0,0,0.06)">'
+        f'<div onclick="tog({idx})" style="background:#ffffff;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;min-height:46px">'
+        f'<span style="color:#111827;font-size:15px;font-weight:800;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:8px">{emp}</span>'
         f'<div style="display:flex;align-items:center;gap:6px;flex-shrink:0">'
         f'{inc_tag}'
-        f'<span style="color:#374151;font-size:11px">{len(tks)}ch</span>'
-        f'<span style="color:{fc};font-size:11px;font-weight:700;min-width:32px;text-align:right">{mx}d</span>'
-        f'<span id="chev{idx}" style="color:#64748b;font-size:12px;margin-left:4px">▶</span>'
+        f'<span style="color:#374151;font-size:12px;font-weight:700">{len(tks)}ch</span>'
+        f'<span style="color:{fc};font-size:13px;font-weight:900;min-width:32px;text-align:right">{mx}d</span>'
+        f'<span id="chev{idx}" style="color:#64748b;font-size:13px;margin-left:4px">▶</span>'
         f'</div></div>'
         f'<div id="sec{idx}" style="display:none;padding:10px;background:#f8fafc">{cards}</div>'
         f'</div>'
@@ -121,14 +121,14 @@ def _rsec(resp, tks, idx, cor='#ea580c'):
     inc_tag = f'<span style="color:#dc2626;font-size:10px;font-weight:900;margin-right:4px">⚠{inc}</span>' if inc else ''
     cards = ''.join(_tk(t, sc=True) for t in tks_s)
     return (
-        f'<div style="margin-bottom:2px;border-radius:8px;overflow:hidden;border:1px solid #e2e8f0">'
-        f'<div onclick="tog({idx})" style="background:#ffffff;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;min-height:42px">'
-        f'<span style="color:{cor};font-size:13px;font-weight:700;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:8px">{resp}</span>'
+        f'<div style="margin-bottom:4px;border-radius:10px;overflow:hidden;border:1px solid #d1d5db;box-shadow:0 1px 4px rgba(0,0,0,0.06)">'
+        f'<div onclick="tog({idx})" style="background:#ffffff;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;min-height:46px">'
+        f'<span style="color:{cor};font-size:15px;font-weight:800;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:8px">{resp}</span>'
         f'<div style="display:flex;align-items:center;gap:6px;flex-shrink:0">'
         f'{inc_tag}'
-        f'<span style="color:#374151;font-size:11px">{len(tks)}ch</span>'
-        f'<span style="color:{fc};font-size:11px;font-weight:700;min-width:32px;text-align:right">{mx}d</span>'
-        f'<span id="chev{idx}" style="color:#64748b;font-size:12px;margin-left:4px">▶</span>'
+        f'<span style="color:#374151;font-size:12px;font-weight:700">{len(tks)}ch</span>'
+        f'<span style="color:{fc};font-size:13px;font-weight:900;min-width:32px;text-align:right">{mx}d</span>'
+        f'<span id="chev{idx}" style="color:#64748b;font-size:13px;margin-left:4px">▶</span>'
         f'</div></div>'
         f'<div id="sec{idx}" style="display:none;padding:10px;background:#f8fafc">{cards}</div>'
         f'</div>'
@@ -144,12 +144,12 @@ def _ugrp(titulo, cor, bg, tks, sc=True, uid=None):
                 f'<span style="color:{cor};font-size:20px;font-weight:900">{len(tks)}</span></div>'
                 f'{cards}</div>')
     return (
-        f'<div style="margin-bottom:3px;border-radius:8px;overflow:hidden;border:1px solid #e2e8f0">'
-        f'<div onclick="tog(\'{uid}\')" style="background:{bg};border-left:4px solid {cor};padding:10px 14px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;min-height:42px">'
-        f'<span style="color:{cor};font-size:13px;font-weight:900">{titulo}</span>'
+        f'<div style="margin-bottom:6px;border-radius:10px;overflow:hidden;border:2px solid {cor}44;box-shadow:0 2px 8px {cor}18">'
+        f'<div onclick="tog(\'{uid}\')" style="background:{bg};border-left:6px solid {cor};padding:12px 14px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;min-height:46px">'
+        f'<span style="color:{cor};font-size:15px;font-weight:900">{titulo}</span>'
         f'<div style="display:flex;align-items:center;gap:8px">'
-        f'<span style="color:{cor};font-size:16px;font-weight:900">{len(tks)}</span>'
-        f'<span id="chev{uid}" style="color:{cor};font-size:12px">▶</span>'
+        f'<span style="color:{cor};font-size:24px;font-weight:900">{len(tks)}</span>'
+        f'<span id="chev{uid}" style="color:{cor};font-size:14px">▶</span>'
         f'</div></div>'
         f'<div id="sec{uid}" style="display:none;padding:10px;background:#f8fafc">{cards}</div>'
         f'</div>'
@@ -183,9 +183,9 @@ def _d_safe(s):
 
 def _d_stat(label, val, cor, tab=''):
     click = f' onclick="dTab(\'{tab}\')" title="Ir para {label}"' if tab else ''
-    return (f'<div class="dstat"{click} style="background:#fff;border:1px solid {cor}33;border-radius:8px;padding:8px 18px;text-align:center;min-width:90px;box-shadow:0 1px 3px rgba(0,0,0,0.06)">'
-            f'<div style="color:{cor};font-size:26px;font-weight:900;line-height:1.1">{val}</div>'
-            f'<div style="color:#374151;font-size:9px;font-weight:700;margin-top:4px;letter-spacing:.5px">{label}</div></div>')
+    return (f'<div class="dstat"{click} style="background:{cor}0d;border:2px solid {cor}55;border-top:3px solid {cor};border-radius:10px;padding:10px 20px;text-align:center;min-width:100px;box-shadow:0 2px 8px {cor}22">'
+            f'<div style="color:{cor};font-size:34px;font-weight:900;line-height:1.1">{val}</div>'
+            f'<div style="color:#374151;font-size:11px;font-weight:800;margin-top:5px;letter-spacing:.5px">{label}</div></div>')
 
 def _d_row(t, show_cli=False):
     fc,_ = _dc(t['dias'])
@@ -224,11 +224,11 @@ def _d_clibox(emp, tks):
     sid = _d_safe(emp)
     itag = f'<div style="color:#dc2626;font-size:11px;margin-top:2px">⚠ {inc} inc</div>' if inc else ''
     return (f'<div class="dcbox" data-id="{sid}" onclick="dCli(\'{sid}\')" '
-            f'style="border:1px solid #e2e8f0;border-radius:8px;padding:12px 14px;cursor:pointer;background:#ffffff;min-width:130px;box-shadow:0 1px 4px rgba(0,0,0,0.06)">'
-            f'<div style="color:#ea580c;font-size:12px;font-weight:900;margin-bottom:3px">{emp}</div>'
-            f'<div style="color:#1e293b;font-size:12px;font-weight:700">{len(tks)} tickets</div>'
+            f'style="border:2px solid #e2e8f0;border-radius:10px;padding:14px 16px;cursor:pointer;background:#ffffff;min-width:140px;box-shadow:0 2px 8px rgba(0,0,0,0.08)">'
+            f'<div style="color:#ea580c;font-size:14px;font-weight:900;margin-bottom:4px">{emp}</div>'
+            f'<div style="color:#1e293b;font-size:13px;font-weight:700">{len(tks)} tickets</div>'
             f'{itag}'
-            f'<div style="color:{fc};font-size:13px;font-weight:700;margin-top:4px">{mx}d</div></div>')
+            f'<div style="color:{fc};font-size:15px;font-weight:900;margin-top:6px">{mx}d</div></div>')
 
 def _d_respbox(resp, tks, cor):
     inc = sum(1 for t in tks if t['tipo']=='Incidente')
@@ -237,11 +237,11 @@ def _d_respbox(resp, tks, cor):
     sid = _d_safe(resp)
     itag = f'<div style="color:#dc2626;font-size:11px;margin-top:2px">⚠ {inc} inc</div>' if inc else ''
     return (f'<div class="drbox" onclick="dResp(\'{sid}\')" '
-            f'style="border:1px solid #e2e8f0;border-radius:8px;padding:12px 14px;cursor:pointer;background:#ffffff;min-width:150px;box-shadow:0 1px 4px rgba(0,0,0,0.06)">'
-            f'<div style="color:{cor};font-size:12px;font-weight:900;margin-bottom:3px">{resp}</div>'
-            f'<div style="color:#1e293b;font-size:12px;font-weight:700">{len(tks)} chamados</div>'
+            f'style="border:2px solid #e2e8f0;border-radius:10px;padding:14px 16px;cursor:pointer;background:#ffffff;min-width:160px;box-shadow:0 2px 8px rgba(0,0,0,0.08)">'
+            f'<div style="color:{cor};font-size:14px;font-weight:900;margin-bottom:4px">{resp}</div>'
+            f'<div style="color:#1e293b;font-size:13px;font-weight:700">{len(tks)} chamados</div>'
             f'{itag}'
-            f'<div style="color:{fc};font-size:13px;font-weight:700;margin-top:4px">{mx}d</div></div>')
+            f'<div style="color:{fc};font-size:15px;font-weight:900;margin-top:6px">{mx}d</div></div>')
 
 def _d_detail(label, tks, div_id, close_fn):
     inc = sum(1 for t in tks if t['tipo']=='Incidente')
@@ -266,10 +266,10 @@ def _d_detail(label, tks, div_id, close_fn):
 def _d_urg_sec(titulo, cor, bg, tks):
     if not tks: return ''
     rows = ''.join(_d_row(t, show_cli=True) for t in sorted(tks, key=lambda x:(0 if x['tipo']=='Incidente' else 1,-x['dias'])))
-    return (f'<div style="margin-bottom:20px;background:#ffffff;border-radius:10px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.06)">'
-            f'<div style="background:{bg};border-left:4px solid {cor};padding:12px 16px;display:flex;align-items:center;gap:12px">'
-            f'<span style="color:{cor};font-size:13px;font-weight:900">{titulo}</span>'
-            f'<span style="color:{cor};font-size:22px;font-weight:900;line-height:1">{len(tks)}</span></div>'
+    return (f'<div style="margin-bottom:24px;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 3px 12px rgba(0,0,0,0.08)">'
+            f'<div style="background:{bg};border-left:6px solid {cor};padding:14px 18px;display:flex;align-items:center;gap:14px">'
+            f'<span style="color:{cor};font-size:15px;font-weight:900">{titulo}</span>'
+            f'<span style="color:{cor};font-size:30px;font-weight:900;line-height:1">{len(tks)}</span></div>'
             f'<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">'
             f'{_d_tbl_hdr(show_cli=True)}<tbody>{rows}</tbody></table></div></div>')
 
@@ -331,18 +331,18 @@ def _d_urg_por_cli(titulo, cor, bg, tks):
                  f'<span style="color:#374151;font-size:11px;margin-left:10px">{len(emp_tks)} chamados · {mx}d</span>'
                  f'</td></tr>')
         rows += ''.join(_d_row(t, show_cli=False) for t in emp_tks)
-    return (f'<div style="margin-bottom:20px;background:#ffffff;border-radius:10px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.06)">'
-            f'<div style="background:{bg};border-left:4px solid {cor};padding:12px 16px;display:flex;align-items:center;gap:12px">'
-            f'<span style="color:{cor};font-size:13px;font-weight:900">{titulo}</span>'
-            f'<span style="color:{cor};font-size:22px;font-weight:900;line-height:1">{len(tks)}</span></div>'
+    return (f'<div style="margin-bottom:24px;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 3px 12px rgba(0,0,0,0.08)">'
+            f'<div style="background:{bg};border-left:6px solid {cor};padding:14px 18px;display:flex;align-items:center;gap:14px">'
+            f'<span style="color:{cor};font-size:15px;font-weight:900">{titulo}</span>'
+            f'<span style="color:{cor};font-size:30px;font-weight:900;line-height:1">{len(tks)}</span></div>'
             f'<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">'
             f'{_d_tbl_hdr(show_cli=False)}<tbody>{rows}</tbody></table></div></div>')
 
 def _d_kpi_big(label, val, cor, sub=''):
-    sub_html = f'<div style="color:#64748b;font-size:10px;font-weight:700;margin-top:4px">{sub}</div>' if sub else ''
-    return (f'<div style="background:#ffffff;border:1px solid #e2e8f0;border-top:3px solid {cor};border-radius:10px;padding:18px 22px;flex:1;min-width:110px;box-shadow:0 1px 4px rgba(0,0,0,0.06)">'
-            f'<div style="color:{cor};font-size:40px;font-weight:900;line-height:1;font-variant-numeric:tabular-nums">{val}</div>'
-            f'<div style="color:#374151;font-size:10px;font-weight:700;letter-spacing:.8px;margin-top:10px;text-transform:uppercase">{label}</div>'
+    sub_html = f'<div style="color:#64748b;font-size:11px;font-weight:700;margin-top:4px">{sub}</div>' if sub else ''
+    return (f'<div style="background:{cor}0d;border:2px solid {cor}44;border-top:4px solid {cor};border-radius:12px;padding:18px 22px;flex:1;min-width:120px;box-shadow:0 3px 12px {cor}22">'
+            f'<div style="color:{cor};font-size:52px;font-weight:900;line-height:1;font-variant-numeric:tabular-nums">{val}</div>'
+            f'<div style="color:#374151;font-size:12px;font-weight:800;letter-spacing:.8px;margin-top:10px;text-transform:uppercase">{label}</div>'
             f'{sub_html}</div>')
 
 def _d_exec_bar_chart(by_cli, clientes):
@@ -617,13 +617,13 @@ def gerar_html(all_tks, baixados_hoje=None, urg_tks=None):
     for r in resp_logus: resp_secs+=_rsec(r,by_resp[r],idx,'#7c3aed'); idx+=1
 
     urg_html=(
-        _ugrp('🟢 PDV — Urgente',        '#15803d','#f0fdf4',pdv_tks, uid='ug0')+
-        _ugrp('🔴 Corporativo — Urgente', '#b91c1c','#fef2f2',erp_tks, uid='ug1')+
-        _ugrp('🛠️ Sustentação',           '#6d28d9','#f5f3ff',sust_tks,     uid='ug2')+
-        _ugrp('⚙️ Engenharia Software',   '#1d4ed8','#eff6ff',eng_tks,     uid='ug5')+
-        _ugrp('🤝 Comercial',             '#b45309','#fffbeb',com_tks,     uid='ug3')+
-        _ugrp('🖥️ Desenv. PDV',           '#7e22ce','#faf5ff',desenv_pdv_tks,uid='ug6')+
-        _ugrp('🧪 Homologação',           '#0e7490','#ecfeff',homolog_tks, uid='ug7')+
+        _ugrp('🟢 PDV — Urgente',        '#16a34a','#dcfce7',pdv_tks, uid='ug0')+
+        _ugrp('🔴 Corporativo — Urgente', '#dc2626','#fee2e2',erp_tks, uid='ug1')+
+        _ugrp('🛠️ Sustentação',           '#7c3aed','#ede9fe',sust_tks,     uid='ug2')+
+        _ugrp('⚙️ Engenharia Software',   '#2563eb','#dbeafe',eng_tks,     uid='ug5')+
+        _ugrp('🤝 Comercial',             '#d97706','#fef3c7',com_tks,     uid='ug3')+
+        _ugrp('🖥️ Desenv. PDV',           '#9333ea','#f3e8ff',desenv_pdv_tks,uid='ug6')+
+        _ugrp('🧪 Homologação',           '#0891b2','#cffafe',homolog_tks, uid='ug7')+
         _ugrp_por_cli('📋 Pendentes de Atendimento','#475569','#f8fafc',pendente_tks,uid='ug4')
     )
 
@@ -766,19 +766,19 @@ def gerar_html(all_tks, baixados_hoje=None, urg_tks=None):
     dt_cli_grid    = ''.join(_d_clibox(e,by_cli[e]) for e in cli_ord)
     dt_cli_details = ''.join(_d_detail(e,by_cli[e],f'dtd-{_d_safe(e)}','dCli(null)') for e in clientes)
 
-    dt_rsul_grid    = ''.join(_d_respbox(r,by_resp[r],'#f97316') for r in resp_sul)
-    dt_rlogus_grid  = ''.join(_d_respbox(r,by_resp[r],'#a78bfa') for r in resp_logus)
+    dt_rsul_grid    = ''.join(_d_respbox(r,by_resp[r],'#ea580c') for r in resp_sul)
+    dt_rlogus_grid  = ''.join(_d_respbox(r,by_resp[r],'#7c3aed') for r in resp_logus)
     dt_rsul_det     = ''.join(_d_detail(r,by_resp[r],f'dtr-{_d_safe(r)}','dResp(null)') for r in resp_sul)
     dt_rlogus_det   = ''.join(_d_detail(r,by_resp[r],f'dtr-{_d_safe(r)}','dResp(null)') for r in resp_logus)
 
     dt_urg_html=(
-        _d_urg_sec('🟢 PDV — Urgente',        '#15803d','#f0fdf4',pdv_tks)+
-        _d_urg_sec('🔴 Corporativo — Urgente', '#b91c1c','#fef2f2',erp_tks)+
-        _d_urg_sec('🛠️ Sustentação',           '#6d28d9','#f5f3ff',sust_tks)+
-        _d_urg_sec('⚙️ Engenharia Software',   '#1d4ed8','#eff6ff',eng_tks)+
-        _d_urg_sec('🤝 Comercial',             '#b45309','#fffbeb',com_tks)+
-        _d_urg_sec('🖥️ Desenv. PDV',           '#7e22ce','#faf5ff',desenv_pdv_tks)+
-        _d_urg_sec('🧪 Homologação',           '#0e7490','#ecfeff',homolog_tks)+
+        _d_urg_sec('🟢 PDV — Urgente',        '#16a34a','#dcfce7',pdv_tks)+
+        _d_urg_sec('🔴 Corporativo — Urgente', '#dc2626','#fee2e2',erp_tks)+
+        _d_urg_sec('🛠️ Sustentação',           '#7c3aed','#ede9fe',sust_tks)+
+        _d_urg_sec('⚙️ Engenharia Software',   '#2563eb','#dbeafe',eng_tks)+
+        _d_urg_sec('🤝 Comercial',             '#d97706','#fef3c7',com_tks)+
+        _d_urg_sec('🖥️ Desenv. PDV',           '#9333ea','#f3e8ff',desenv_pdv_tks)+
+        _d_urg_sec('🧪 Homologação',           '#0891b2','#cffafe',homolog_tks)+
         _d_urg_por_cli('📋 Pendentes de Atendimento','#475569','#f8fafc',pendente_tks)
     )
 
@@ -838,9 +838,9 @@ def gerar_html(all_tks, baixados_hoje=None, urg_tks=None):
     def _d_stat_sm(label, val, cor, tab=''):
         if not val: return ''
         click = f' onclick="dTab(\'{tab}\')" title="Ir para {label}"' if tab else ''
-        return (f'<div class="dstat"{click} style="background:#fff;border:1px solid {cor}33;border-radius:8px;padding:8px 18px;text-align:center;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,0.06)">'
-                f'<div style="color:{cor};font-size:30px;font-weight:900;line-height:1">{val}</div>'
-                f'<div style="color:#374151;font-size:10px;font-weight:700;letter-spacing:.5px;margin-top:4px">{label}</div>'
+        return (f'<div class="dstat"{click} style="background:{cor}0d;border:2px solid {cor}44;border-top:3px solid {cor};border-radius:10px;padding:8px 16px;text-align:center;cursor:pointer;box-shadow:0 2px 8px {cor}22">'
+                f'<div style="color:{cor};font-size:34px;font-weight:900;line-height:1">{val}</div>'
+                f'<div style="color:#374151;font-size:11px;font-weight:800;letter-spacing:.5px;margin-top:5px">{label}</div>'
                 f'</div>')
 
     dt_hdr_stats=(
@@ -880,9 +880,9 @@ body{{padding-bottom:70px}}
 .hdr-top{{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}}
 .hdr-logo{{height:36px;background:#fff;border-radius:7px;padding:3px 8px}}
 .stats{{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}}
-.stat{{background:#ffffff;border-radius:8px;padding:7px 4px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,0.06)}}
-.stat-n{{font-size:22px;font-weight:900}}
-.stat-l{{font-size:10px;font-weight:800;letter-spacing:.3px;margin-top:2px;color:#374151}}
+.stat{{background:#ffffff;border-radius:10px;padding:8px 4px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.1)}}
+.stat-n{{font-size:26px;font-weight:900}}
+.stat-l{{font-size:10px;font-weight:800;letter-spacing:.3px;margin-top:3px;color:#374151}}
 #content{{padding:12px 14px}}
 .view{{display:none}}.view.on{{display:block}}
 #nav{{position:fixed;bottom:0;left:0;right:0;background:#ffffff;border-top:1px solid #e2e8f0;display:flex;z-index:100;padding-bottom:env(safe-area-inset-bottom);box-shadow:0 -1px 8px rgba(0,0,0,0.06)}}
