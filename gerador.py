@@ -608,8 +608,8 @@ def gerar_html(all_tks, baixados_hoje=None, urg_tks=None):
         _ugrp('🟢 PDV — Urgente',        '#4ade80','#052e16',pdv_tks, uid='ug0')+
         _ugrp('🔴 Corporativo — Urgente', '#ef4444','#1a0000',erp_tks, uid='ug1')+
         _ugrp('🛠️ Sustentação',           '#818cf8','#0d0f20',sust_tks,uid='ug2')+
-        _ugrp('🤝 Comercial',             '#fbbf24','#1a1000',com_tks, uid='ug3')+
         _ugrp('⚙️ Engenharia Software',   '#60a5fa','#051025',eng_tks, uid='ug5')+
+        _ugrp('🤝 Comercial',             '#fbbf24','#1a1000',com_tks, uid='ug3')+
         _ugrp_por_cli('📋 Pendentes de Atendimento','#94a3b8','#0a0f14',pendente_tks,uid='ug4')
     )
 
@@ -731,8 +731,10 @@ def gerar_html(all_tks, baixados_hoje=None, urg_tks=None):
                 f'{sub_html}</div>')
 
     mob_res=(
-        # KPIs — dashboard no topo
-        f'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">'
+        # Chamados por seção (igual aba Urgentes) — no topo
+        urg_html
+        # KPIs
+        +f'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:16px 0 14px">'
         +_mob_kpi('TOTAL ABERTOS',  tot,           '#3b82f6', f'{n_cli} clientes')
         +_mob_kpi('INCIDENTES',     tot_inc,       '#ef4444', f'{pct_inc}%')
         +_mob_kpi('URGENTES',       n_urg_critico, '#f97316', 'PDV+Corp')
@@ -750,8 +752,6 @@ def gerar_html(all_tks, baixados_hoje=None, urg_tks=None):
         +f'<div style="color:#64748b;font-size:10px;font-weight:700;letter-spacing:1px;margin-bottom:10px">TIPO</div>'
         +_bar('Incidente',tot_inc,tot,'#ef4444')+_bar('Requisição',n_req,tot,'#3b82f6')+_bar('Dúvida',n_duv,tot,'#a78bfa')
         +f'</div></div>'
-        # Painel de prioridades colapsável
-        +_priority_panel_html(tk_lkp,baixados_by_code,URG_PDV_EF,URG_ERP_EF,prefix='mprp')
         # ENTRARAM
         +(f'<div style="color:#22c55e;font-size:12px;font-weight:700;letter-spacing:1px;padding:12px 0 6px">📥 ENTRARAM</div>'
           +mob_ent if datas_ent else '')
@@ -775,8 +775,8 @@ def gerar_html(all_tks, baixados_hoje=None, urg_tks=None):
         _d_urg_sec('🟢 PDV — Urgente',        '#4ade80','#052e16',pdv_tks)+
         _d_urg_sec('🔴 Corporativo — Urgente', '#ef4444','#1a0000',erp_tks)+
         _d_urg_sec('🛠️ Sustentação',           '#818cf8','#0d0f20',sust_tks)+
-        _d_urg_sec('🤝 Comercial',             '#fbbf24','#1a1000',com_tks)+
         _d_urg_sec('⚙️ Engenharia Software',   '#60a5fa','#051025',eng_tks)+
+        _d_urg_sec('🤝 Comercial',             '#fbbf24','#1a1000',com_tks)+
         _d_urg_por_cli('📋 Pendentes de Atendimento','#94a3b8','#0a0f14',pendente_tks)
     )
 
@@ -797,8 +797,10 @@ def gerar_html(all_tks, baixados_hoje=None, urg_tks=None):
     dt_bar_chart = _d_exec_bar_chart(by_cli, clientes)
 
     dt_res_html=(
+        # ── chamados por seção (igual aba Urgentes) ─────────────────────────────
+        dt_urg_html
         # ── KPI cards ──────────────────────────────────────────────────────────
-        f'<div style="display:flex;gap:12px;margin-bottom:22px;flex-wrap:wrap">'
+        +f'<div style="display:flex;gap:12px;margin:24px 0 22px;flex-wrap:wrap">'
         +_d_kpi_big('Total Abertos',  tot,           '#3b82f6', f'{n_cli} clientes')
         +_d_kpi_big('Incidentes',     tot_inc,       '#ef4444', f'{pct_inc}% do total')
         +_d_kpi_big('Urgentes',       n_urg_critico, '#f97316', 'PDV + Corporativo')
@@ -822,8 +824,6 @@ def gerar_html(all_tks, baixados_hoje=None, urg_tks=None):
         +_bar('Incidente',tot_inc,tot,'#ef4444')+_bar('Requisição',n_req,tot,'#3b82f6')+_bar('Dúvida/Outros',n_duv,tot,'#a78bfa')
         +f'</div></div>'
         +f'</div>'
-        # ── painel de prioridades ───────────────────────────────────────────────
-        +f'<div style="margin-bottom:20px">{_priority_panel_html(tk_lkp,baixados_by_code,URG_PDV_EF,URG_ERP_EF,prefix="dprp")}</div>'
         # ── ENTRARAM / RESOLVIDOS ───────────────────────────────────────────────
         +(f'<div style="display:flex;align-items:center;gap:14px;margin:20px 0 12px">'
           f'<span style="color:#22c55e;font-size:12px;font-weight:700;letter-spacing:1px">📥 ENTRARAM</span>'
