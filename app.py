@@ -7,6 +7,7 @@ from flask import Flask, Response, request, session, redirect
 
 from gerador import gerar_html
 from csv_parser import parse_csv, parse_csv_baixados
+from excel_parser import parse_excel
 
 app = Flask(__name__)
 app.secret_key = 'ls-bi-2026-xk9'
@@ -167,26 +168,27 @@ body{background:#0c0c0c;color:#e5e7eb;font-family:"Segoe UI",Arial,sans-serif;mi
         <div class="fname" id="n1"></div>
       </div>
       <div class="slot slot-main" id="drop2">
-        <input type="file" name="csv_main" accept=".csv" required onchange="setName(this,'n2')">
+        <input type="file" name="csv_main" accept=".csv,.xlsx" required onchange="setName(this,'n2')">
         <div class="ico">📋</div>
-        <div class="lbl">ABERTOS <span class="badge req">obrigatório</span></div>
-        <div class="hint">Todos os chamados abertos (demais prioridades)</div>
+        <div class="lbl">ABERTOS / EXCEL <span class="badge req">obrigatório</span></div>
+        <div class="hint">CSV de abertos <strong>ou</strong> Excel completo do Tolvdesk<br>(Excel já traz baixados automaticamente)</div>
         <div class="fname" id="n2"></div>
       </div>
     </div>
     <div class="slot slot-bx" id="drop3" style="margin-bottom:4px">
       <input type="file" name="csv_baixados" accept=".csv" onchange="setName(this,'n3')">
       <div class="ico">📤</div>
-      <div class="lbl">BAIXADOS DO DIA <span class="badge opt">opcional</span></div>
-      <div class="hint">Chamados resolvidos — filtre por data de resolução = hoje e exporte</div>
+      <div class="lbl">BAIXADOS DO DIA <span class="badge opt">opcional — só se usar CSV</span></div>
+      <div class="hint">Não precisa se usar o Excel completo acima</div>
       <div class="fname" id="n3"></div>
     </div>
     <button class="btn" type="submit" id="btn">🚀 Publicar Painel</button>
     <div class="tip">
-      <strong style="color:#6b7280">Como exportar no Tolvdesk:</strong><br>
-      1. <strong style="color:#ef4444">Urgentes:</strong> Filtrar → Prioridade = Urgente → Exportar CSV<br>
-      2. <strong style="color:#f97316">Abertos:</strong> Filtrar → Outros / Todos abertos → Exportar CSV<br>
-      3. <strong style="color:#22c55e">Baixados:</strong> Filtrar → Resolvidos hoje → Exportar CSV
+      <strong style="color:#6b7280">Modo Excel (recomendado):</strong><br>
+      1. No Tolvdesk clique em <strong>Exportar tickets</strong> → baixa o Excel completo<br>
+      2. Sobe o Excel no campo ABERTOS/EXCEL acima<br>
+      3. Baixados do dia são detectados automaticamente<br><br>
+      <strong style="color:#6b7280">Modo CSV (antigo):</strong> sobe os 3 CSVs separados como antes
     </div>
   </form>
 </div>
@@ -272,14 +274,21 @@ def admin_gerar():
         ultimo = f'<div class="ok">&#10003; Último painel publicado às {_painel["gerado_em"]}</div>' if _painel['gerado_em'] else ''
         return Response(UPLOAD_PAGE.replace('{error}', err).replace('{ultimo}', ultimo), mimetype='text/html', status=400)
 
+    fname = f_main.filename.lower()
+    conteudo = f_main.read()
+    baixados_excel = []
+
     try:
-        main_tks = parse_csv(f_main.read())
+        if fname.endswith('.xlsx'):
+            main_tks, baixados_excel = parse_excel(conteudo)
+        else:
+            main_tks = parse_csv(conteudo)
     except Exception as e:
-        err = f'<div class="err">&#9888; Erro ao ler CSV Abertos: {e}</div>'
+        err = f'<div class="err">&#9888; Erro ao ler arquivo: {e}</div>'
         ultimo = f'<div class="ok">&#10003; Último painel publicado às {_painel["gerado_em"]}</div>' if _painel['gerado_em'] else ''
         return Response(UPLOAD_PAGE.replace('{error}', err).replace('{ultimo}', ultimo), mimetype='text/html', status=400)
 
-    # CSV Urgentes (opcional) — tickets deste arquivo vão direto para seções Urgente
+    # CSV Urgentes (opcional)
     urg_tks = []
     f_urg = request.files.get('csv_urg')
     if f_urg and f_urg.filename:
@@ -288,14 +297,15 @@ def admin_gerar():
         except Exception:
             pass
 
-    # CSV Baixados (opcional)
-    baixados = []
-    f_bx = request.files.get('csv_baixados')
-    if f_bx and f_bx.filename:
-        try:
-            baixados = parse_csv_baixados(f_bx.read())
-        except Exception:
-            pass
+    # CSV Baixados (opcional) — ignorado se Excel já trouxe baixados
+    baixados = baixados_excel
+    if not baixados:
+        f_bx = request.files.get('csv_baixados')
+        if f_bx and f_bx.filename:
+            try:
+                baixados = parse_csv_baixados(f_bx.read())
+            except Exception:
+                pass
 
     try:
         html = gerar_html(main_tks, baixados, urg_tks=urg_tks)

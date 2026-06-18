@@ -82,6 +82,16 @@ def _ticon(t):
 def _tk(t, sc=True):
     fc,bg = _dc(t['dias'])
     cli = f'<div style="color:#ea580c;font-size:15px;font-weight:800;margin-bottom:6px">{t["empresa"]}</div>' if sc else ''
+    # badges extras do Excel
+    extras = ''
+    if t.get('sla_venceu'):
+        extras += '<span style="background:#fee2e2;color:#b91c1c;font-size:10px;font-weight:800;border-radius:4px;padding:2px 7px;margin-right:4px">⏰ SLA</span>'
+    if t.get('abandonado'):
+        extras += '<span style="background:#f3f4f6;color:#6b7280;font-size:10px;font-weight:800;border-radius:4px;padding:2px 7px;margin-right:4px">🔕 Abandonado</span>'
+    dias_mov = t.get('dias_sem_mov', 0)
+    if dias_mov > 2:
+        mc = '#dc2626' if dias_mov > 14 else '#d97706' if dias_mov > 7 else '#64748b'
+        extras += f'<span style="background:#f8fafc;color:{mc};font-size:10px;font-weight:800;border-radius:4px;padding:2px 7px">↩ {dias_mov}d s/mov</span>'
     return (f'<div style="background:#ffffff;border-radius:12px;padding:14px 16px;margin-bottom:10px;border-left:6px solid {fc};box-shadow:0 3px 10px rgba(0,0,0,0.1)">'
             f'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'
             f'<span style="color:{fc};font-size:20px;font-weight:900">#{t["code"]}</span>'
@@ -90,7 +100,9 @@ def _tk(t, sc=True):
             f'<div style="color:#111827;font-size:14px;font-weight:600;line-height:1.5;margin-bottom:10px">{_ticon(t["tipo"])} {t["assunto"]}</div>'
             f'<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px">'
             f'<span style="color:#374151;font-size:13px;font-weight:700">{t["atrib"]}</span>'
-            f'{_sbadge(t["status"])}</div></div>')
+            f'{_sbadge(t["status"])}</div>'
+            +(f'<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:4px">{extras}</div>' if extras else '')
+            +'</div>')
 
 def _csec(emp, tks, idx):
     tks_s = sorted(tks, key=lambda x:(0 if x['tipo']=='Incidente' else 1,-x['dias']))
@@ -194,8 +206,17 @@ def _d_row(t, show_cli=False):
     ec = {'Novo':'#22c55e','Em andamento':'#3b82f6','Aguardando':'#d97706','Resolvido':'#22c55e','Fechado':'#22c55e'}.get(t['status'],'#6b7280')
     cli = f'<td style="color:#ea580c;font-size:12px;font-weight:700;padding:9px 12px;white-space:nowrap">{t["empresa"]}</td>' if show_cli else ''
     url = f'https://logusretail.tolvdesk.com/webapp/#/tickets/{t["code"]}'
+    # badges extras
+    sla_tag = '<span style="background:#fee2e2;color:#b91c1c;font-size:9px;font-weight:900;border-radius:3px;padding:1px 5px;margin-left:4px">SLA</span>' if t.get('sla_venceu') else ''
+    abnd_tag = '<span style="background:#f3f4f6;color:#6b7280;font-size:9px;font-weight:900;border-radius:3px;padding:1px 5px;margin-left:4px">ABN</span>' if t.get('abandonado') else ''
+    dias_mov = t.get('dias_sem_mov', 0)
+    if dias_mov > 2:
+        mc = '#dc2626' if dias_mov > 14 else '#d97706' if dias_mov > 7 else '#64748b'
+        smov_td = f'<td style="color:{mc};font-weight:800;padding:9px 8px;font-size:12px;text-align:right;white-space:nowrap">{dias_mov}d</td>'
+    else:
+        smov_td = f'<td style="color:#d1d5db;padding:9px 8px;font-size:11px;text-align:right">—</td>'
     return (f'<tr style="border-bottom:1px solid #f1f5f9">'
-            f'<td style="color:#ea580c;font-weight:900;padding:9px 12px;white-space:nowrap">#{t["code"]}</td>'
+            f'<td style="color:#ea580c;font-weight:900;padding:9px 12px;white-space:nowrap">#{t["code"]}{sla_tag}{abnd_tag}</td>'
             f'{cli}'
             f'<td style="padding:9px 12px"><span style="background:{tc}22;color:{tc};border-radius:4px;padding:3px 8px;font-size:10px;font-weight:900">{tipo.upper()}</span></td>'
             f'<td style="color:#111827;padding:9px 12px;font-size:13px;font-weight:500">{t["assunto"]}</td>'
@@ -203,6 +224,7 @@ def _d_row(t, show_cli=False):
             f'<td style="color:#374151;padding:9px 12px;font-size:12px;font-weight:600;white-space:nowrap">{t["atrib"]}</td>'
             f'<td style="color:#64748b;padding:9px 12px;font-size:12px;white-space:nowrap">{t["data"]}</td>'
             f'<td style="color:{fc};font-weight:900;padding:9px 12px;text-align:right;white-space:nowrap">{t["dias"]}</td>'
+            f'{smov_td}'
             f'<td style="padding:9px 8px;white-space:nowrap">'
             f'<a href="{url}" target="_blank" style="background:#ea580c;color:#fff;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:700;text-decoration:none;white-space:nowrap">🔗 Ver</a>'
             f'</td></tr>')
@@ -218,6 +240,7 @@ def _d_tbl_hdr(show_cli=False):
             '<th style="color:#475569;font-size:10px;font-weight:700;text-align:left;padding:8px 12px;background:#f8fafc">COM QUEM</th>'
             '<th style="color:#475569;font-size:10px;font-weight:700;text-align:left;padding:8px 12px;background:#f8fafc">ABERTURA</th>'
             '<th style="color:#475569;font-size:10px;font-weight:700;text-align:right;padding:8px 12px;background:#f8fafc">DIAS</th>'
+            '<th style="color:#475569;font-size:10px;font-weight:700;text-align:right;padding:8px 8px;background:#f8fafc">S/MOV</th>'
             '<th style="background:#f8fafc;padding:8px 8px"></th>'
             '</tr></thead>')
 
