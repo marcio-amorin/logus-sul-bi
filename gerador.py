@@ -571,11 +571,17 @@ def gerar_html(all_tks, baixados_hoje=None, urg_tks=None):
 
     # Times dedicados — NUNCA vão para PDV/ERP Urgente, independente de urgência
     SUST_ATRIB = {'Sustentação Desenv.','Sust. Desenv.'}
-    sust_tks  = sorted([t for t in sul if t['atrib'] in SUST_ATRIB], key=lambda x:-x['dias'])
-    eng_tks   = sorted([t for t in sul if t['atrib']=='Engenharia Software'], key=lambda x:-x['dias'])
-    com_tks   = sorted([t for t in sul if t['atrib']=='Comercial'], key=lambda x:-x['dias'])
+    DESENV_PDV_ATRIB = {'Desenv. PDV','Sust. Desenv. PDV'}
+    HOMOLOG_ATRIB    = {'Homologação','Homologacao'}
+    sust_tks      = sorted([t for t in sul if t['atrib'] in SUST_ATRIB], key=lambda x:-x['dias'])
+    eng_tks       = sorted([t for t in sul if t['atrib']=='Engenharia Software'], key=lambda x:-x['dias'])
+    com_tks       = sorted([t for t in sul if t['atrib']=='Comercial'], key=lambda x:-x['dias'])
+    desenv_pdv_tks= sorted([t for t in sul if t['atrib'] in DESENV_PDV_ATRIB], key=lambda x:-x['dias'])
+    homolog_tks   = sorted([t for t in sul if t['atrib'] in HOMOLOG_ATRIB], key=lambda x:-x['dias'])
 
-    team_codes = {t['code'] for t in sust_tks} | {t['code'] for t in eng_tks} | {t['code'] for t in com_tks}
+    team_codes = ({t['code'] for t in sust_tks} | {t['code'] for t in eng_tks}
+                | {t['code'] for t in com_tks}  | {t['code'] for t in desenv_pdv_tks}
+                | {t['code'] for t in homolog_tks})
 
     # PDV/ERP Urgente — apenas tickets sem time dedicado
     pdv_tks   = sorted([t for t in sul if t['code'] in URG_PDV_EF and t['code'] not in team_codes], key=lambda x:-x['dias'])
@@ -586,10 +592,10 @@ def gerar_html(all_tks, baixados_hoje=None, urg_tks=None):
 
     n_urg_critico = len(pdv_tks) + len(erp_tks)
 
-    _shown_codes = pdv_codes | erp_codes | team_codes | {t['code'] for t in com_tks}
+    _shown_codes = pdv_codes | erp_codes | team_codes
     pendente_tks = sorted([t for t in sul if t['code'] not in _shown_codes], key=lambda x:-x['dias'])
 
-    n_urg=len(pdv_tks)+len(erp_tks)+len(eng_tks)+len(sust_tks)+len(com_tks)+len(pendente_tks)
+    n_urg=len(pdv_tks)+len(erp_tks)+len(sust_tks)+len(eng_tks)+len(com_tks)+len(desenv_pdv_tks)+len(homolog_tks)+len(pendente_tks)
     n_bklog=len(BACKLOG)
 
     pct_nov=int(n_nov/tot*100) if tot else 0
@@ -613,9 +619,11 @@ def gerar_html(all_tks, baixados_hoje=None, urg_tks=None):
     urg_html=(
         _ugrp('🟢 PDV — Urgente',        '#4ade80','#052e16',pdv_tks, uid='ug0')+
         _ugrp('🔴 Corporativo — Urgente', '#ef4444','#1a0000',erp_tks, uid='ug1')+
-        _ugrp('🛠️ Sustentação',           '#818cf8','#0d0f20',sust_tks,uid='ug2')+
-        _ugrp('⚙️ Engenharia Software',   '#60a5fa','#051025',eng_tks, uid='ug5')+
-        _ugrp('🤝 Comercial',             '#fbbf24','#1a1000',com_tks, uid='ug3')+
+        _ugrp('🛠️ Sustentação',           '#818cf8','#0d0f20',sust_tks,     uid='ug2')+
+        _ugrp('⚙️ Engenharia Software',   '#60a5fa','#051025',eng_tks,     uid='ug5')+
+        _ugrp('🤝 Comercial',             '#fbbf24','#1a1000',com_tks,     uid='ug3')+
+        _ugrp('🖥️ Desenv. PDV',           '#c084fc','#150a25',desenv_pdv_tks,uid='ug6')+
+        _ugrp('🧪 Homologação',           '#22d3ee','#031a1f',homolog_tks, uid='ug7')+
         _ugrp_por_cli('📋 Pendentes de Atendimento','#94a3b8','#0a0f14',pendente_tks,uid='ug4')
     )
 
@@ -781,6 +789,8 @@ def gerar_html(all_tks, baixados_hoje=None, urg_tks=None):
         _d_urg_sec('🛠️ Sustentação',           '#818cf8','#0d0f20',sust_tks)+
         _d_urg_sec('⚙️ Engenharia Software',   '#60a5fa','#051025',eng_tks)+
         _d_urg_sec('🤝 Comercial',             '#fbbf24','#1a1000',com_tks)+
+        _d_urg_sec('🖥️ Desenv. PDV',           '#c084fc','#150a25',desenv_pdv_tks)+
+        _d_urg_sec('🧪 Homologação',           '#22d3ee','#031a1f',homolog_tks)+
         _d_urg_por_cli('📋 Pendentes de Atendimento','#94a3b8','#0a0f14',pendente_tks)
     )
 
