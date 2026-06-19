@@ -991,6 +991,7 @@ def gerar_html(all_tks, baixados_hoje=None, urg_tks=None):
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Sul BI">
 <link rel="apple-touch-icon" href="/static/icon-192.png">
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <style>
 *{{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}}
 html,body{{background:#f1f5f9;color:#1e293b;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}}
@@ -1077,30 +1078,60 @@ function copiarWpp(btn){{
     setTimeout(function(){{btn.innerHTML=orig;btn.style.background='#25D366';}},2000);
   }});
 }}
+function _capturarResumo(btn){{
+  var inner=document.getElementById('resumo-inner');
+  if(!inner) return;
+  var orig=btn.innerHTML; btn.innerHTML='⏳ Capturando...'; btn.disabled=true;
+  var prevOv=inner.style.overflow; var prevH=inner.style.maxHeight;
+  inner.style.overflow='visible'; inner.style.maxHeight='none';
+  html2canvas(inner,{{scale:2,useCORS:true,logging:false,width:inner.scrollWidth,height:inner.scrollHeight}}).then(function(canvas){{
+    inner.style.overflow=prevOv; inner.style.maxHeight=prevH;
+    canvas.toBlob(function(blob){{
+      if(navigator.clipboard&&navigator.clipboard.write){{
+        navigator.clipboard.write([new ClipboardItem({{'image/png':blob}})]).then(function(){{
+          btn.innerHTML='✅ Imagem copiada! Cole no WhatsApp';
+          btn.style.background='#16a34a';
+          setTimeout(function(){{btn.innerHTML=orig;btn.style.background='#25D366';btn.disabled=false;}},3000);
+        }}).catch(function(){{_downloadCanvas(canvas,btn,orig);}});
+      }} else {{ _downloadCanvas(canvas,btn,orig); }}
+    }});
+  }}).catch(function(){{inner.style.overflow=prevOv;inner.style.maxHeight=prevH;btn.innerHTML=orig;btn.disabled=false;}});
+}}
+function _downloadCanvas(canvas,btn,orig){{
+  var a=document.createElement('a'); a.href=canvas.toDataURL('image/png');
+  a.download='logus-sul-bi.png'; a.click();
+  btn.innerHTML='✅ Baixado! Envie no WhatsApp'; btn.style.background='#16a34a';
+  setTimeout(function(){{btn.innerHTML=orig;btn.style.background='#25D366';btn.disabled=false;}},3000);
+}}
 function abrirResumo(){{
   var ov=document.getElementById('resumo-ov');
   if(!ov){{
     ov=document.createElement('div');
     ov.id='resumo-ov';
-    ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px';
+    ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;display:flex;align-items:center;justify-content:center;padding:12px';
     ov.onclick=function(e){{if(e.target===ov)ov.style.display='none';}};
     var box=document.createElement('div');
-    box.style.cssText='background:#f1f5f9;border-radius:12px;overflow:hidden;width:95vw;max-width:1100px;height:88vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.3)';
+    box.style.cssText='background:#f1f5f9;border-radius:12px;overflow:hidden;width:95vw;max-width:1100px;height:90vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.3)';
     var top=document.createElement('div');
-    top.style.cssText='background:#ea580c;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0';
+    top.style.cssText='background:#ea580c;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;gap:8px';
     var lbl=document.createElement('span');
-    lbl.style.cssText='color:#fff;font-size:12px;font-weight:700';
-    lbl.textContent='📷 Resumo Visual — tira print desta tela';
-    var btn=document.createElement('button');
-    btn.style.cssText='background:transparent;border:none;color:#fff;font-size:20px;cursor:pointer;line-height:1;padding:0 4px';
-    btn.textContent='✕';
-    btn.onclick=function(){{ov.style.display='none';}};
-    top.appendChild(lbl); top.appendChild(btn);
+    lbl.style.cssText='color:#fff;font-size:12px;font-weight:700;flex:1';
+    lbl.textContent='📷 Resumo Visual — Logus Sul BI';
+    var copyBtn=document.createElement('button');
+    copyBtn.style.cssText='background:#25D366;border:none;color:#fff;font-size:12px;font-weight:700;cursor:pointer;border-radius:6px;padding:6px 12px;white-space:nowrap';
+    copyBtn.innerHTML='📋 Copiar Imagem → WhatsApp';
+    copyBtn.onclick=function(){{_capturarResumo(copyBtn);}};
+    var closeBtn=document.createElement('button');
+    closeBtn.style.cssText='background:transparent;border:none;color:#fff;font-size:20px;cursor:pointer;line-height:1;padding:0 4px';
+    closeBtn.textContent='✕';
+    closeBtn.onclick=function(){{ov.style.display='none';}};
+    top.appendChild(lbl); top.appendChild(copyBtn); top.appendChild(closeBtn);
     var content=document.getElementById('resumo-data');
-    if(!content){{box.innerHTML='<p>Sem dados</p>';}}
+    if(!content){{box.innerHTML='<p style="padding:20px">Sem dados</p>';}}
     else{{
       var inner=document.createElement('div');
-      inner.style.cssText='overflow-y:auto;max-height:80vh';
+      inner.id='resumo-inner';
+      inner.style.cssText='overflow-y:auto;flex:1;background:#f1f5f9;padding:12px';
       inner.innerHTML=content.innerHTML;
       box.appendChild(top); box.appendChild(inner);
     }}
