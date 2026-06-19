@@ -9,14 +9,18 @@ def _parse_dt(val):
     if not val:
         return '', 0
     hoje = _hoje_brt()
-    if isinstance(val, (datetime, date)):
-        d = val if isinstance(val, date) else val.date()
+    # openpyxl pode retornar datetime ou date diretamente
+    if isinstance(val, datetime):
+        d = val.date()
         return d.strftime('%d/%m/%Y'), (hoje - d).days
+    if isinstance(val, date):
+        return val.strftime('%d/%m/%Y'), (hoje - val).days
     s = str(val).strip()
     if not s or s == 'None':
         return '', 0
     s_date = s[:10]
-    for fmt in ('%d/%m/%Y', '%Y-%m-%d', '%m/%d/%Y'):
+    # tenta vários formatos incluindo traço (DD-MM-YYYY) e barra (DD/MM/YYYY)
+    for fmt in ('%d/%m/%Y', '%d-%m-%Y', '%Y-%m-%d', '%Y/%m/%d', '%m/%d/%Y', '%m-%d-%Y'):
         try:
             d = datetime.strptime(s_date, fmt).date()
             return d.strftime('%d/%m/%Y'), (hoje - d).days
