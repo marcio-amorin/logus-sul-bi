@@ -971,16 +971,12 @@ function filtrarRes(prefix,val){{
   var el=document.getElementById(prefix+'-'+val); if(el)el.style.display='block';
 }}
 function abrirTk(code,btn){{
-  navigator.clipboard.writeText(code).then(function(){{
-    window.open('https://logusretail.tolvdesk.com/webapp/#/tickets/todos','tolvdesk');
-    var orig=btn.innerHTML;
-    btn.innerHTML='✅ Copiado! Cole na busca';
-    btn.style.background='#16a34a';
-    btn.style.minWidth='160px';
-    setTimeout(function(){{btn.innerHTML=orig;btn.style.background='#ea580c';btn.style.minWidth='';}},2500);
-  }}).catch(function(){{
-    window.open('https://logusretail.tolvdesk.com/webapp/#/tickets/todos','tolvdesk');
-  }});
+  window.open('https://logusretail.tolvdesk.com/webapp/#/tickets/todos?busca='+code,'tolvdesk');
+  navigator.clipboard.writeText(code).catch(function(){{}});
+  var orig=btn.innerHTML;
+  btn.innerHTML='🔍 Buscando...';
+  btn.style.background='#2563eb';
+  setTimeout(function(){{btn.innerHTML=orig;btn.style.background='#ea580c';}},2000);
 }}
 function selDate(grp,safe){{
   document.querySelectorAll('[data-grp="'+grp+'"]').forEach(function(b){{
