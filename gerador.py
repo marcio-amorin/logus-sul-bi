@@ -1,6 +1,6 @@
 from datetime import date, datetime, timezone, timedelta
 from collections import defaultdict
-import math, unicodedata
+import math, unicodedata, json
 
 def _pnorm(s):
     """Normaliza string de prioridade removendo acentos e lowercasing."""
@@ -638,6 +638,35 @@ def gerar_html(all_tks, baixados_hoje=None, urg_tks=None):
     pct_req=int(n_req/tot*100) if tot else 0
     pct_duv=int(n_duv/tot*100) if tot else 0
 
+    # ── WhatsApp text ─────────────────────────────────────────────────────────
+    def _wpp_linha(t):
+        smov = f' ↩{t["dias_sem_mov"]}d' if t.get('dias_sem_mov', 0) >= 2 else ''
+        sla  = ' ⏰SLA' if t.get('sla_venceu') else ''
+        assunto = t['assunto'][:55] + ('…' if len(t['assunto']) > 55 else '')
+        return f'  #{t["code"]} {t["empresa"]} — {assunto} — {t["dias"]}d{smov}{sla}'
+    def _wpp_sec(emoji, nome, tks):
+        if not tks: return ''
+        return f'\n{emoji} *{nome} ({len(tks)})*\n' + '\n'.join(_wpp_linha(t) for t in tks) + '\n'
+    hora_brt = datetime.now(timezone(timedelta(hours=-3))).strftime('%H:%M')
+    wpp = f'📊 *Logus Sul BI — {today_str}*\n'
+    wpp += f'_{hora_brt} · {tot} chamados · {tot_inc} incidentes · {tot_ag} aguardando · {n_cli} clientes_\n'
+    wpp += _wpp_sec('🟢', 'PDV — Urgente',        pdv_tks)
+    wpp += _wpp_sec('🔴', 'Corporativo — Urgente', erp_tks)
+    wpp += _wpp_sec('🛠️', 'Sustentação',           sust_tks)
+    wpp += _wpp_sec('⚙️', 'Engenharia Software',   eng_tks)
+    wpp += _wpp_sec('🤝', 'Comercial',             com_tks)
+    wpp += _wpp_sec('🖥️', 'Desenv. PDV',           desenv_pdv_tks)
+    wpp += _wpp_sec('🧪', 'Homologação',           homolog_tks)
+    if pendente_tks:
+        wpp += f'\n📋 *Pendentes ({len(pendente_tks)})*\n'
+        wpp += '\n'.join(_wpp_linha(t) for t in pendente_tks[:20])
+        if len(pendente_tks) > 20:
+            wpp += f'\n  ... e mais {len(pendente_tks)-20} tickets'
+        wpp += '\n'
+    if n_resol:
+        wpp += f'\n✅ *Resolvidos hoje: {n_resol}*\n'
+    wpp_json = json.dumps(wpp)
+
     # ── mobile HTML vars ──────────────────────────────────────────────────────
     idx=0
     cli_secs=''
@@ -890,6 +919,54 @@ def gerar_html(all_tks, baixados_hoje=None, urg_tks=None):
        +_d_stat_sm('HOMOLOG.',   len(homolog_tks),    '#0e7490','urg')
     )
 
+    # ── Resumo visual (modal portrait) ────────────────────────────────────────
+    def _rsm_sec(emoji, cor, bg, nome, tks):
+        if not tks: return ''
+        rows = ''
+        for t in tks:
+            smov = f'<span style="color:#d97706;font-size:10px"> ↩{t["dias_sem_mov"]}d</span>' if t.get('dias_sem_mov',0)>=2 else ''
+            sla  = '<span style="color:#dc2626;font-size:10px"> ⏰SLA</span>' if t.get('sla_venceu') else ''
+            fc,_ = _dc(t['dias'])
+            assunto = t['assunto'][:48]+('…' if len(t['assunto'])>48 else '')
+            rows += (f'<div style="padding:6px 10px;border-bottom:1px solid #f1f5f9;display:flex;justify-content:space-between;align-items:flex-start;gap:8px">'
+                     f'<div style="flex:1;min-width:0">'
+                     f'<span style="color:#ea580c;font-weight:800;font-size:11px">#{t["code"]}</span> '
+                     f'<span style="color:#374151;font-size:11px;font-weight:600">{t["empresa"]}</span><br>'
+                     f'<span style="color:#64748b;font-size:10px">{assunto}</span>{sla}'
+                     f'</div>'
+                     f'<div style="text-align:right;flex-shrink:0">'
+                     f'<span style="color:{fc};font-weight:900;font-size:12px">{t["dias"]}d</span>{smov}'
+                     f'</div></div>')
+        return (f'<div style="margin-bottom:8px;border-radius:8px;overflow:hidden;border:1px solid {cor}44">'
+                f'<div style="background:{bg};padding:6px 10px;display:flex;justify-content:space-between">'
+                f'<span style="color:{cor};font-size:11px;font-weight:800">{emoji} {nome}</span>'
+                f'<span style="color:{cor};font-size:11px;font-weight:900">{len(tks)}</span>'
+                f'</div>{rows}</div>')
+
+    resumo_secs = (
+        _rsm_sec('🟢','#16a34a','#dcfce7','PDV — Urgente',        pdv_tks)
+       +_rsm_sec('🔴','#dc2626','#fee2e2','Corporativo — Urgente', erp_tks)
+       +_rsm_sec('🛠️','#7c3aed','#ede9fe','Sustentação',           sust_tks)
+       +_rsm_sec('⚙️','#2563eb','#dbeafe','Engenharia Software',   eng_tks)
+       +_rsm_sec('🤝','#d97706','#fef3c7','Comercial',             com_tks)
+       +_rsm_sec('🖥️','#9333ea','#f3e8ff','Desenv. PDV',           desenv_pdv_tks)
+       +_rsm_sec('🧪','#0891b2','#cffafe','Homologação',           homolog_tks)
+       +_rsm_sec('📋','#475569','#f8fafc','Pendentes',             pendente_tks)
+    )
+    resumo_html = (
+        f'<div style="background:#fff7ed;border-bottom:3px solid #ea580c;padding:12px 14px;display:flex;justify-content:space-between;align-items:center">'
+        f'<div><div style="color:#ea580c;font-size:14px;font-weight:900">Logus Sul BI</div>'
+        f'<div style="color:#64748b;font-size:10px">{today_str} · {hora_brt}</div></div>'
+        f'<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;text-align:center">'
+        f'<div style="background:#fff;border-radius:6px;padding:4px 8px"><div style="color:#ea580c;font-size:16px;font-weight:900">{tot}</div><div style="color:#64748b;font-size:9px">CHAMADOS</div></div>'
+        f'<div style="background:#fff;border-radius:6px;padding:4px 8px"><div style="color:#dc2626;font-size:16px;font-weight:900">{tot_inc}</div><div style="color:#64748b;font-size:9px">INCIDENTES</div></div>'
+        f'<div style="background:#fff;border-radius:6px;padding:4px 8px"><div style="color:#f97316;font-size:16px;font-weight:900">{n_urg_critico}</div><div style="color:#64748b;font-size:9px">URGENTES</div></div>'
+        f'<div style="background:#fff;border-radius:6px;padding:4px 8px"><div style="color:#d97706;font-size:16px;font-weight:900">{tot_ag}</div><div style="color:#64748b;font-size:9px">AGUARDANDO</div></div>'
+        f'</div></div>'
+        f'<div style="padding:10px;overflow-y:auto;max-height:70vh">{resumo_secs}</div>'
+    )
+    resumo_json = json.dumps(resumo_html)
+
     return f"""<!DOCTYPE html><html lang="pt-BR"><head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
@@ -978,6 +1055,33 @@ function abrirTk(code,btn){{
   btn.style.background='#2563eb';
   setTimeout(function(){{btn.innerHTML=orig;btn.style.background='#ea580c';}},2000);
 }}
+var _wppTxt={wpp_json};
+function copiarWpp(btn){{
+  navigator.clipboard.writeText(_wppTxt).then(function(){{
+    var orig=btn.innerHTML;
+    btn.innerHTML='✅ Copiado!';
+    btn.style.background='#16a34a';
+    setTimeout(function(){{btn.innerHTML=orig;btn.style.background='#25D366';}},2000);
+  }});
+}}
+var _resumoHtml={resumo_json};
+function abrirResumo(){{
+  var ov=document.getElementById('resumo-ov');
+  if(!ov){{
+    ov=document.createElement('div');
+    ov.id='resumo-ov';
+    ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px';
+    ov.onclick=function(e){{if(e.target===ov)ov.style.display='none';}};
+    var box=document.createElement('div');
+    box.style.cssText='background:#f1f5f9;border-radius:14px;overflow:hidden;width:100%;max-width:420px;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.3)';
+    var close='<div style="background:#ea580c;padding:8px 12px;display:flex;justify-content:space-between;align-items:center"><span style="color:#fff;font-size:12px;font-weight:700">📷 Resumo Visual — tira print desta tela</span><button onclick="document.getElementById(\'resumo-ov\').style.display=\'none\'" style="background:transparent;border:none;color:#fff;font-size:18px;cursor:pointer;line-height:1">✕</button></div>';
+    box.innerHTML=close+_resumoHtml;
+    ov.appendChild(box);
+    document.body.appendChild(ov);
+  }} else {{
+    ov.style.display='flex';
+  }}
+}}
 function selDate(grp,safe){{
   document.querySelectorAll('[data-grp="'+grp+'"]').forEach(function(b){{
     b.style.background='#f1f5f9';
@@ -1011,6 +1115,8 @@ window.onload=function(){{showTab('cli');dTab('cli')}};
     </div>
     <div style="display:flex;gap:10px;align-items:center">
       {dt_hdr_stats}
+      <button onclick="copiarWpp(this)" style="background:#25D366;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">📱 WhatsApp</button>
+      <button onclick="abrirResumo()" style="background:#2563eb;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">📷 Resumo</button>
       <a href="https://logusretail.tolvdesk.com/webapp/#/tickets/todos" target="_blank" title="Abrir Tolvdesk" style="background:#ea580c;color:#fff;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap;display:flex;align-items:center;gap:6px">🔗 Tolvdesk</a>
     </div>
   </div>
@@ -1066,7 +1172,11 @@ window.onload=function(){{showTab('cli');dTab('cli')}};
 <div id="hdr">
   <div class="hdr-top">
     <img class="hdr-logo" src="/static/logo.png">
-    <span style="color:#6b4c30;font-size:11px">📅 {today_str}</span>
+    <div style="display:flex;gap:6px;align-items:center">
+      <button onclick="copiarWpp(this)" style="background:#25D366;color:#fff;border:none;border-radius:6px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer">📱</button>
+      <button onclick="abrirResumo()" style="background:#2563eb;color:#fff;border:none;border-radius:6px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer">📷</button>
+      <span style="color:#6b4c30;font-size:11px">📅 {today_str}</span>
+    </div>
   </div>
   <div class="stats">
     <div class="stat"><div class="stat-n" style="color:#ea580c">{n_cli}</div><div class="stat-l">CLIENTES</div></div>
