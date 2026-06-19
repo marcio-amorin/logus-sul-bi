@@ -226,7 +226,7 @@ def _d_row(t, show_cli=False):
             f'<td style="color:{fc};font-weight:900;padding:9px 12px;text-align:right;white-space:nowrap">{t["dias"]}</td>'
             f'{smov_td}'
             f'<td style="padding:9px 8px;white-space:nowrap">'
-            f'<button onclick="copiarTk(\'{t["code"]}\',this)" style="background:#ea580c;color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap">📋 #{t["code"]}</button>'
+            f'<a href="https://logusretail.tolvdesk.com/webapp/#/tickets/todos?busca={t[\"code\"]}" target="tolvdesk" style="background:#ea580c;color:#fff;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:700;text-decoration:none;white-space:nowrap">🔍 #{t["code"]}</a>'
             f'</td></tr>')
 
 def _d_tbl_hdr(show_cli=False):
