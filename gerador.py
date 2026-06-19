@@ -919,51 +919,66 @@ def gerar_html(all_tks, baixados_hoje=None, urg_tks=None):
        +_d_stat_sm('HOMOLOG.',   len(homolog_tks),    '#0e7490','urg')
     )
 
-    # ── Resumo visual (modal portrait) ────────────────────────────────────────
-    def _rsm_sec(emoji, cor, bg, nome, tks):
+    # ── Resumo visual (modal tabela larga) ────────────────────────────────────
+    def _rsm_tbl(emoji, cor, bg, nome, tks):
         if not tks: return ''
         rows = ''
         for t in tks:
-            smov = f'<span style="color:#d97706;font-size:10px"> ↩{t["dias_sem_mov"]}d</span>' if t.get('dias_sem_mov',0)>=2 else ''
-            sla  = '<span style="color:#dc2626;font-size:10px"> ⏰SLA</span>' if t.get('sla_venceu') else ''
             fc,_ = _dc(t['dias'])
-            assunto = t['assunto'][:48]+('…' if len(t['assunto'])>48 else '')
-            rows += (f'<div style="padding:6px 10px;border-bottom:1px solid #f1f5f9;display:flex;justify-content:space-between;align-items:flex-start;gap:8px">'
-                     f'<div style="flex:1;min-width:0">'
-                     f'<span style="color:#ea580c;font-weight:800;font-size:11px">#{t["code"]}</span> '
-                     f'<span style="color:#374151;font-size:11px;font-weight:600">{t["empresa"]}</span><br>'
-                     f'<span style="color:#64748b;font-size:10px">{assunto}</span>{sla}'
-                     f'</div>'
-                     f'<div style="text-align:right;flex-shrink:0">'
-                     f'<span style="color:{fc};font-weight:900;font-size:12px">{t["dias"]}d</span>{smov}'
-                     f'</div></div>')
-        return (f'<div style="margin-bottom:8px;border-radius:8px;overflow:hidden;border:1px solid {cor}44">'
-                f'<div style="background:{bg};padding:6px 10px;display:flex;justify-content:space-between">'
-                f'<span style="color:{cor};font-size:11px;font-weight:800">{emoji} {nome}</span>'
-                f'<span style="color:{cor};font-size:11px;font-weight:900">{len(tks)}</span>'
-                f'</div>{rows}</div>')
+            sla  = '<span style="background:#fee2e2;color:#b91c1c;font-size:9px;font-weight:900;border-radius:3px;padding:1px 4px;margin-left:3px">SLA</span>' if t.get('sla_venceu') else ''
+            dias_mov = t.get('dias_sem_mov',0)
+            if dias_mov >= 2:
+                mc = '#dc2626' if dias_mov>14 else '#d97706' if dias_mov>7 else '#64748b'
+                smov_td = f'<td style="color:{mc};font-weight:800;padding:7px 8px;font-size:12px;text-align:right;white-space:nowrap">{dias_mov}d</td>'
+            elif dias_mov == 1:
+                smov_td = '<td style="color:#16a34a;font-size:11px;padding:7px 8px;text-align:right">✓ 1d</td>'
+            else:
+                smov_td = '<td style="color:#16a34a;font-size:11px;padding:7px 8px;text-align:right">✓ hoje</td>'
+            tc = '#ef4444' if t['tipo']=='Incidente' else '#3b82f6' if t['tipo']=='Requisição' else '#6b7280'
+            ec = {'Novo':'#22c55e','Em andamento':'#3b82f6','Aguardando':'#d97706'}.get(t['status'],'#6b7280')
+            rows += (f'<tr style="border-bottom:1px solid #f1f5f9">'
+                     f'<td style="color:#ea580c;font-weight:900;padding:7px 10px;white-space:nowrap;font-size:12px">#{t["code"]}{sla}</td>'
+                     f'<td style="color:#ea580c;font-weight:700;padding:7px 10px;font-size:12px;white-space:nowrap">{t["empresa"]}</td>'
+                     f'<td style="padding:7px 8px"><span style="background:{tc}22;color:{tc};border-radius:3px;padding:2px 6px;font-size:9px;font-weight:900">{t["tipo"].upper()[:3]}</span></td>'
+                     f'<td style="color:#111827;padding:7px 10px;font-size:12px">{t["assunto"][:60]}{"…" if len(t["assunto"])>60 else ""}</td>'
+                     f'<td style="padding:7px 8px"><span style="background:{ec}22;color:{ec};border-radius:3px;padding:2px 6px;font-size:9px;font-weight:900">{t["status"].upper()[:3]}</span></td>'
+                     f'<td style="color:#374151;padding:7px 10px;font-size:12px;white-space:nowrap">{t["atrib"]}</td>'
+                     f'<td style="color:{fc};font-weight:900;padding:7px 10px;font-size:13px;text-align:right;white-space:nowrap">{t["dias"]}d</td>'
+                     f'{smov_td}</tr>')
+        hdr = (f'<thead><tr style="background:{bg}">'
+               f'<th style="color:{cor};padding:6px 10px;font-size:10px;text-align:left;white-space:nowrap">{emoji} {nome} ({len(tks)})</th>'
+               f'<th style="color:#475569;padding:6px 10px;font-size:10px;text-align:left">CLIENTE</th>'
+               f'<th style="color:#475569;padding:6px 8px;font-size:10px">TIPO</th>'
+               f'<th style="color:#475569;padding:6px 10px;font-size:10px;text-align:left">ASSUNTO</th>'
+               f'<th style="color:#475569;padding:6px 8px;font-size:10px">ESTADO</th>'
+               f'<th style="color:#475569;padding:6px 10px;font-size:10px;text-align:left">COM QUEM</th>'
+               f'<th style="color:#475569;padding:6px 10px;font-size:10px;text-align:right">DIAS</th>'
+               f'<th style="color:#475569;padding:6px 8px;font-size:10px;text-align:right">S/MOV</th>'
+               f'</tr></thead>')
+        return (f'<table style="width:100%;border-collapse:collapse;margin-bottom:12px;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.08)">'
+                f'{hdr}<tbody>{rows}</tbody></table>')
 
     resumo_secs = (
-        _rsm_sec('🟢','#16a34a','#dcfce7','PDV — Urgente',        pdv_tks)
-       +_rsm_sec('🔴','#dc2626','#fee2e2','Corporativo — Urgente', erp_tks)
-       +_rsm_sec('🛠️','#7c3aed','#ede9fe','Sustentação',           sust_tks)
-       +_rsm_sec('⚙️','#2563eb','#dbeafe','Engenharia Software',   eng_tks)
-       +_rsm_sec('🤝','#d97706','#fef3c7','Comercial',             com_tks)
-       +_rsm_sec('🖥️','#9333ea','#f3e8ff','Desenv. PDV',           desenv_pdv_tks)
-       +_rsm_sec('🧪','#0891b2','#cffafe','Homologação',           homolog_tks)
-       +_rsm_sec('📋','#475569','#f8fafc','Pendentes',             pendente_tks)
+        _rsm_tbl('🟢','#16a34a','#dcfce7','PDV — Urgente',        pdv_tks)
+       +_rsm_tbl('🔴','#dc2626','#fee2e2','Corporativo — Urgente', erp_tks)
+       +_rsm_tbl('🛠️','#7c3aed','#ede9fe','Sustentação',           sust_tks)
+       +_rsm_tbl('⚙️','#2563eb','#dbeafe','Engenharia Software',   eng_tks)
+       +_rsm_tbl('🤝','#d97706','#fef3c7','Comercial',             com_tks)
+       +_rsm_tbl('🖥️','#9333ea','#f3e8ff','Desenv. PDV',           desenv_pdv_tks)
+       +_rsm_tbl('🧪','#0891b2','#cffafe','Homologação',           homolog_tks)
+       +_rsm_tbl('📋','#475569','#f8fafc','Pendentes',             pendente_tks)
     )
     resumo_html = (
-        f'<div style="background:#fff7ed;border-bottom:3px solid #ea580c;padding:12px 14px;display:flex;justify-content:space-between;align-items:center">'
-        f'<div><div style="color:#ea580c;font-size:14px;font-weight:900">Logus Sul BI</div>'
-        f'<div style="color:#64748b;font-size:10px">{today_str} · {hora_brt}</div></div>'
-        f'<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;text-align:center">'
-        f'<div style="background:#fff;border-radius:6px;padding:4px 8px"><div style="color:#ea580c;font-size:16px;font-weight:900">{tot}</div><div style="color:#64748b;font-size:9px">CHAMADOS</div></div>'
-        f'<div style="background:#fff;border-radius:6px;padding:4px 8px"><div style="color:#dc2626;font-size:16px;font-weight:900">{tot_inc}</div><div style="color:#64748b;font-size:9px">INCIDENTES</div></div>'
-        f'<div style="background:#fff;border-radius:6px;padding:4px 8px"><div style="color:#f97316;font-size:16px;font-weight:900">{n_urg_critico}</div><div style="color:#64748b;font-size:9px">URGENTES</div></div>'
-        f'<div style="background:#fff;border-radius:6px;padding:4px 8px"><div style="color:#d97706;font-size:16px;font-weight:900">{tot_ag}</div><div style="color:#64748b;font-size:9px">AGUARDANDO</div></div>'
+        f'<div style="background:#fff7ed;border-bottom:3px solid #ea580c;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0">'
+        f'<div><div style="color:#ea580c;font-size:15px;font-weight:900">Logus Sul BI</div>'
+        f'<div style="color:#64748b;font-size:11px">{today_str} · {hora_brt}</div></div>'
+        f'<div style="display:flex;gap:16px">'
+        f'<div style="text-align:center"><div style="color:#ea580c;font-size:20px;font-weight:900">{tot}</div><div style="color:#64748b;font-size:9px">CHAMADOS</div></div>'
+        f'<div style="text-align:center"><div style="color:#dc2626;font-size:20px;font-weight:900">{tot_inc}</div><div style="color:#64748b;font-size:9px">INCIDENTES</div></div>'
+        f'<div style="text-align:center"><div style="color:#f97316;font-size:20px;font-weight:900">{n_urg_critico}</div><div style="color:#64748b;font-size:9px">URGENTES</div></div>'
+        f'<div style="text-align:center"><div style="color:#d97706;font-size:20px;font-weight:900">{tot_ag}</div><div style="color:#64748b;font-size:9px">AGUARDANDO</div></div>'
         f'</div></div>'
-        f'<div style="padding:10px;overflow-y:auto;max-height:70vh">{resumo_secs}</div>'
+        f'<div style="padding:12px 16px;overflow-y:auto;flex:1">{resumo_secs}</div>'
     )
     return f"""<!DOCTYPE html><html lang="pt-BR"><head>
 <meta charset="UTF-8">
@@ -1070,7 +1085,7 @@ function abrirResumo(){{
     ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px';
     ov.onclick=function(e){{if(e.target===ov)ov.style.display='none';}};
     var box=document.createElement('div');
-    box.style.cssText='background:#f1f5f9;border-radius:14px;overflow:hidden;width:100%;max-width:420px;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.3)';
+    box.style.cssText='background:#f1f5f9;border-radius:12px;overflow:hidden;width:95vw;max-width:1100px;height:88vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.3)';
     var top=document.createElement('div');
     top.style.cssText='background:#ea580c;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0';
     var lbl=document.createElement('span');
