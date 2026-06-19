@@ -1230,21 +1230,22 @@ window.onload=function(){{showTab('cli');dTab('cli')}};
 <!-- ═══════════════════════════════════════════════ DESKTOP -->
 <div id="dt">
   <div style="position:sticky;top:0;z-index:200;background:#ffffff;box-shadow:0 2px 8px rgba(0,0,0,0.08)">
-  <div style="background:#ffffff;border-bottom:1px solid #e2e8f0;padding:14px 28px;display:flex;align-items:center;justify-content:space-between">
+  <div style="background:#ffffff;border-bottom:1px solid #e2e8f0;padding:10px 28px;display:flex;align-items:center;justify-content:space-between">
     <div style="display:flex;align-items:center;gap:14px">
-      <img src="/static/logo.png" style="height:46px;background:#fff;border-radius:8px;padding:4px 10px">
+      <img src="/static/logo.png" style="height:42px;background:#fff;border-radius:8px;padding:4px 10px">
       <div>
         <span style="color:#ea580c;font-size:10px;font-weight:900;background:#fff7ed;border:1px solid #ea580c;border-radius:4px;padding:2px 8px;letter-spacing:.5px">SUL</span>
         <div style="color:#94a3b8;font-size:11px;margin-top:4px">Painel de Chamados · {today_str}</div>
       </div>
     </div>
-    <div style="display:flex;gap:10px;align-items:center">
-      {dt_hdr_stats}
-      <button onclick="copiarWpp(this)" style="background:#25D366;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">📱 WhatsApp</button>
-      <button onclick="abrirResumo()" style="background:#2563eb;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">📷 Resumo</button>
-      <button onclick="iniciarRecorte()" style="background:#7c3aed;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">✂️ Recortar</button>
-      <a href="https://logusretail.tolvdesk.com/webapp/#/tickets/todos" target="_blank" title="Abrir Tolvdesk" style="background:#ea580c;color:#fff;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap;display:flex;align-items:center;gap:6px">🔗 Tolvdesk</a>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button onclick="abrirResumo()" style="background:#2563eb;color:#fff;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap">📷 Resumo</button>
+      <button onclick="iniciarRecorte()" style="background:#7c3aed;color:#fff;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap">✂️ Recortar</button>
+      <a href="https://logusretail.tolvdesk.com/webapp/#/tickets/todos" target="_blank" title="Abrir Tolvdesk" style="background:#ea580c;color:#fff;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:700;text-decoration:none;white-space:nowrap;display:flex;align-items:center;gap:6px">🔗 Tolvdesk</a>
     </div>
+  </div>
+  <div style="background:#f8fafc;border-bottom:1px solid #e2e8f0;padding:8px 28px;display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+    {dt_hdr_stats}
   </div>
   <div style="background:#f8fafc;border-bottom:1px solid #e2e8f0;padding:8px 28px;display:flex;gap:8px;align-items:center">
     <span style="color:#374151;font-size:10px;font-weight:700;margin-right:4px">DIAS EM ABERTO:</span>
@@ -1299,7 +1300,6 @@ window.onload=function(){{showTab('cli');dTab('cli')}};
   <div class="hdr-top">
     <img class="hdr-logo" src="/static/logo.png">
     <div style="display:flex;gap:6px;align-items:center">
-      <button onclick="copiarWpp(this)" style="background:#25D366;color:#fff;border:none;border-radius:6px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer">📱</button>
       <button onclick="abrirResumo()" style="background:#2563eb;color:#fff;border:none;border-radius:6px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer">📷</button>
       <button onclick="iniciarRecorte()" style="background:#7c3aed;color:#fff;border:none;border-radius:6px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer">✂️</button>
       <span style="color:#6b4c30;font-size:11px">📅 {today_str}</span>
