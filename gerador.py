@@ -965,9 +965,9 @@ def gerar_html(all_tks, baixados_hoje=None, urg_tks=None):
         f'</div></div>'
         f'<div style="padding:10px;overflow-y:auto;max-height:70vh">{resumo_secs}</div>'
     )
-    resumo_json = json.dumps(resumo_html)
-
-    return f"""<!DOCTYPE html><html lang="pt-BR"><head>
+    return f"""<!DOCTYPE html><html lang="pt-BR">
+<div id="resumo-data" style="display:none">{resumo_html}</div>
+<head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
 <title>Logus Sul BI · {today_str}</title>
@@ -1064,7 +1064,6 @@ function copiarWpp(btn){{
     setTimeout(function(){{btn.innerHTML=orig;btn.style.background='#25D366';}},2000);
   }});
 }}
-var _resumoHtml={resumo_json};
 function abrirResumo(){{
   var ov=document.getElementById('resumo-ov');
   if(!ov){{
@@ -1074,8 +1073,24 @@ function abrirResumo(){{
     ov.onclick=function(e){{if(e.target===ov)ov.style.display='none';}};
     var box=document.createElement('div');
     box.style.cssText='background:#f1f5f9;border-radius:14px;overflow:hidden;width:100%;max-width:420px;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.3)';
-    var close='<div style="background:#ea580c;padding:8px 12px;display:flex;justify-content:space-between;align-items:center"><span style="color:#fff;font-size:12px;font-weight:700">📷 Resumo Visual — tira print desta tela</span><button onclick="document.getElementById(\'resumo-ov\').style.display=\'none\'" style="background:transparent;border:none;color:#fff;font-size:18px;cursor:pointer;line-height:1">✕</button></div>';
-    box.innerHTML=close+_resumoHtml;
+    var top=document.createElement('div');
+    top.style.cssText='background:#ea580c;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0';
+    var lbl=document.createElement('span');
+    lbl.style.cssText='color:#fff;font-size:12px;font-weight:700';
+    lbl.textContent='📷 Resumo Visual — tira print desta tela';
+    var btn=document.createElement('button');
+    btn.style.cssText='background:transparent;border:none;color:#fff;font-size:20px;cursor:pointer;line-height:1;padding:0 4px';
+    btn.textContent='✕';
+    btn.onclick=function(){{ov.style.display='none';}};
+    top.appendChild(lbl); top.appendChild(btn);
+    var content=document.getElementById('resumo-data');
+    if(!content){{box.innerHTML='<p>Sem dados</p>';}}
+    else{{
+      var inner=document.createElement('div');
+      inner.style.cssText='overflow-y:auto;max-height:80vh';
+      inner.innerHTML=content.innerHTML;
+      box.appendChild(top); box.appendChild(inner);
+    }}
     ov.appendChild(box);
     document.body.appendChild(ov);
   }} else {{
