@@ -965,9 +965,7 @@ def gerar_html(all_tks, baixados_hoje=None, urg_tks=None):
         f'</div></div>'
         f'<div style="padding:10px;overflow-y:auto;max-height:70vh">{resumo_secs}</div>'
     )
-    return f"""<!DOCTYPE html><html lang="pt-BR">
-<div id="resumo-data" style="display:none">{resumo_html}</div>
-<head>
+    return f"""<!DOCTYPE html><html lang="pt-BR"><head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
 <title>Logus Sul BI · {today_str}</title>
@@ -1216,4 +1214,5 @@ window.onload=function(){{showTab('cli');dTab('cli')}};
 </nav>
 </div>
 
+<div id="resumo-data" style="display:none">{resumo_html}</div>
 </body></html>"""
