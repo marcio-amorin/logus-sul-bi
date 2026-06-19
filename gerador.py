@@ -89,7 +89,7 @@ def _tk(t, sc=True):
     if t.get('abandonado'):
         extras += '<span style="background:#f3f4f6;color:#6b7280;font-size:10px;font-weight:800;border-radius:4px;padding:2px 7px;margin-right:4px">🔕 Abandonado</span>'
     dias_mov = t.get('dias_sem_mov', 0)
-    if dias_mov > 2:
+    if dias_mov >= 2:
         mc = '#dc2626' if dias_mov > 14 else '#d97706' if dias_mov > 7 else '#64748b'
         extras += f'<span style="background:#f8fafc;color:{mc};font-size:10px;font-weight:800;border-radius:4px;padding:2px 7px">↩ {dias_mov}d s/mov</span>'
     return (f'<div style="background:#ffffff;border-radius:12px;padding:14px 16px;margin-bottom:10px;border-left:6px solid {fc};box-shadow:0 3px 10px rgba(0,0,0,0.1)">'
@@ -210,7 +210,7 @@ def _d_row(t, show_cli=False):
     sla_tag = '<span style="background:#fee2e2;color:#b91c1c;font-size:9px;font-weight:900;border-radius:3px;padding:1px 5px;margin-left:4px">SLA</span>' if t.get('sla_venceu') else ''
     abnd_tag = '<span style="background:#f3f4f6;color:#6b7280;font-size:9px;font-weight:900;border-radius:3px;padding:1px 5px;margin-left:4px">ABN</span>' if t.get('abandonado') else ''
     dias_mov = t.get('dias_sem_mov', 0)
-    if dias_mov > 2:
+    if dias_mov >= 2:
         mc = '#dc2626' if dias_mov > 14 else '#d97706' if dias_mov > 7 else '#64748b'
         smov_td = f'<td style="color:{mc};font-weight:800;padding:9px 8px;font-size:12px;text-align:right;white-space:nowrap">{dias_mov}d</td>'
     else:
