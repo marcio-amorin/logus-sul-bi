@@ -232,7 +232,7 @@ def _d_row(t, show_cli=False):
             f'<td style="color:{fc};font-weight:900;padding:9px 12px;text-align:right;white-space:nowrap">{t["dias"]}</td>'
             f'{smov_td}'
             f'<td style="padding:9px 8px;white-space:nowrap">'
-            f'<a href="https://logusretail.tolvdesk.com/webapp/#/tickets/{t["code"]}" target="_blank" style="background:#ea580c;color:#fff;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:700;text-decoration:none;white-space:nowrap">🔗 Abrir</a>'
+            f'<a href="https://logusretail.tolvdesk.com/webapp/#/tickets/{t["code"]}" target="tolvdesk" style="background:#ea580c;color:#fff;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:700;text-decoration:none;white-space:nowrap">🔗 Abrir</a>'
             f'</td></tr>')
 
 def _d_tbl_hdr(show_cli=False):
@@ -1009,7 +1009,10 @@ window.onload=function(){{showTab('cli');dTab('cli')}};
         <div style="color:#94a3b8;font-size:11px;margin-top:4px">Painel de Chamados · {today_str}</div>
       </div>
     </div>
-    <div style="display:flex;gap:10px;align-items:center">{dt_hdr_stats}</div>
+    <div style="display:flex;gap:10px;align-items:center">
+      {dt_hdr_stats}
+      <a href="https://logusretail.tolvdesk.com/webapp/#/tickets/todos" target="tolvdesk" title="Clique para abrir o Tolvdesk — depois os botões Abrir funcionam direto" style="background:#ea580c;color:#fff;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap;display:flex;align-items:center;gap:6px">🔗 Tolvdesk</a>
+    </div>
   </div>
   <div style="background:#f8fafc;border-bottom:1px solid #e2e8f0;padding:8px 28px;display:flex;gap:8px;align-items:center">
     <span style="color:#374151;font-size:10px;font-weight:700;margin-right:4px">DIAS EM ABERTO:</span>
