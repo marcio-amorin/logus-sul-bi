@@ -232,7 +232,7 @@ def _d_row(t, show_cli=False):
             f'<td style="color:{fc};font-weight:900;padding:9px 12px;text-align:right;white-space:nowrap">{t["dias"]}</td>'
             f'{smov_td}'
             f'<td style="padding:9px 8px;white-space:nowrap">'
-            f'<a href="https://logusretail.tolvdesk.com/webapp/#/tickets/{t["code"]}" target="tolvdesk" style="background:#ea580c;color:#fff;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:700;text-decoration:none;white-space:nowrap">🔗 Abrir</a>'
+            f'<button onclick="abrirTk(\'{t["code"]}\',this)" style="background:#ea580c;color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap">📋 #{t["code"]}</button>'
             f'</td></tr>')
 
 def _d_tbl_hdr(show_cli=False):
@@ -970,12 +970,16 @@ function filtrarRes(prefix,val){{
   document.querySelectorAll('[id^="'+prefix+'-"]').forEach(function(el){{el.style.display='none'}});
   var el=document.getElementById(prefix+'-'+val); if(el)el.style.display='block';
 }}
-function copiarTk(code,btn){{
+function abrirTk(code,btn){{
   navigator.clipboard.writeText(code).then(function(){{
-    var orig=btn.textContent;
-    btn.textContent='✅ Copiado!';
+    window.open('https://logusretail.tolvdesk.com/webapp/#/tickets/todos','tolvdesk');
+    var orig=btn.innerHTML;
+    btn.innerHTML='✅ Copiado! Cole na busca';
     btn.style.background='#16a34a';
-    setTimeout(function(){{btn.textContent=orig;btn.style.background='#ea580c';}},1500);
+    btn.style.minWidth='160px';
+    setTimeout(function(){{btn.innerHTML=orig;btn.style.background='#ea580c';btn.style.minWidth='';}},2500);
+  }}).catch(function(){{
+    window.open('https://logusretail.tolvdesk.com/webapp/#/tickets/todos','tolvdesk');
   }});
 }}
 function selDate(grp,safe){{
@@ -1011,7 +1015,7 @@ window.onload=function(){{showTab('cli');dTab('cli')}};
     </div>
     <div style="display:flex;gap:10px;align-items:center">
       {dt_hdr_stats}
-      <a href="https://logusretail.tolvdesk.com/webapp/#/tickets/todos" target="tolvdesk" title="Clique para abrir o Tolvdesk — depois os botões Abrir funcionam direto" style="background:#ea580c;color:#fff;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap;display:flex;align-items:center;gap:6px">🔗 Tolvdesk</a>
+      <a href="https://logusretail.tolvdesk.com/webapp/#/tickets/todos" target="_blank" title="Abrir Tolvdesk" style="background:#ea580c;color:#fff;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap;display:flex;align-items:center;gap:6px">🔗 Tolvdesk</a>
     </div>
   </div>
   <div style="background:#f8fafc;border-bottom:1px solid #e2e8f0;padding:8px 28px;display:flex;gap:8px;align-items:center">
