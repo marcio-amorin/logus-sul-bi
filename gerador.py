@@ -92,6 +92,10 @@ def _tk(t, sc=True):
     if dias_mov >= 2:
         mc = '#dc2626' if dias_mov > 14 else '#d97706' if dias_mov > 7 else '#64748b'
         extras += f'<span style="background:#f8fafc;color:{mc};font-size:10px;font-weight:800;border-radius:4px;padding:2px 7px">↩ {dias_mov}d s/mov</span>'
+    elif dias_mov == 1:
+        extras += '<span style="background:#dcfce7;color:#16a34a;font-size:10px;font-weight:800;border-radius:4px;padding:2px 7px">✓ 1d</span>'
+    else:
+        extras += '<span style="background:#dcfce7;color:#16a34a;font-size:10px;font-weight:800;border-radius:4px;padding:2px 7px">✓ hoje</span>'
     return (f'<div style="background:#ffffff;border-radius:12px;padding:14px 16px;margin-bottom:10px;border-left:6px solid {fc};box-shadow:0 3px 10px rgba(0,0,0,0.1)">'
             f'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'
             f'<span style="color:{fc};font-size:20px;font-weight:900">#{t["code"]}</span>'
@@ -213,8 +217,10 @@ def _d_row(t, show_cli=False):
     if dias_mov >= 2:
         mc = '#dc2626' if dias_mov > 14 else '#d97706' if dias_mov > 7 else '#64748b'
         smov_td = f'<td style="color:{mc};font-weight:800;padding:9px 8px;font-size:12px;text-align:right;white-space:nowrap">{dias_mov}d</td>'
+    elif dias_mov == 1:
+        smov_td = '<td style="color:#16a34a;font-weight:700;padding:9px 8px;font-size:11px;text-align:right;white-space:nowrap">✓ 1d</td>'
     else:
-        smov_td = f'<td style="color:#d1d5db;padding:9px 8px;font-size:11px;text-align:right">—</td>'
+        smov_td = '<td style="color:#16a34a;font-weight:700;padding:9px 8px;font-size:11px;text-align:right;white-space:nowrap">✓ hoje</td>'
     return (f'<tr style="border-bottom:1px solid #f1f5f9">'
             f'<td style="color:#ea580c;font-weight:900;padding:9px 12px;white-space:nowrap">#{t["code"]}{sla_tag}{abnd_tag}</td>'
             f'{cli}'
