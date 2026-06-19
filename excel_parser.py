@@ -76,7 +76,11 @@ def parse_excel(content_bytes):
         status = get(row, 'status')
 
         data_str, dias      = _parse_dt(get_raw(row, 'datahora_abertura'))
-        _,        dias_mov  = _parse_dt(get_raw(row, 'datahora_ultima_interacao'))
+        raw_mov             = get_raw(row, 'datahora_ultima_interacao')
+        _,        dias_mov  = _parse_dt(raw_mov)
+        # se não tem data de movimentação, considera que nunca foi tocado (usa dias em aberto)
+        if not raw_mov or str(raw_mov).strip() in ('', 'None'):
+            dias_mov = max(dias, 0)
         resolucao, _        = _parse_dt(get_raw(row, 'datahora_encerramento'))
 
         t = {
