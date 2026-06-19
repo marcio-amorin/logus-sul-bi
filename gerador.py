@@ -1141,6 +1141,66 @@ function abrirResumo(){{
     ov.style.display='flex';
   }}
 }}
+function iniciarRecorte(){{
+  var ov=document.createElement('div');
+  ov.style.cssText='position:fixed;inset:0;z-index:99999;cursor:crosshair;user-select:none';
+  var mask=document.createElement('div');
+  mask.style.cssText='position:absolute;inset:0;background:rgba(0,0,0,0.35)';
+  ov.appendChild(mask);
+  var sel=document.createElement('div');
+  sel.style.cssText='position:absolute;border:2px solid #25D366;background:rgba(37,211,102,0.12);display:none;pointer-events:none';
+  ov.appendChild(sel);
+  var tip=document.createElement('div');
+  tip.style.cssText='position:fixed;top:14px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;padding:9px 20px;border-radius:8px;font-size:13px;font-weight:700;pointer-events:none;white-space:nowrap;box-shadow:0 4px 12px rgba(0,0,0,0.4)';
+  tip.textContent='✂️ Arraste para selecionar a área — ESC cancela';
+  ov.appendChild(tip);
+  var sx=0,sy=0,drawing=false;
+  function getR(e){{var x=Math.min(e.clientX,sx),y=Math.min(e.clientY,sy);return{{x:x,y:y,w:Math.abs(e.clientX-sx),h:Math.abs(e.clientY-sy)}};}}
+  ov.addEventListener('mousedown',function(e){{
+    e.preventDefault(); drawing=true; sx=e.clientX; sy=e.clientY;
+    sel.style.display='block'; sel.style.left=sx+'px'; sel.style.top=sy+'px'; sel.style.width='0'; sel.style.height='0';
+  }});
+  ov.addEventListener('mousemove',function(e){{
+    if(!drawing) return;
+    var r=getR(e); sel.style.left=r.x+'px'; sel.style.top=r.y+'px'; sel.style.width=r.w+'px'; sel.style.height=r.h+'px';
+  }});
+  ov.addEventListener('mouseup',function(e){{
+    if(!drawing) return; drawing=false;
+    var r=getR(e); document.body.removeChild(ov); document.removeEventListener('keydown',onEsc);
+    if(r.w>10&&r.h>10) _capturarArea(r.x,r.y,r.w,r.h);
+  }});
+  function onEsc(e){{if(e.key==='Escape'){{document.body.removeChild(ov);document.removeEventListener('keydown',onEsc);}}}}
+  document.addEventListener('keydown',onEsc);
+  document.body.appendChild(ov);
+}}
+function _capturarArea(cx,cy,cw,ch){{
+  var px=window.scrollX||0, py=window.scrollY||0;
+  var load=document.createElement('div');
+  load.style.cssText='position:fixed;top:14px;left:50%;transform:translateX(-50%);background:#2563eb;color:#fff;padding:9px 20px;border-radius:8px;font-size:13px;font-weight:700;z-index:99999;white-space:nowrap';
+  load.textContent='⏳ Capturando...';
+  document.body.appendChild(load);
+  html2canvas(document.body,{{scale:2,useCORS:true,logging:false,x:cx+px,y:cy+py,width:cw,height:ch,windowWidth:document.documentElement.scrollWidth,windowHeight:document.documentElement.scrollHeight}}).then(function(canvas){{
+    document.body.removeChild(load);
+    canvas.toBlob(function(blob){{
+      if(navigator.clipboard&&navigator.clipboard.write){{
+        navigator.clipboard.write([new ClipboardItem({{'image/png':blob}})]).then(function(){{
+          _msgArea('✅ Área copiada! Cole no WhatsApp');
+        }}).catch(function(){{_dlArea(canvas);}});
+      }} else {{ _dlArea(canvas); }}
+    }});
+  }}).catch(function(){{document.body.removeChild(load);}});
+}}
+function _msgArea(txt){{
+  var m=document.createElement('div');
+  m.style.cssText='position:fixed;top:14px;left:50%;transform:translateX(-50%);background:#16a34a;color:#fff;padding:9px 20px;border-radius:8px;font-size:13px;font-weight:700;z-index:99999;white-space:nowrap;box-shadow:0 4px 12px rgba(0,0,0,0.3)';
+  m.textContent=txt; document.body.appendChild(m);
+  setTimeout(function(){{document.body.removeChild(m);}},3000);
+}}
+function _dlArea(canvas){{
+  var a=document.createElement('a'); a.href=canvas.toDataURL('image/png');
+  a.download='logus-sul-bi-recorte.png'; a.click();
+  _msgArea('✅ Salvo! Envie no WhatsApp');
+}}
 function selDate(grp,safe){{
   document.querySelectorAll('[data-grp="'+grp+'"]').forEach(function(b){{
     b.style.background='#f1f5f9';
@@ -1176,6 +1236,7 @@ window.onload=function(){{showTab('cli');dTab('cli')}};
       {dt_hdr_stats}
       <button onclick="copiarWpp(this)" style="background:#25D366;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">📱 WhatsApp</button>
       <button onclick="abrirResumo()" style="background:#2563eb;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">📷 Resumo</button>
+      <button onclick="iniciarRecorte()" style="background:#7c3aed;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">✂️ Recortar</button>
       <a href="https://logusretail.tolvdesk.com/webapp/#/tickets/todos" target="_blank" title="Abrir Tolvdesk" style="background:#ea580c;color:#fff;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap;display:flex;align-items:center;gap:6px">🔗 Tolvdesk</a>
     </div>
   </div>
@@ -1234,6 +1295,7 @@ window.onload=function(){{showTab('cli');dTab('cli')}};
     <div style="display:flex;gap:6px;align-items:center">
       <button onclick="copiarWpp(this)" style="background:#25D366;color:#fff;border:none;border-radius:6px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer">📱</button>
       <button onclick="abrirResumo()" style="background:#2563eb;color:#fff;border:none;border-radius:6px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer">📷</button>
+      <button onclick="iniciarRecorte()" style="background:#7c3aed;color:#fff;border:none;border-radius:6px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer">✂️</button>
       <span style="color:#6b4c30;font-size:11px">📅 {today_str}</span>
     </div>
   </div>
