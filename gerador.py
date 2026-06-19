@@ -1084,7 +1084,8 @@ function _capturarResumo(btn){{
   var orig=btn.innerHTML; btn.innerHTML='⏳ Capturando...'; btn.disabled=true;
   var prevOv=inner.style.overflow; var prevH=inner.style.maxHeight;
   inner.style.overflow='visible'; inner.style.maxHeight='none';
-  html2canvas(inner,{{scale:2,useCORS:true,logging:false,width:inner.scrollWidth,height:inner.scrollHeight}}).then(function(canvas){{
+  var dpr=window.devicePixelRatio||1;
+  html2canvas(inner,{{scale:Math.max(3,dpr*2),useCORS:true,logging:false,width:inner.scrollWidth,height:inner.scrollHeight}}).then(function(canvas){{
     inner.style.overflow=prevOv; inner.style.maxHeight=prevH;
     canvas.toBlob(function(blob){{
       if(navigator.clipboard&&navigator.clipboard.write){{
@@ -1175,18 +1176,23 @@ function iniciarRecorte(){{
 }}
 function _capturarArea(cx,cy,cw,ch){{
   var px=window.scrollX||0, py=window.scrollY||0;
+  var dpr=window.devicePixelRatio||1;
+  var sc=Math.max(3, dpr*2);
   var load=document.createElement('div');
   load.style.cssText='position:fixed;top:14px;left:50%;transform:translateX(-50%);background:#2563eb;color:#fff;padding:9px 20px;border-radius:8px;font-size:13px;font-weight:700;z-index:99999;white-space:nowrap';
   load.textContent='⏳ Capturando...';
   document.body.appendChild(load);
-  html2canvas(document.body,{{scale:2,useCORS:true,logging:false,x:cx+px,y:cy+py,width:cw,height:ch,windowWidth:document.documentElement.scrollWidth,windowHeight:document.documentElement.scrollHeight}}).then(function(canvas){{
+  html2canvas(document.body,{{scale:sc,useCORS:true,logging:false,x:cx+px,y:cy+py,width:cw,height:ch}}).then(function(fullC){{
+    var out=document.createElement('canvas');
+    out.width=Math.round(cw*sc); out.height=Math.round(ch*sc);
+    out.getContext('2d').drawImage(fullC,0,0);
     document.body.removeChild(load);
-    canvas.toBlob(function(blob){{
+    out.toBlob(function(blob){{
       if(navigator.clipboard&&navigator.clipboard.write){{
         navigator.clipboard.write([new ClipboardItem({{'image/png':blob}})]).then(function(){{
           _msgArea('✅ Área copiada! Cole no WhatsApp');
-        }}).catch(function(){{_dlArea(canvas);}});
-      }} else {{ _dlArea(canvas); }}
+        }}).catch(function(){{_dlArea(out);}});
+      }} else {{ _dlArea(out); }}
     }});
   }}).catch(function(){{document.body.removeChild(load);}});
 }}
