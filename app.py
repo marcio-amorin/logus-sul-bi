@@ -13,8 +13,8 @@ app = Flask(__name__)
 app.secret_key = 'ls-bi-2026-xk9'
 app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024  # 10 MB
 
-ADMIN_USER  = 'marcio'
-ADMIN_PASS  = 'amorin'
+ADMIN_USER  = 'logussul'
+ADMIN_PASS  = 'varlog'
 VIEWER_USER = 'varejus'
 VIEWER_PASS = 'varlog'
 API_TOKEN   = 'ls-sul-pub-2026'
