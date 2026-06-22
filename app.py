@@ -17,6 +17,7 @@ ADMIN_USER  = 'logussul'
 ADMIN_PASS  = 'varlog'
 VIEWER_USER = 'varejus'
 VIEWER_PASS = 'varlog'
+API_TOKEN   = 'ls-sul-pub-2026'
 
 # painel em memória — gerado pelo admin, visto pela equipe
 _painel = {'html': None, 'gerado_em': None}
@@ -317,6 +318,57 @@ def admin_gerar():
     _painel['html'] = html
     _painel['gerado_em'] = _agora_brt()
     return redirect('/admin')
+
+@app.route('/api/publicar', methods=['POST'])
+def api_publicar():
+    token = request.form.get('token') or request.headers.get('X-Token', '')
+    if token != API_TOKEN:
+        return Response('{"erro":"token invalido"}', status=401, mimetype='application/json')
+
+    f_main = request.files.get('csv_main')
+    if not f_main or not f_main.filename:
+        return Response('{"erro":"arquivo principal obrigatorio"}', status=400, mimetype='application/json')
+
+    fname = f_main.filename.lower()
+    conteudo = f_main.read()
+    baixados_excel = []
+
+    try:
+        if fname.endswith('.xlsx'):
+            main_tks, baixados_excel = parse_excel(conteudo)
+        else:
+            main_tks = parse_csv(conteudo)
+    except Exception as e:
+        return Response(f'{{"erro":"erro ao ler arquivo: {e}"}}', status=400, mimetype='application/json')
+
+    urg_tks = []
+    f_urg = request.files.get('csv_urg')
+    if f_urg and f_urg.filename:
+        try:
+            urg_tks = parse_csv(f_urg.read())
+        except Exception:
+            pass
+
+    baixados = baixados_excel
+    if not baixados:
+        f_bx = request.files.get('csv_baixados')
+        if f_bx and f_bx.filename:
+            try:
+                baixados = parse_csv_baixados(f_bx.read())
+            except Exception:
+                pass
+
+    try:
+        html = gerar_html(main_tks, baixados, urg_tks=urg_tks)
+    except Exception as e:
+        return Response(f'{{"erro":"erro ao gerar painel: {e}"}}', status=500, mimetype='application/json')
+
+    _painel['html'] = html
+    _painel['gerado_em'] = _agora_brt()
+    return Response(
+        f'{{"ok":true,"gerado_em":"{_painel["gerado_em"]}","chamados":{len(main_tks)},"urgentes":{len(urg_tks)},"baixados":{len(baixados)}}}',
+        mimetype='application/json'
+    )
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
