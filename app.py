@@ -7,7 +7,7 @@ from flask import Flask, Response, request, session, redirect
 
 from gerador import gerar_html
 from csv_parser import parse_csv, parse_csv_baixados
-from excel_parser import parse_excel
+from excel_parser import parse_excel, parse_backlog_excel
 
 app = Flask(__name__)
 app.secret_key = 'ls-bi-2026-xk9'
@@ -230,6 +230,15 @@ el.addEventListener("dragleave",function(){el.classList.remove("over");});
 el.addEventListener("drop",function(){el.classList.remove("over");});});
 </script></body></html>"""
 
+def _ler_backlog(f_backlog):
+    """Lê arquivo backlog xlsx se enviado, retorna lista ou None."""
+    if f_backlog and f_backlog.filename:
+        try:
+            return parse_backlog_excel(f_backlog.read())
+        except Exception:
+            pass
+    return None
+
 def admin_logado():
     return session.get('admin') == True
 
@@ -336,9 +345,10 @@ def admin_gerar():
             except Exception:
                 pass
 
+    backlog = _ler_backlog(request.files.get('backlog'))
     gerado_em = _agora_brt()
     try:
-        html = gerar_html(main_tks, baixados, urg_tks=urg_tks, gerado_em=gerado_em)
+        html = gerar_html(main_tks, baixados, urg_tks=urg_tks, gerado_em=gerado_em, backlog=backlog)
     except Exception as e:
         err = f'<div class="err">&#9888; Erro ao gerar painel: {e}</div>'
         ultimo = f'<div class="ok">&#10003; Último painel publicado às {_painel["gerado_em"]}</div>' if _painel['gerado_em'] else ''
@@ -395,9 +405,10 @@ def api_publicar():
             except Exception:
                 pass
 
+    backlog = _ler_backlog(request.files.get('backlog'))
     gerado_em = _agora_brt()
     try:
-        html = gerar_html(main_tks, baixados, urg_tks=urg_tks, gerado_em=gerado_em)
+        html = gerar_html(main_tks, baixados, urg_tks=urg_tks, gerado_em=gerado_em, backlog=backlog)
     except Exception as e:
         return Response(f'{{"erro":"erro ao gerar painel: {e}"}}', status=500, mimetype='application/json')
 

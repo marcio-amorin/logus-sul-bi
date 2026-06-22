@@ -525,11 +525,12 @@ def _priority_panel_html(tk_lkp, baixados_by_code, urg_pdv=None, urg_erp=None, p
 
 # ── main ──────────────────────────────────────────────────────────────────────
 
-def gerar_html(all_tks, baixados_hoje=None, urg_tks=None, gerado_em=None):
+def gerar_html(all_tks, baixados_hoje=None, urg_tks=None, gerado_em=None, backlog=None):
     today     = _hoje_brt()
     today_str = today.strftime('%d/%m/%Y')
     baixados_hoje = baixados_hoje or []
     urg_tks   = urg_tks or []
+    _backlog  = backlog if backlog is not None else BACKLOG
 
     # merge: urg_tks entram no pool geral (sem duplicatas)
     urg_codes_extra = {t['code'] for t in urg_tks}
@@ -629,7 +630,7 @@ def gerar_html(all_tks, baixados_hoje=None, urg_tks=None, gerado_em=None):
     pendente_tks = sorted([t for t in sul if t['code'] not in _shown_codes], key=lambda x:-x['dias'])
 
     n_urg=len(pdv_tks)+len(erp_tks)+len(sust_tks)+len(eng_tks)+len(com_tks)+len(desenv_pdv_tks)+len(homolog_tks)+len(pendente_tks)
-    n_bklog=len(BACKLOG)
+    n_bklog=len(_backlog)
 
     pct_nov=int(n_nov/tot*100) if tot else 0
     pct_and=int(n_and/tot*100) if tot else 0
@@ -691,7 +692,7 @@ def gerar_html(all_tks, baixados_hoje=None, urg_tks=None, gerado_em=None):
 
     cust_html=''
     for st in ['Urgente','Em Homologação','Em Roadmap','Pendente','Homologado']:
-        grp=[b for b in BACKLOG if b['status']==st]
+        grp=[b for b in _backlog if b['status']==st]
         if not grp: continue
         cor={'Urgente':'#b91c1c','Em Homologação':'#c2410c','Em Roadmap':'#1d4ed8','Homologado':'#15803d'}.get(st,'#475569')
         cust_html+=(f'<div style="color:{cor};font-size:11px;font-weight:700;letter-spacing:1px;padding:10px 4px 6px">{st.upper()} — {len(grp)}</div>'
@@ -846,7 +847,7 @@ def gerar_html(all_tks, baixados_hoje=None, urg_tks=None, gerado_em=None):
 
     dt_cust_rows=''
     for st in ['Urgente','Em Homologação','Em Roadmap','Pendente','Homologado']:
-        for b in [x for x in BACKLOG if x['status']==st]:
+        for b in [x for x in _backlog if x['status']==st]:
             s=b['status']
             cor={'Urgente':'#ef4444','Homologado':'#22c55e','Em Homologação':'#fb923c','Em Roadmap':'#60a5fa'}.get(s,'#6b7280')
             est=b['est'] if b['est'] else '—'

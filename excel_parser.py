@@ -111,3 +111,36 @@ def parse_excel(content_bytes):
                 baixados.append(t)
 
     return main_tks, baixados
+
+
+def parse_backlog_excel(conteudo):
+    """Lê o arquivo BACKLOG CUSTOMIZAÇÕES e retorna lista no formato do BACKLOG."""
+    wb = openpyxl.load_workbook(io.BytesIO(conteudo), data_only=True)
+    ws = wb.active
+    backlog = []
+    for row in ws.iter_rows(min_row=4, values_only=True):
+        num    = row[0]
+        ticket = row[2]
+        cliente= row[3]
+        desc   = row[4]
+        est_v  = row[5]
+        status = row[6]
+        # pula linhas sem ticket numérico
+        if not ticket or not str(ticket).replace('.0','').strip().isdigit():
+            continue
+        num = int(num) if num else len(backlog) + 1
+        ticket_str = str(int(ticket))
+        est = ''
+        if isinstance(est_v, datetime):
+            est = est_v.strftime('%d/%m')
+        elif est_v:
+            est = str(est_v).strip()
+        backlog.append({
+            'num':    num,
+            'ticket': ticket_str,
+            'cliente': str(cliente).strip() if cliente else '',
+            'desc':   str(desc).strip()    if desc    else '',
+            'est':    est,
+            'status': str(status).strip()  if status  else 'Pendente',
+        })
+    return backlog
