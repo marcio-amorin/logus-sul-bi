@@ -1,4 +1,4 @@
-import os
+import os, json
 from datetime import datetime, timezone, timedelta
 
 def _agora_brt():
@@ -21,6 +21,34 @@ API_TOKEN   = 'ls-sul-pub-2026'
 
 # painel em memória — gerado pelo admin, visto pela equipe
 _painel = {'html': None, 'gerado_em': None}
+
+# ── cache em disco (sobrevive a restart do servidor) ──────────────────────────
+_CACHE_META = os.path.join(os.path.dirname(__file__), 'painel_cache_meta.json')
+_CACHE_HTML = os.path.join(os.path.dirname(__file__), 'painel_cache.html')
+
+def _salvar_cache(html, gerado_em):
+    try:
+        with open(_CACHE_HTML, 'w', encoding='utf-8') as f:
+            f.write(html)
+        with open(_CACHE_META, 'w', encoding='utf-8') as f:
+            json.dump({'gerado_em': gerado_em}, f)
+    except Exception:
+        pass
+
+def _carregar_cache():
+    try:
+        if os.path.exists(_CACHE_HTML) and os.path.exists(_CACHE_META):
+            with open(_CACHE_HTML, 'r', encoding='utf-8') as f:
+                html = f.read()
+            with open(_CACHE_META, 'r', encoding='utf-8') as f:
+                meta = json.load(f)
+            return html, meta.get('gerado_em')
+    except Exception:
+        pass
+    return None, None
+
+# carrega cache ao iniciar (caso o servidor tenha reiniciado)
+_painel['html'], _painel['gerado_em'] = _carregar_cache()
 
 VIEWER_LOGIN_PAGE = '''<!DOCTYPE html><html lang="pt-BR"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -318,6 +346,7 @@ def admin_gerar():
 
     _painel['html'] = html
     _painel['gerado_em'] = gerado_em
+    _salvar_cache(html, gerado_em)
     return redirect('/admin')
 
 @app.route('/api/publicar', methods=['POST'])
@@ -367,6 +396,7 @@ def api_publicar():
 
     _painel['html'] = html
     _painel['gerado_em'] = gerado_em
+    _salvar_cache(html, gerado_em)
     return Response(
         f'{{"ok":true,"gerado_em":"{_painel["gerado_em"]}","chamados":{len(main_tks)},"urgentes":{len(urg_tks)},"baixados":{len(baixados)}}}',
         mimetype='application/json'
