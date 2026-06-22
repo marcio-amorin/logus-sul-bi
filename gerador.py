@@ -1225,6 +1225,14 @@ function tog(i){{
   c.textContent=open?'▶':'▼';
 }}
 window.onload=function(){{showTab('cli');dTab('cli')}};
+(function(){{
+  var _ts={json.dumps(gerado_em or today_str)};
+  setInterval(function(){{
+    fetch('/api/status').then(function(r){{return r.json();}}).then(function(d){{
+      if(d.gerado_em && d.gerado_em!==_ts) location.reload();
+    }}).catch(function(){{}});
+  }},60000);
+}})();
 </script></head><body>
 
 <!-- ═══════════════════════════════════════════════ DESKTOP -->

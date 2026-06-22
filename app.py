@@ -349,6 +349,13 @@ def admin_gerar():
     _salvar_cache(html, gerado_em)
     return redirect('/admin')
 
+@app.route('/api/status')
+def api_status():
+    return Response(
+        json.dumps({'gerado_em': _painel.get('gerado_em')}),
+        mimetype='application/json'
+    )
+
 @app.route('/api/publicar', methods=['POST'])
 def api_publicar():
     token = request.form.get('token') or request.headers.get('X-Token', '')
