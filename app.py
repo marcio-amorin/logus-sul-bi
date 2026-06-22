@@ -308,15 +308,16 @@ def admin_gerar():
             except Exception:
                 pass
 
+    gerado_em = _agora_brt()
     try:
-        html = gerar_html(main_tks, baixados, urg_tks=urg_tks)
+        html = gerar_html(main_tks, baixados, urg_tks=urg_tks, gerado_em=gerado_em)
     except Exception as e:
         err = f'<div class="err">&#9888; Erro ao gerar painel: {e}</div>'
         ultimo = f'<div class="ok">&#10003; Último painel publicado às {_painel["gerado_em"]}</div>' if _painel['gerado_em'] else ''
         return Response(UPLOAD_PAGE.replace('{error}', err).replace('{ultimo}', ultimo), mimetype='text/html', status=500)
 
     _painel['html'] = html
-    _painel['gerado_em'] = _agora_brt()
+    _painel['gerado_em'] = gerado_em
     return redirect('/admin')
 
 @app.route('/api/publicar', methods=['POST'])
@@ -358,13 +359,14 @@ def api_publicar():
             except Exception:
                 pass
 
+    gerado_em = _agora_brt()
     try:
-        html = gerar_html(main_tks, baixados, urg_tks=urg_tks)
+        html = gerar_html(main_tks, baixados, urg_tks=urg_tks, gerado_em=gerado_em)
     except Exception as e:
         return Response(f'{{"erro":"erro ao gerar painel: {e}"}}', status=500, mimetype='application/json')
 
     _painel['html'] = html
-    _painel['gerado_em'] = _agora_brt()
+    _painel['gerado_em'] = gerado_em
     return Response(
         f'{{"ok":true,"gerado_em":"{_painel["gerado_em"]}","chamados":{len(main_tks)},"urgentes":{len(urg_tks)},"baixados":{len(baixados)}}}',
         mimetype='application/json'

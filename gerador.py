@@ -525,7 +525,7 @@ def _priority_panel_html(tk_lkp, baixados_by_code, urg_pdv=None, urg_erp=None, p
 
 # ── main ──────────────────────────────────────────────────────────────────────
 
-def gerar_html(all_tks, baixados_hoje=None, urg_tks=None):
+def gerar_html(all_tks, baixados_hoje=None, urg_tks=None, gerado_em=None):
     today     = _hoje_brt()
     today_str = today.strftime('%d/%m/%Y')
     baixados_hoje = baixados_hoje or []
@@ -1329,4 +1329,8 @@ window.onload=function(){{showTab('cli');dTab('cli')}};
 </div>
 
 <div id="resumo-data" style="display:none">{resumo_html}</div>
+
+<div style="position:fixed;bottom:12px;right:14px;z-index:9998;background:rgba(15,15,15,0.82);backdrop-filter:blur(6px);color:#e5e7eb;font-size:11px;font-weight:600;padding:6px 12px;border-radius:20px;border:1px solid rgba(255,255,255,0.12);pointer-events:none;white-space:nowrap">
+  🔄 Atualizado: {gerado_em or today_str}
+</div>
 </body></html>"""
