@@ -1238,6 +1238,7 @@ window.onload=function(){{showTab('cli');dTab('cli')}};
         <div style="margin-top:4px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
           <span style="color:#374151;font-size:12px;font-weight:900">Painel de Chamados · {today_str}</span>
           <span style="color:#16a34a;font-size:11px;font-weight:800;background:#dcfce7;border:1px solid #86efac;border-radius:12px;padding:2px 10px;white-space:nowrap">🔄 Atualizado: {gerado_em or today_str}</span>
+          <button onclick="location.reload()" title="Atualizar painel" style="background:#f1f5f9;border:1px solid #cbd5e1;border-radius:8px;padding:3px 10px;font-size:11px;font-weight:700;cursor:pointer;color:#374151;white-space:nowrap">⟳ Atualizar</button>
         </div>
       </div>
     </div>
@@ -1306,6 +1307,7 @@ window.onload=function(){{showTab('cli');dTab('cli')}};
       <button onclick="abrirResumo()" style="background:#2563eb;color:#fff;border:none;border-radius:6px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer">📷</button>
       <button onclick="iniciarRecorte()" style="background:#7c3aed;color:#fff;border:none;border-radius:6px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer">✂️</button>
       <span style="color:#16a34a;font-size:10px;font-weight:800;background:#dcfce7;border:1px solid #86efac;border-radius:10px;padding:3px 8px;white-space:nowrap">🔄 {gerado_em or today_str}</span>
+      <button onclick="location.reload()" style="background:#f1f5f9;border:1px solid #cbd5e1;border-radius:6px;padding:4px 8px;font-size:11px;font-weight:700;cursor:pointer;color:#374151">⟳</button>
     </div>
   </div>
   <div class="stats">
