@@ -1235,7 +1235,10 @@ window.onload=function(){{showTab('cli');dTab('cli')}};
       <img src="/static/logo.png" style="height:42px;background:#fff;border-radius:8px;padding:4px 10px">
       <div>
         <span style="color:#ea580c;font-size:10px;font-weight:900;background:#fff7ed;border:1px solid #ea580c;border-radius:4px;padding:2px 8px;letter-spacing:.5px">SUL</span>
-        <div style="color:#94a3b8;font-size:11px;margin-top:4px">Painel de Chamados · {today_str}</div>
+        <div style="margin-top:4px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <span style="color:#374151;font-size:12px;font-weight:900">Painel de Chamados · {today_str}</span>
+          <span style="color:#16a34a;font-size:11px;font-weight:800;background:#dcfce7;border:1px solid #86efac;border-radius:12px;padding:2px 10px;white-space:nowrap">🔄 Atualizado: {gerado_em or today_str}</span>
+        </div>
       </div>
     </div>
     <div style="display:flex;gap:8px;align-items:center">
@@ -1302,7 +1305,7 @@ window.onload=function(){{showTab('cli');dTab('cli')}};
     <div style="display:flex;gap:6px;align-items:center">
       <button onclick="abrirResumo()" style="background:#2563eb;color:#fff;border:none;border-radius:6px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer">📷</button>
       <button onclick="iniciarRecorte()" style="background:#7c3aed;color:#fff;border:none;border-radius:6px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer">✂️</button>
-      <span style="color:#6b4c30;font-size:11px">📅 {today_str}</span>
+      <span style="color:#16a34a;font-size:10px;font-weight:800;background:#dcfce7;border:1px solid #86efac;border-radius:10px;padding:3px 8px;white-space:nowrap">🔄 {gerado_em or today_str}</span>
     </div>
   </div>
   <div class="stats">
@@ -1330,7 +1333,4 @@ window.onload=function(){{showTab('cli');dTab('cli')}};
 
 <div id="resumo-data" style="display:none">{resumo_html}</div>
 
-<div style="position:fixed;bottom:12px;right:14px;z-index:9998;background:rgba(15,15,15,0.82);backdrop-filter:blur(6px);color:#e5e7eb;font-size:11px;font-weight:600;padding:6px 12px;border-radius:20px;border:1px solid rgba(255,255,255,0.12);pointer-events:none;white-space:nowrap">
-  🔄 Atualizado: {gerado_em or today_str}
-</div>
 </body></html>"""
