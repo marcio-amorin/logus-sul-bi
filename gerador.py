@@ -49,7 +49,7 @@ PATCHES = {
     '4255':  {'atrib':'Engenharia Software', 'status':'Aguardando'},
     '8264':  {'atrib':'Engenharia Software', 'status':'Em andamento'},
     '24621': {'atrib':'Rafael Beckert',      'status':'Aguardando'},
-    '24760': {'atrib':'Carlos Viana',        'status':'Aguardando'},
+    '24760': {'atrib':'Homologação',         'status':'Aguardando'},
     '20174': {'atrib':'Comercial',           'status':'Aguardando'},
     '21028': {'atrib':'Comercial',           'status':'Em andamento'},
 }
