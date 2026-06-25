@@ -41,7 +41,7 @@ SUL_EMP = {
     'VICARI',
     'YPE SUPERMERCADO',
 }
-SUL_RESP = {'Henrique Wolfram','Carlos Viana','Marcio Amorin','Rafael Beckert','— Sem Responsável —'}
+SUL_RESP = {'Henrique Wolfram','Carlos Viana','Marcio Amorin','Rafael Beckert','Jonathan Simecek','— Sem Responsável —'}
 SUL_TEAM = {'Henrique Wolfram','Rafael Beckert'}
 PATCHES = {
     '25267': {'atrib':'Desenv. PDV',        'status':'Em andamento'},
