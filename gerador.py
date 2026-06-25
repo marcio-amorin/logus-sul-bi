@@ -54,7 +54,7 @@ PATCHES = {
     '21028': {'atrib':'Comercial',           'status':'Em andamento'},
     '25768': {'atrib':'Desenv. PDV',         'status':'Aguardando'},
 }
-URG_PDV  = {'25596','25090','24651','25768'}
+URG_PDV  = {'25596','25090','24651','25768','25443'}
 URG_ERP  = {'25628','25647','25648','23301','24846','25173','24807'}
 URG_DEV  = {'24760','24621','25368'}
 URG_ALL  = URG_PDV | URG_ERP | URG_DEV
