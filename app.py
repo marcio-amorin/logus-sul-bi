@@ -15,8 +15,11 @@ app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024  # 10 MB
 
 ADMIN_USER  = 'logussul'
 ADMIN_PASS  = 'varlog'
-VIEWER_USER = 'varejus'
-VIEWER_PASS = 'varlog'
+VIEWERS = {
+    'varejus': 'varlog',
+    'marcio':  'amorin',
+    'karla':   'amorin',
+}
 API_TOKEN   = 'ls-sul-pub-2026'
 
 # painel em memória — gerado pelo admin, visto pela equipe
@@ -251,7 +254,7 @@ def viewer_login():
     if request.method == 'POST':
         u = request.form.get('usuario', '').strip()
         s = request.form.get('senha', '').strip()
-        if u == VIEWER_USER and s == VIEWER_PASS:
+        if VIEWERS.get(u) == s:
             session['viewer'] = True
             return redirect('/')
         if u == ADMIN_USER and s == ADMIN_PASS:
